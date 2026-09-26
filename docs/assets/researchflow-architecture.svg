@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="820" viewBox="0 0 1440 820" role="img" aria-labelledby="title desc">
+  <title id="title">ResearchFlow system architecture</title>
+  <desc id="desc">Clients connect to an asynchronous API and SSE layer, which schedules bounded research tasks on the nanobot runtime. Research tools retrieve and verify evidence stored in SQLite, local documents, vector indexes, memory, and reports.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f4f8f4"/>
+      <stop offset="1" stop-color="#edf3ef"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1c6047"/>
+      <stop offset="1" stop-color="#288060"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#183b2d" flood-opacity=".10"/>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#5d786b"/>
+    </marker>
+    <style>
+      .title{font:700 32px Inter,Segoe UI,sans-serif;fill:#16251f}.subtitle{font:400 15px Inter,Segoe UI,sans-serif;fill:#607168}
+      .section{font:700 12px Inter,Segoe UI,sans-serif;letter-spacing:2px;fill:#357058}.node-title{font:700 18px Inter,Segoe UI,sans-serif;fill:#17251f}
+      .node-text{font:400 13px Inter,Segoe UI,sans-serif;fill:#53665c}.small-title{font:700 14px Inter,Segoe UI,sans-serif;fill:#1f3d31}
+      .small-text{font:400 12px Inter,Segoe UI,sans-serif;fill:#607168}.pill-text{font:600 12px Inter,Segoe UI,sans-serif;fill:#1b5943}
+      .card{fill:#fff;stroke:#d5e0d9;stroke-width:1.5}.soft{fill:#eef6f1;stroke:#c9ddd1;stroke-width:1.5}.line{fill:none;stroke:#5d786b;stroke-width:2;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1440" height="820" rx="28" fill="url(#bg)"/>
+  <text x="64" y="67" class="title">ResearchFlow · Evidence-grounded Agent</text>
+  <text x="64" y="94" class="subtitle">nanobot Runtime + hybrid retrieval + verifiable citations + persistent asynchronous execution</text>
+
+  <text x="64" y="145" class="section">ENTRY</text>
+  <g filter="url(#shadow)">
+    <rect x="64" y="166" width="220" height="228" rx="20" class="card"/>
+  </g>
+  <text x="88" y="202" class="node-title">Clients</text>
+  <rect x="88" y="225" width="172" height="42" rx="10" class="soft"/><text x="107" y="251" class="small-title">Web workspace</text>
+  <rect x="88" y="279" width="172" height="42" rx="10" class="soft"/><text x="107" y="305" class="small-title">Research CLI</text>
+  <rect x="88" y="333" width="172" height="42" rx="10" class="soft"/><text x="107" y="359" class="small-title">REST clients</text>
+
+  <text x="332" y="145" class="section">SERVICE LAYER</text>
+  <g filter="url(#shadow)"><rect x="332" y="166" width="280" height="228" rx="20" class="card"/></g>
+  <text x="356" y="202" class="node-title">HTTP / SSE API</text>
+  <text x="356" y="226" class="node-text">aiohttp · port 18791</text>
+  <g>
+    <rect x="356" y="248" width="106" height="32" rx="16" fill="#e4f2e9"/><text x="375" y="269" class="pill-text">Document API</text>
+    <rect x="476" y="248" width="112" height="32" rx="16" fill="#e4f2e9"/><text x="497" y="269" class="pill-text">Task API</text>
+    <rect x="356" y="292" width="106" height="32" rx="16" fill="#e4f2e9"/><text x="382" y="313" class="pill-text">SSE replay</text>
+    <rect x="476" y="292" width="112" height="32" rx="16" fill="#e4f2e9"/><text x="493" y="313" class="pill-text">Source API</text>
+  </g>
+  <text x="356" y="354" class="small-text">Upload · query · cancel · replay</text>
+  <text x="356" y="375" class="small-text">reports · exact evidence chunks</text>
+
+  <text x="660" y="145" class="section">ORCHESTRATION</text>
+  <g filter="url(#shadow)"><rect x="660" y="166" width="310" height="228" rx="20" fill="url(#accent)"/></g>
+  <text x="686" y="202" style="font:700 18px Inter,Segoe UI,sans-serif;fill:white">Persistent Task Manager</text>
+  <text x="686" y="228" style="font:400 13px Inter,Segoe UI,sans-serif;fill:#d9eee5">SQLite-backed lifecycle and event log</text>
+  <rect x="686" y="251" width="258" height="43" rx="11" fill="#ffffff" fill-opacity=".13"/>
+  <text x="706" y="277" style="font:600 13px Inter,Segoe UI,sans-serif;fill:white">Queue + semaphore (max concurrency = 2)</text>
+  <rect x="686" y="306" width="122" height="44" rx="11" fill="#ffffff" fill-opacity=".13"/>
+  <text x="705" y="333" style="font:600 12px Inter,Segoe UI,sans-serif;fill:white">SSE event replay</text>
+  <rect x="820" y="306" width="124" height="44" rx="11" fill="#ffffff" fill-opacity=".13"/>
+  <text x="841" y="326" style="font:600 12px Inter,Segoe UI,sans-serif;fill:white">Restart recovery</text>
+  <text x="846" y="341" style="font:400 10px Inter,Segoe UI,sans-serif;fill:#d9eee5">orphan → failed</text>
+  <text x="686" y="376" style="font:400 12px Inter,Segoe UI,sans-serif;fill:#d9eee5">pending → running → succeeded / failed / cancelled</text>
+
+  <text x="1018" y="145" class="section">AGENT RUNTIME</text>
+  <g filter="url(#shadow)"><rect x="1018" y="166" width="358" height="228" rx="20" class="card"/></g>
+  <text x="1044" y="202" class="node-title">nanobot AgentLoop</text>
+  <text x="1044" y="226" class="node-text">Existing runtime, sessions and ToolRegistry</text>
+  <rect x="1044" y="248" width="306" height="46" rx="11" class="soft"/>
+  <text x="1064" y="276" class="small-title">research-flow skill · grounded workflow</text>
+  <text x="1044" y="324" class="small-text">research_search · research_read</text>
+  <text x="1044" y="347" class="small-text">research_report · research_memory</text>
+  <text x="1044" y="370" class="small-text">stream callbacks → task events → SSE</text>
+
+  <path d="M284 280 H322" class="line"/>
+  <path d="M612 280 H650" class="line"/>
+  <path d="M970 280 H1008" class="line"/>
+
+  <text x="64" y="451" class="section">GROUNDED RESEARCH LOOP</text>
+  <g filter="url(#shadow)"><rect x="64" y="472" width="1312" height="102" rx="20" class="card"/></g>
+  <g>
+    <rect x="88" y="499" width="184" height="48" rx="12" class="soft"/><text x="133" y="528" class="small-title">1 · Decompose</text>
+    <path d="M272 523 H305" class="line"/>
+    <rect x="315" y="499" width="184" height="48" rx="12" class="soft"/><text x="369" y="528" class="small-title">2 · Retrieve</text>
+    <path d="M499 523 H532" class="line"/>
+    <rect x="542" y="499" width="184" height="48" rx="12" class="soft"/><text x="599" y="528" class="small-title">3 · Reflect</text>
+    <path d="M726 523 H759" class="line"/>
+    <rect x="769" y="499" width="184" height="48" rx="12" class="soft"/><text x="816" y="528" class="small-title">4 · Synthesize</text>
+    <path d="M953 523 H986" class="line"/>
+    <rect x="996" y="499" width="184" height="48" rx="12" class="soft"/><text x="1053" y="528" class="small-title">5 · Verify</text>
+    <path d="M1180 523 H1213" class="line"/>
+    <rect x="1223" y="499" width="129" height="48" rx="12" fill="#1e6a4d"/><text x="1250" y="528" style="font:700 14px Inter,Segoe UI,sans-serif;fill:white">Report</text>
+  </g>
+
+  <text x="64" y="628" class="section">EVIDENCE &amp; PERSISTENCE</text>
+  <g filter="url(#shadow)"><rect x="64" y="649" width="1312" height="122" rx="20" class="card"/></g>
+  <g>
+    <rect x="88" y="674" width="220" height="72" rx="14" class="soft"/><text x="110" y="703" class="small-title">Local corpus</text><text x="110" y="726" class="small-text">PDF · Markdown · text · source</text>
+    <rect x="328" y="674" width="220" height="72" rx="14" class="soft"/><text x="350" y="703" class="small-title">Hybrid retrieval</text><text x="350" y="726" class="small-text">BM25 · dense · weighted RRF</text>
+    <rect x="568" y="674" width="220" height="72" rx="14" class="soft"/><text x="590" y="703" class="small-title">Stable citations</text><text x="590" y="726" class="small-text">RF-source-chunk · exact lookup</text>
+    <rect x="808" y="674" width="220" height="72" rx="14" class="soft"/><text x="830" y="703" class="small-title">SQLite</text><text x="830" y="726" class="small-text">sources · chunks · tasks · events</text>
+    <rect x="1048" y="674" width="304" height="72" rx="14" class="soft"/><text x="1070" y="703" class="small-title">Durable outputs</text><text x="1070" y="726" class="small-text">vector cache · project memory · Markdown reports</text>
+  </g>
+  <path d="M1197 394 C1197 430 1160 444 1160 462" class="line"/>
+  <path d="M720 574 V639" class="line"/>
+</svg>

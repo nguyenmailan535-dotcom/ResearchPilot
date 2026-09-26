@@ -1,0 +1,93 @@
+{
+  "cases": 1,
+  "metrics": {
+    "task_completion_rate": 1.0,
+    "answer_pass_rate": 1.0,
+    "concept_coverage": 1.0,
+    "citation_validity": 1.0,
+    "relevant_citation_recall": 1.0,
+    "paragraph_citation_coverage": 1.0,
+    "average_latency_seconds": 16.045,
+    "average_prompt_tokens": 20913.0,
+    "average_completion_tokens": 1621.0,
+    "average_tool_events": 3.0
+  },
+  "details": [
+    {
+      "id": "e2e-01",
+      "query": "如果只能使用约 1.5KB 内存估计十亿级基数，HyperLogLog 能提供什么精度，其误差如何随寄存器数量变化？",
+      "language": "zh",
+      "difficulty": "medium",
+      "answer": "## HyperLogLog：约 1.5 KB 内存估计十亿级基数时的精度\n\n**核心结论.** 使用约 1.5 KB 内存时，HyperLogLog（HLL）可以对远超 10^9（十亿）的基数给出**典型精度约 2%** 的估计 [RF-f6b914c4-1]。其相对精度（标准误差）的通用公式约为 **1.04/√m**，其中 m 为寄存器数量 [RF-f6b914c4-1][RF-f6b914c4-37]。\n\n**1.5 KB 场景的具体参数.** HLL 程序设定 m = 2^b 个寄存器，b∈[4..16]，并被明确设计用于最大基数落在 [0..10^9] 范围的情形 [RF-f6b914c4-37]。在 32 位哈希下，寄存器值只需 5 位（\"short bytes\"）即可存储 [RF-f6b914c4-41]。1.5 KB = 12288 位，按每寄存器 5 位计算约合 m≈2400 个寄存器，代入 σ≈1.04/√m 得约 2%——与原文所述\"1.5 千字节内存、约 2% 精度\"一致 [RF-f6b914c4-1][RF-f6b914c4-41]。为支持超过十亿范围的去重计数，多数 HLL 实现实际采用 6 位寄存器 [RF-2dccfeb5-8]。\n\n**误差随寄存器数量的变化.** HLL 的标准误差仅取决于寄存器数量 m，**与基数大小无关**，且随 m 增大按 1/√m 改善（呈与存储大小平方根成反比的一般规律）[RF-b40077a8-12][RF-b40077a8-15][RF-b40077a8-5]。因此寄存器数每翻四倍，误差减半；每翻一倍，误差约降为原来的 1/√2（约 0.707 倍）[RF-f6b914c4-8][RF-b40077a8-5]。按 σ=1.04/√m 估算的典型误差量级为：m=1024 时约 3.25%，m=2048 时约 2.3%，m=4096 时约 1.63%，m=16384 时约 0.81% [RF-f6b914c4-37][RF-f6b914c4-8]。\n\n**误差分布与区间.** 由于平均效应与中心极限定理，估计值近似服从高斯分布：落在 σ、2σ、3σ 区间内的概率分别约为 65%、95%、99% [RF-f6b914c4-41]。\n\n**范围与精度的权衡.** HLL 的计数范围可达 O(2^{2^q})（q 为每个寄存器的位数）[RF-b40077a8-12][RF-b40077a8-14]；但在内存极小时误差显著上升——例如在仅 128 位内存下 HLL 误差接近 50% [RF-b40077a8-15]。\n\n**关于误差系数的说明.** 原文的 1.04/√m 为 HLL 的标准误差 [RF-f6b914c4-1][RF-f6b914c4-8][RF-b40077a8-12]；而 DREX 论文在比较表中将 HLL 误差记为 2.33/√m（假设 5 位寄存器）[RF-b40077a8-15]，这是同一数据结构的另一种误差表述口径，引用时需注意区分来源。\n\n---\n**Sources:** HLL [RF-f6b914c4-1][RF-f6b914c4-8][RF-f6b914c4-37][RF-f6b914c4-41]；DREX [RF-b40077a8-5][RF-b40077a8-12][RF-b40077a8-14][RF-b40077a8-15]；ULL [RF-2dccfeb5-8]。",
+      "error": null,
+      "elapsed_seconds": 16.045,
+      "prompt_tokens": 20913,
+      "completion_tokens": 1621,
+      "tool_events": [
+        "read_file(\"nanobot/skills/research-flow/SKILL.md\"), research_sources",
+        "research_memory(\"search\"), research_search(\"HyperLogLog 1.5KB memory billion cardina…\"), research_search(\"register number m accuracy standard erro…\")",
+        "research_read, research_search(\"HyperLogLog 6-bit registers billion rang…\")"
+      ],
+      "streamed_chars": 1705,
+      "response_ok": true,
+      "completed": true,
+      "answer_pass": true,
+      "concept_coverage": 1.0,
+      "concepts": [
+        {
+          "aliases": [
+            "1.5 KB",
+            "1.5KB"
+          ],
+          "matched": "1.5 KB"
+        },
+        {
+          "aliases": [
+            "2%"
+          ],
+          "matched": "2%"
+        },
+        {
+          "aliases": [
+            "1.04/√m",
+            "1.04 / √m",
+            "1.04/sqrt(m)"
+          ],
+          "matched": "1.04/√m"
+        }
+      ],
+      "citations": [
+        "RF-F6B914C4-1",
+        "RF-F6B914C4-37",
+        "RF-F6B914C4-41",
+        "RF-2DCCFEB5-8",
+        "RF-B40077A8-12",
+        "RF-B40077A8-15",
+        "RF-B40077A8-5",
+        "RF-F6B914C4-8",
+        "RF-B40077A8-14"
+      ],
+      "valid_citations": [
+        "RF-F6B914C4-1",
+        "RF-F6B914C4-37",
+        "RF-F6B914C4-41",
+        "RF-2DCCFEB5-8",
+        "RF-B40077A8-12",
+        "RF-B40077A8-15",
+        "RF-B40077A8-5",
+        "RF-F6B914C4-8",
+        "RF-B40077A8-14"
+      ],
+      "missing_citations": [],
+      "citation_validity": 1.0,
+      "relevant_citation_recall": 1.0,
+      "relevant_label_precision": 0.1111,
+      "relevant_hits": [
+        "RF-F6B914C4-1"
+      ],
+      "paragraph_citation_coverage": 1.0
+    }
+  ],
+  "dataset": "benchmarks/researchflow/cardinality_e2e_holdout_16.jsonl",
+  "model": "deepseek-flash"
+}

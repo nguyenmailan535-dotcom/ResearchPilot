@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ResearchFlow evidence-grounded research workspace">
+  <title>ResearchFlow</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="mark">RF</div>
+        <div>
+          <h1>ResearchFlow</h1>
+          <p>Evidence-grounded research agent</p>
+        </div>
+      </div>
+      <div class="health"><span id="health-dot"></span><span id="health-text">连接中</span></div>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar panel">
+        <div class="section-heading">
+          <div><span class="eyebrow">WORKSPACE</span><h2>研究任务</h2></div>
+          <button id="refresh-tasks" class="icon-button" title="刷新">↻</button>
+        </div>
+        <div id="task-list" class="task-list empty-state">暂无任务</div>
+      </aside>
+
+      <section class="workspace">
+        <div class="hero panel">
+          <span class="eyebrow">NEW RESEARCH</span>
+          <h2>从本地证据出发，完成可审计的技术研究</h2>
+          <form id="research-form">
+            <textarea id="query" rows="4" maxlength="10000" required
+              placeholder="例如：比较当前论文库中的基数估计方法，分析精度、内存开销与分布式合并能力。"></textarea>
+            <div class="form-row">
+              <input id="project" value="default" maxlength="100" aria-label="项目名称">
+              <button id="submit-task" class="primary" type="submit">开始研究 <span>→</span></button>
+            </div>
+          </form>
+        </div>
+
+        <div class="content-grid">
+          <article class="panel result-panel">
+            <div class="section-heading">
+              <div><span class="eyebrow">LIVE TRACE</span><h2 id="detail-title">选择一个任务</h2></div>
+              <button id="cancel-task" class="danger hidden">取消任务</button>
+            </div>
+            <div id="task-meta" class="meta-row"></div>
+            <ol id="stage-flow" class="stage-flow" aria-label="Agent 执行阶段">
+              <li data-stage="plan"><span>1</span><strong>任务分解</strong></li>
+              <li data-stage="retrieve"><span>2</span><strong>证据检索</strong></li>
+              <li data-stage="reflect"><span>3</span><strong>缺口反思</strong></li>
+              <li data-stage="synthesize"><span>4</span><strong>报告生成</strong></li>
+              <li data-stage="verify"><span>5</span><strong>引用校验</strong></li>
+            </ol>
+            <div id="answer" class="answer muted">任务执行过程与最终答案会显示在这里。</div>
+            <div class="trace-header"><h3>执行轨迹</h3><span id="event-count">0 events</span></div>
+            <ol id="trace" class="trace"></ol>
+          </article>
+
+          <aside class="resources">
+            <section class="panel compact">
+              <div class="section-heading">
+                <div><span class="eyebrow">CORPUS</span><h2>证据库</h2></div>
+                <label class="upload-button">上传<input id="file-upload" type="file" hidden></label>
+              </div>
+              <div id="upload-status" class="muted small"></div>
+              <div id="document-list" class="resource-list"></div>
+            </section>
+            <section class="panel compact">
+              <div class="section-heading">
+                <div><span class="eyebrow">OUTPUTS</span><h2>研究报告</h2></div>
+              </div>
+              <div id="report-list" class="resource-list"></div>
+            </section>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="report-dialog">
+    <div class="dialog-head"><h2 id="report-title">报告</h2><button id="close-dialog">×</button></div>
+    <div id="report-content" class="markdown dialog-content"></div>
+  </dialog>
+  <dialog id="source-dialog" class="source-dialog">
+    <div class="dialog-head"><h2 id="source-title">证据原文</h2><button id="close-source-dialog">×</button></div>
+    <div id="source-meta" class="source-meta"></div>
+    <div id="source-content" class="source-content"></div>
+  </dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="/assets/app.js" defer></script>
+</body>
+</html>

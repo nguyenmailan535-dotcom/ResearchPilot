@@ -6,6 +6,7 @@ import time
 from collections import defaultdict
 from typing import Any, Callable, Iterable
 
+from nanobot.research.metrics import percentile
 from nanobot.research.retrieval import RetrievalSuite, reflect_query
 from nanobot.research.store import ResearchStore
 
@@ -40,7 +41,7 @@ def _aggregate(details: list[dict[str, Any]], k: int) -> dict[str, Any]:
         relevant = set(detail["relevant"])
         retrieved = detail["retrieved"][:k]
         hits = relevant.intersection(retrieved)
-        recall += len(hits) / len(relevant)
+        recall += len(hits) / len(relevant) if relevant else float(not retrieved)
         success += float(bool(hits))
         rank = next(
             (position for position, citation in enumerate(retrieved, start=1) if citation in relevant),
@@ -69,6 +70,7 @@ def benchmark_retrieval(
     cases: Iterable[dict[str, Any]],
     *,
     ks: tuple[int, ...] = (1, 3, 5),
+    include_reranker: bool = True,
 ) -> dict[str, Any]:
     """Evaluate four retrieval methods against the same immutable relevance labels."""
     cases = validate_cases(store, cases)
@@ -80,6 +82,14 @@ def benchmark_retrieval(
         "hybrid_rrf": lambda query: suite.hybrid(query, top_k=max_k),
         "reflected_hybrid": lambda query: suite.reflected_hybrid(query, top_k=max_k),
     }
+    if include_reranker and suite.reranker is not None:
+        methods["hybrid_reranked"] = lambda query: suite.search(
+            query,
+            strategy="hybrid",
+            top_k=max_k,
+            no_answer_threshold=0.0,
+            rerank=True,
+        ).results
     output: dict[str, Any] = {
         "dataset_cases": len(cases),
         "ks": list(ks),
@@ -90,7 +100,9 @@ def benchmark_retrieval(
         details: list[dict[str, Any]] = []
         for case in cases:
             query = str(case["query"])
+            query_started = time.perf_counter()
             results = search(query)
+            query_latency_ms = (time.perf_counter() - query_started) * 1000
             detail = {
                 "id": str(case["id"]),
                 "query": query,
@@ -101,6 +113,7 @@ def benchmark_retrieval(
                     {str(value).upper() for value in case["relevant_citations"]}
                 ),
                 "retrieved": [str(item["citation"]).upper() for item in results],
+                "latency_ms": round(query_latency_ms, 3),
             }
             if method_name == "reflected_hybrid":
                 # Reflection is currently deterministic terminology expansion and
@@ -109,11 +122,20 @@ def benchmark_retrieval(
                 detail["reflected_query"] = reflect_query(query, [])
             details.append(detail)
         metrics = {f"at_{k}": _aggregate(details, k) for k in ks}
+        latencies = [float(detail["latency_ms"]) for detail in details]
+        misses = [
+            detail["id"]
+            for detail in details
+            if set(detail["relevant"]).isdisjoint(detail["retrieved"][:max_k])
+        ]
         output["methods"][method_name] = {
             "elapsed_seconds": round(time.perf_counter() - started, 3),
+            "p50_latency_ms": percentile(latencies, 50),
+            "p95_latency_ms": percentile(latencies, 95),
             "metrics": metrics,
             "by_language_at_max_k": _group_metrics(details, k=max_k, field="language"),
             "by_difficulty_at_max_k": _group_metrics(details, k=max_k, field="difficulty"),
             "details": details,
+            "bad_cases": {"retrieval_miss": misses},
         }
     return output

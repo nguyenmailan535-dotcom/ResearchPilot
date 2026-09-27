@@ -1,18 +1,21 @@
 <div align="center">
-  <img src="nanobot_logo.png" alt="nanobot" width="500">
-  <h1>nanobot: Ultra-Lightweight Personal AI Assistant</h1>
+  <h1>ResearchFlow Agent</h1>
+  <p>基于 nanobot Runtime 的可审计本地论文研究 Agent</p>
   <p>
-    <a href="https://pypi.org/project/nanobot-ai/"><img src="https://img.shields.io/pypi/v/nanobot-ai" alt="PyPI"></a>
-    <a href="https://pepy.tech/project/nanobot-ai"><img src="https://static.pepy.tech/badge/nanobot-ai" alt="Downloads"></a>
+    <a href="https://github.com/nguyenmailan535-dotcom/researchflow-agent/actions/workflows/ci.yml"><img src="https://github.com/nguyenmailan535-dotcom/researchflow-agent/actions/workflows/ci.yml/badge.svg" alt="ResearchFlow CI"></a>
     <img src="https://img.shields.io/badge/python-≥3.11-blue" alt="Python">
     <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
-    <a href="./COMMUNICATION.md"><img src="https://img.shields.io/badge/Feishu-Group-E9DBFC?style=flat&logo=feishu&logoColor=white" alt="Feishu"></a>
-    <a href="./COMMUNICATION.md"><img src="https://img.shields.io/badge/WeChat-Group-C5EAB4?style=flat&logo=wechat&logoColor=white" alt="WeChat"></a>
-    <a href="https://discord.gg/MnCvHqpUGB"><img src="https://img.shields.io/badge/Discord-Community-5865F2?style=flat&logo=discord&logoColor=white" alt="Discord"></a>
   </p>
 </div>
 
-🐈 **nanobot** is an **ultra-lightweight** personal AI assistant inspired by [OpenClaw](https://github.com/openclaw/openclaw).
+> Built on the open-source nanobot v0.1.4 Runtime. ResearchFlow reuses its AgentRunner,
+> ToolRegistry and session runtime, while the research retrieval, evidence verification,
+> asynchronous task service, SSE workspace and evaluation system are project extensions.
+
+[Architecture](./docs/RESEARCH_FLOW.md) · [API](./docs/RESEARCH_API.md) ·
+[Benchmarks](./benchmarks/researchflow/README.md) · [Resume/Interview notes](./docs/RESUME_PROJECT.md)
+
+🐈 The underlying **nanobot** project is an ultra-lightweight personal AI assistant inspired by [OpenClaw](https://github.com/openclaw/openclaw).
 
 ⚡️ Delivers core agent functionality with **99% fewer lines of code** than OpenClaw.
 
@@ -150,9 +153,10 @@
 
 This branch extends nanobot v0.1.4 with **ResearchFlow**, a technical and academic research
 workflow built directly on the existing AgentRunner and ToolRegistry. It indexes local PDFs,
-Markdown, text, and source files; retrieves multilingual evidence with BM25 and dense/hybrid
-retrieval; produces stable chunk citations; validates report citations; and keeps project-scoped
-decisions in durable memory. A persistent asynchronous task API, resumable SSE event stream, and
+Markdown, text, and source files; retrieves multilingual evidence with selectable BM25, dense,
+weighted-RRF hybrid and reflected-hybrid retrieval; optionally reranks candidates; abstains when
+evidence is weak; validates Claim—Evidence alignment; and keeps cited project decisions in a
+versioned Evidence Ledger. A persistent asynchronous task API, resumable SSE event stream, and
 zero-build web client turn the workflow into a complete local application.
 
 ```bash
@@ -160,7 +164,7 @@ zero-build web client turn the workflow into a complete local application.
 nanobot research ingest ./papers --workspace ./research-workspace
 
 # Inspect retrieval without an LLM call
-nanobot research search "agent task recovery" --workspace ./research-workspace
+nanobot research search "agent task recovery" --workspace ./research-workspace --strategy hybrid
 
 # Use the normal nanobot runtime and ask it to load the research-flow skill
 nanobot agent --workspace ./research-workspace
@@ -170,11 +174,12 @@ nanobot serve --host 127.0.0.1 --port 18791 --workspace ./research-workspace
 ```
 
 The core workflow is **decompose → retrieve → inspect evidence gaps → refine → synthesize →
-verify citations → remember stable decisions**. A checked-in 40-question bilingual benchmark
+verify claims and citations → record cited decisions**. A checked-in 40-question bilingual benchmark
 compares BM25, dense, hybrid, and reflected-hybrid retrieval; the best Recall@5 is 0.6625. See
 the separate 16-question end-to-end holdout evaluation for grounded-answer metrics: 100% task
-completion and citation validity, 93.75% answer pass rate, 87.50% concept coverage, and 88.54%
-relevant-citation recall.
+completion and citation validity, 93.75% answer pass rate, 85.94% concept coverage, and 82.29%
+relevant-citation recall. Evaluation also records P50/P95 latency, token/cost totals, abstention
+quality, deterministic Claim—Evidence support, Bad Cases, and an optional structured LLM judge.
 See [ResearchFlow architecture](./docs/RESEARCH_FLOW.md), the
 [HTTP/SSE API](./docs/RESEARCH_API.md), and the
 [reproducible benchmark report](./benchmarks/researchflow/README.md).

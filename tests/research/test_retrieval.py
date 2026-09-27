@@ -102,3 +102,46 @@ def test_benchmark_compares_all_methods(tmp_path: Path) -> None:
     }
     assert result["methods"]["vector"]["metrics"]["at_1"]["mrr"] == 1.0
     assert validate_cases(store, cases) == cases
+
+
+def test_online_hybrid_supports_abstention_fallback_and_reranking(tmp_path: Path) -> None:
+    store = _store(tmp_path)
+    dense = DenseRetriever(store, model_name="test/model", embedder=_KeywordEmbedder())
+    suite = RetrievalSuite(
+        store,
+        dense,
+        reranker=lambda _query, passages: [float("RabbitMQ" in text) for text in passages],
+    )
+
+    outcome = suite.search(
+        "RabbitMQ acknowledgement",
+        strategy="hybrid",
+        top_k=1,
+        no_answer_threshold=0.0,
+        rerank=True,
+    )
+    assert outcome.used_strategy == "hybrid"
+    assert outcome.reranked is True
+    assert outcome.results[0]["title"] == "rabbit"
+    assert outcome.latency_ms >= 0
+
+    abstained = suite.search(
+        "totally absent vocabulary",
+        strategy="bm25",
+        top_k=2,
+        no_answer_threshold=0.1,
+    )
+    assert abstained.no_answer is True
+    assert abstained.results == []
+
+    class BrokenDense:
+        def search(self, *_args, **_kwargs):
+            raise RuntimeError("embedding model offline")
+
+    degraded = RetrievalSuite(store, BrokenDense()).search(
+        "RabbitMQ acknowledgement",
+        strategy="hybrid",
+        no_answer_threshold=0.0,
+    )
+    assert degraded.degraded is True
+    assert degraded.used_strategy == "bm25"

@@ -33,7 +33,8 @@ async def test_research_tools_complete_grounded_workflow(tmp_path: Path) -> None
     assert '"status": "indexed"' in ingest
 
     search = await registry.execute(
-        "research_search", {"query": "durable checkpoint tool call", "top_k": 3}
+        "research_search",
+        {"query": "durable checkpoint tool call", "top_k": 3, "strategy": "bm25"},
     )
     assert "RF-" in search
     citation = search.split("[", 1)[1].split("]", 1)[0]
@@ -49,6 +50,18 @@ async def test_research_tools_complete_grounded_workflow(tmp_path: Path) -> None
         },
     )
     assert "RM-" in memory
+
+    decision = await registry.execute(
+        "research_decision",
+        {
+            "action": "record",
+            "project": "runtime",
+            "kind": "decision",
+            "content": "Use evidence-backed checkpoints.",
+            "citations": [citation],
+        },
+    )
+    assert "ED-" in decision
 
     report = await registry.execute(
         "research_report",
@@ -83,6 +96,7 @@ def test_registers_expected_research_tools_without_creating_database(tmp_path: P
     assert {
         "research_ingest",
         "research_search",
+        "research_decision",
         "research_read",
         "research_memory",
         "research_report",

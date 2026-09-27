@@ -3,15 +3,32 @@
 from __future__ import annotations
 
 import hashlib
+import math
+import os
 import re
+import time
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Iterable
 
 import numpy as np
 
-from nanobot.research.store import ResearchStore, split_text
+from nanobot.research.store import ResearchStore, split_text, tokenize
 
 DEFAULT_EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+DEFAULT_RERANKER_MODEL = "BAAI/bge-reranker-base"
+RETRIEVAL_STRATEGIES = ("auto", "bm25", "vector", "hybrid", "reflected_hybrid")
+DEFAULT_NO_ANSWER_THRESHOLDS = {
+    "bm25": 0.18,
+    "vector": 0.55,
+    "hybrid": 0.75,
+    "reflected_hybrid": 0.75,
+}
+_QUERY_STOPWORDS = {
+    "a", "an", "and", "are", "as", "at", "be", "by", "did", "do", "does", "for",
+    "from", "how", "in", "is", "it", "of", "on", "or", "the", "these", "to", "was",
+    "were", "what", "when", "where", "which", "who", "why", "with",
+}
 
 _REFLECTION_GLOSSARY: tuple[tuple[tuple[str, ...], str], ...] = (
     (("基数", "去重计数", "distinct"), "cardinality distinct count estimation"),
@@ -164,7 +181,13 @@ class DenseRetriever:
             "cache": str(cache_path),
         }
 
-    def search(self, query: str, *, top_k: int = 6) -> list[dict[str, Any]]:
+    def search(
+        self,
+        query: str,
+        *,
+        top_k: int = 6,
+        source_ids: Iterable[str] | None = None,
+    ) -> list[dict[str, Any]]:
         if self._embeddings is None:
             self.build_index()
         assert self._embeddings is not None
@@ -174,14 +197,69 @@ class DenseRetriever:
         segment_scores = self._embeddings @ query_vector
         scores = np.full(len(self._chunks), -np.inf, dtype=np.float32)
         np.maximum.at(scores, self._segment_chunk_indices, segment_scores)
-        count = max(1, min(top_k, len(self._chunks)))
-        best = np.argsort(-scores, kind="stable")[:count]
+        selected = {value for value in (source_ids or []) if value}
+        candidates = np.asarray(
+            [
+                index
+                for index, chunk in enumerate(self._chunks)
+                if not selected or chunk["source_id"] in selected
+            ],
+            dtype=np.int32,
+        )
+        if not len(candidates):
+            return []
+        count = max(1, min(top_k, len(candidates)))
+        best = candidates[np.argsort(-scores[candidates], kind="stable")[:count]]
         output: list[dict[str, Any]] = []
         for index in best:
             item = dict(self._chunks[int(index)])
             item["score"] = round(float(scores[int(index)]), 6)
             output.append(item)
         return output
+
+
+class FastEmbedReranker:
+    """Optional cross-encoder adapter; loaded only when reranking is requested."""
+
+    def __init__(self, model_name: str = DEFAULT_RERANKER_MODEL, model: Any | None = None) -> None:
+        self.model_name = model_name
+        self._model = model
+
+    @property
+    def model(self) -> Any:
+        if self._model is None:
+            try:
+                from fastembed.rerank.cross_encoder import TextCrossEncoder
+            except ImportError as exc:
+                raise RuntimeError(
+                    "Reranking requires the optional dependency: pip install -e '.[research]'"
+                ) from exc
+            self._model = TextCrossEncoder(model_name=self.model_name)
+        return self._model
+
+    def scores(self, query: str, passages: list[str]) -> list[float]:
+        return [float(value) for value in self.model.rerank(query, passages)]
+
+
+@dataclass(slots=True)
+class RetrievalOutcome:
+    """Observable result for online retrieval, fallback and abstention decisions."""
+
+    query: str
+    requested_strategy: str
+    used_strategy: str
+    results: list[dict[str, Any]]
+    confidence: float
+    no_answer: bool
+    degraded: bool = False
+    fallback_reason: str | None = None
+    reflected_query: str | None = None
+    reranked: bool = False
+    latency_ms: float = 0.0
+    signals: dict[str, float] = field(default_factory=dict)
+
+    def as_dict(self) -> dict[str, Any]:
+        return asdict(self)
 
 
 def reflect_query(query: str, seed_results: list[dict[str, Any]]) -> str:
@@ -198,27 +276,218 @@ def reflect_query(query: str, seed_results: list[dict[str, Any]]) -> str:
 class RetrievalSuite:
     """Comparable BM25, dense, hybrid, and reflected-hybrid retrieval methods."""
 
-    def __init__(self, store: ResearchStore, dense: DenseRetriever) -> None:
+    def __init__(
+        self,
+        store: ResearchStore,
+        dense: DenseRetriever,
+        *,
+        reranker: Any | None = None,
+        bm25_weight: float = 2.0,
+        vector_weight: float = 1.0,
+        rank_constant: int = 60,
+    ) -> None:
         self.store = store
         self.dense = dense
+        self.reranker = reranker
+        self.bm25_weight = bm25_weight
+        self.vector_weight = vector_weight
+        self.rank_constant = rank_constant
 
-    def bm25(self, query: str, *, top_k: int) -> list[dict[str, Any]]:
-        return self.store.search(query, top_k=top_k)
+    def bm25(
+        self, query: str, *, top_k: int, source_ids: Iterable[str] | None = None
+    ) -> list[dict[str, Any]]:
+        return self.store.search(query, top_k=top_k, source_ids=source_ids)
 
-    def vector(self, query: str, *, top_k: int) -> list[dict[str, Any]]:
-        return self.dense.search(query, top_k=top_k)
+    def vector(
+        self, query: str, *, top_k: int, source_ids: Iterable[str] | None = None
+    ) -> list[dict[str, Any]]:
+        return self.dense.search(query, top_k=top_k, source_ids=source_ids)
 
-    def hybrid(self, query: str, *, top_k: int) -> list[dict[str, Any]]:
+    def hybrid(
+        self, query: str, *, top_k: int, source_ids: Iterable[str] | None = None
+    ) -> list[dict[str, Any]]:
         pool = max(20, top_k * 4)
-        return reciprocal_rank_fusion(
-            [self.bm25(query, top_k=pool), self.vector(query, top_k=pool)],
+        bm25 = self.bm25(query, top_k=pool, source_ids=source_ids)
+        vector = self.vector(query, top_k=pool, source_ids=source_ids)
+        fused = reciprocal_rank_fusion(
+            [bm25, vector],
             top_k=top_k,
-            weights=(2.0, 1.0),
+            rank_constant=self.rank_constant,
+            weights=(self.bm25_weight, self.vector_weight),
         )
+        bm25_ids = {item["citation"] for item in bm25}
+        vector_ids = {item["citation"] for item in vector}
+        for item in fused:
+            item["retrievers"] = [
+                name
+                for name, ids in (("bm25", bm25_ids), ("vector", vector_ids))
+                if item["citation"] in ids
+            ]
+        return fused
 
-    def reflected_hybrid(self, query: str, *, top_k: int) -> list[dict[str, Any]]:
+    def reflected_hybrid(
+        self, query: str, *, top_k: int, source_ids: Iterable[str] | None = None
+    ) -> list[dict[str, Any]]:
         pool = max(20, top_k * 4)
-        seed = self.hybrid(query, top_k=pool)
+        seed = self.hybrid(query, top_k=pool, source_ids=source_ids)
         reflected = reflect_query(query, seed)
-        second_pass = self.hybrid(reflected, top_k=pool)
+        second_pass = self.hybrid(reflected, top_k=pool, source_ids=source_ids)
         return reciprocal_rank_fusion([seed, second_pass], top_k=top_k)
+
+    @staticmethod
+    def _confidence(
+        strategy: str,
+        results: list[dict[str, Any]],
+        query: str = "",
+    ) -> tuple[float, dict[str, float]]:
+        if not results:
+            return 0.0, {"top_score": 0.0, "margin": 0.0, "agreement": 0.0}
+        top = float(results[0].get("score", 0.0))
+        second = float(results[1].get("score", 0.0)) if len(results) > 1 else 0.0
+        query_tokens = {
+            token for token in tokenize(query) if len(token) > 1 and token not in _QUERY_STOPWORDS
+        }
+        evidence_tokens = set(
+            token
+            for item in results[:5]
+            for token in tokenize(str(item.get("content", "")))
+            if len(token) > 1
+        )
+        query_coverage = len(query_tokens & evidence_tokens) / max(1, len(query_tokens))
+        if strategy == "bm25":
+            strength = 1.0 - math.exp(-max(0.0, top))
+            margin = max(0.0, top - second) / max(top, 1e-9)
+            confidence = (0.8 * strength + 0.2 * margin) * (0.6 + 0.4 * query_coverage)
+        elif strategy == "vector":
+            strength = max(0.0, min(1.0, (top + 1.0) / 2.0))
+            margin = max(0.0, top - second)
+            confidence = (0.85 * strength + 0.15 * min(1.0, margin * 4)) * (
+                0.6 + 0.4 * query_coverage
+            )
+        else:
+            agreement = sum(
+                1 for item in results[:5] if len(item.get("retrievers", [])) >= 2
+            ) / min(5, len(results))
+            # RRF scores are deliberately small; agreement is the stable cross-method signal.
+            strength = min(1.0, top * 25.0)
+            margin = max(0.0, top - second) * 100.0
+            confidence = (
+                0.45 * strength + 0.45 * agreement + 0.10 * min(1.0, margin)
+            ) * (0.6 + 0.4 * query_coverage)
+            return round(confidence, 4), {
+                "top_score": round(top, 6),
+                "margin": round(margin, 6),
+                "agreement": round(agreement, 4),
+                "query_coverage": round(query_coverage, 4),
+            }
+        return round(confidence, 4), {
+            "top_score": round(top, 6),
+            "margin": round(margin, 6),
+            "agreement": 0.0,
+            "query_coverage": round(query_coverage, 4),
+        }
+
+    def _rerank(
+        self, query: str, results: list[dict[str, Any]], *, top_k: int
+    ) -> list[dict[str, Any]]:
+        if not results or self.reranker is None:
+            return results[:top_k]
+        passages = [str(item["content"]) for item in results]
+        if hasattr(self.reranker, "scores"):
+            scores = self.reranker.scores(query, passages)
+        else:
+            scores = self.reranker(query, passages)
+        if len(scores) != len(results):
+            raise ValueError("Reranker returned a different number of scores than candidates")
+        ranked: list[dict[str, Any]] = []
+        for item, score in zip(results, scores):
+            enriched = dict(item)
+            enriched["retrieval_score"] = enriched.get("score")
+            enriched["reranker_score"] = round(float(score), 6)
+            enriched["score"] = round(float(score), 6)
+            ranked.append(enriched)
+        ranked.sort(key=lambda item: (-item["reranker_score"], item["citation"]))
+        return ranked[:top_k]
+
+    def search(
+        self,
+        query: str,
+        *,
+        strategy: str = "auto",
+        top_k: int = 6,
+        source_ids: Iterable[str] | None = None,
+        no_answer_threshold: float | None = None,
+        allow_fallback: bool = True,
+        rerank: bool = False,
+    ) -> RetrievalOutcome:
+        """Run online retrieval with observable fallback and calibrated abstention metadata."""
+        if strategy not in RETRIEVAL_STRATEGIES:
+            raise ValueError(f"Unknown retrieval strategy: {strategy}")
+        started = time.perf_counter()
+        requested = strategy
+        used = "hybrid" if strategy == "auto" else strategy
+        env_threshold = os.getenv("RESEARCH_NO_ANSWER_THRESHOLD")
+        threshold = (
+            float(env_threshold)
+            if no_answer_threshold is None and env_threshold is not None
+            else DEFAULT_NO_ANSWER_THRESHOLDS[used]
+            if no_answer_threshold is None
+            else max(0.0, min(1.0, float(no_answer_threshold)))
+        )
+        degraded = False
+        fallback_reason: str | None = None
+        reflected_query: str | None = None
+        pool = max(20, top_k * 4) if rerank else top_k
+
+        try:
+            results = getattr(self, used)(query, top_k=pool, source_ids=source_ids)
+        except (RuntimeError, OSError, ValueError) as exc:
+            if not allow_fallback or used == "bm25":
+                raise
+            results = self.bm25(query, top_k=pool, source_ids=source_ids)
+            used = "bm25"
+            degraded = True
+            fallback_reason = f"dense retrieval unavailable: {exc}"
+
+        confidence, signals = self._confidence(used, results, query)
+        if requested == "auto" and confidence < threshold and used != "bm25":
+            try:
+                reflected_query = reflect_query(query, results)
+                if reflected_query != query:
+                    reflected = self.reflected_hybrid(
+                        query, top_k=pool, source_ids=source_ids
+                    )
+                    reflected_confidence, reflected_signals = self._confidence(
+                        "reflected_hybrid", reflected, query
+                    )
+                    if reflected_confidence >= confidence:
+                        results = reflected
+                        confidence = reflected_confidence
+                        signals = reflected_signals
+                        used = "reflected_hybrid"
+            except (RuntimeError, OSError, ValueError) as exc:
+                degraded = True
+                fallback_reason = fallback_reason or f"query reflection unavailable: {exc}"
+
+        reranked = bool(rerank and self.reranker is not None and results)
+        if reranked:
+            results = self._rerank(query, results, top_k=top_k)
+            confidence, rerank_signals = self._confidence("vector", results, query)
+            signals.update({f"reranker_{key}": value for key, value in rerank_signals.items()})
+        else:
+            results = results[:top_k]
+        no_answer = not results or confidence < threshold
+        return RetrievalOutcome(
+            query=query,
+            requested_strategy=requested,
+            used_strategy=used,
+            results=results,
+            confidence=confidence,
+            no_answer=no_answer,
+            degraded=degraded,
+            fallback_reason=fallback_reason,
+            reflected_query=reflected_query,
+            reranked=reranked,
+            latency_ms=round((time.perf_counter() - started) * 1000, 3),
+            signals=signals,
+        )

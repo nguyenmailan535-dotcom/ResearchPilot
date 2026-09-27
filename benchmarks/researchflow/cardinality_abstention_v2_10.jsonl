@@ -1,0 +1,10 @@
+{"id":"v2-pos-rap","query":"RAP 的数据包处理吞吐相比已有方案提升多少？","relevant_citations":["RF-EA8EE7AB-2"],"answerable":true,"language":"zh","difficulty":"easy","source":"RAP"}
+{"id":"v2-pos-rvcc","query":"What is RVCC's reported Incast tail-latency reduction?","relevant_citations":["RF-E26B02A3-2","RF-E26B02A3-10","RF-E26B02A3-85"],"answerable":true,"language":"en","difficulty":"easy","source":"RVCC"}
+{"id":"v2-pos-smb","query":"SMB 使用 10000 bits 时相对误差小于 0.1 的概率下界是多少？","relevant_citations":["RF-83330C9C-45"],"answerable":true,"language":"zh","difficulty":"medium","source":"SMB"}
+{"id":"v2-pos-spread","query":"What is the memory trade-off introduced by HP-Filter?","relevant_citations":["RF-977C4044-15"],"answerable":true,"language":"en","difficulty":"medium","source":"SpreadSketch"}
+{"id":"v2-pos-cross","query":"哪些新增方案在 P4 或 Tofino 可编程交换机上实现或部署？","relevant_citations":["RF-EA8EE7AB-2","RF-E26B02A3-1","RF-977C4044-18"],"answerable":true,"language":"zh","difficulty":"hard","source":"cross-paper"}
+{"id":"v2-neg-01","query":"RAP 使用了哪一种零知识证明来验证频繁模式？","relevant_citations":[],"answerable":false,"language":"zh","difficulty":"hard","source":"unanswerable"}
+{"id":"v2-neg-02","query":"Which BBR pacing gain cycle does RVCC configure at end hosts?","relevant_citations":[],"answerable":false,"language":"en","difficulty":"hard","source":"unanswerable"}
+{"id":"v2-neg-03","query":"SMB 使用哪一种 LSTM 结构预测下一个数据项？","relevant_citations":[],"answerable":false,"language":"zh","difficulty":"hard","source":"unanswerable"}
+{"id":"v2-neg-04","query":"Which CUDA kernel block size is used by HP-SpreadSketch on NVIDIA GPUs?","relevant_citations":[],"answerable":false,"language":"en","difficulty":"hard","source":"unanswerable"}
+{"id":"v2-neg-05","query":"这些论文如何利用区块链共识在多个数据中心之间复制 sketch？","relevant_citations":[],"answerable":false,"language":"zh","difficulty":"hard","source":"unanswerable"}

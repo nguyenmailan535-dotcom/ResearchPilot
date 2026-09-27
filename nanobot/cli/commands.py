@@ -1036,11 +1036,20 @@ def research_ingest(
     path: str = typer.Argument(..., help="PDF, Markdown, text, source file, or directory"),
     workspace: str | None = typer.Option(None, "--workspace", "-w"),
     max_files: int = typer.Option(100, "--max-files", min=1, max=500),
+    chunk_size: int = typer.Option(1200, "--chunk-size", min=200, max=4000),
+    chunk_overlap: int = typer.Option(160, "--chunk-overlap", min=0, max=1000),
+    chunk_strategy: str = typer.Option("structure", "--chunk-strategy"),
 ):
     """Index local evidence for grounded research."""
     store = _research_store(workspace)
     try:
-        result = store.ingest_path(Path(path), max_files=max_files)
+        result = store.ingest_path(
+            Path(path),
+            max_files=max_files,
+            max_chars=chunk_size,
+            overlap=chunk_overlap,
+            chunk_strategy=chunk_strategy,
+        )
     except (FileNotFoundError, ValueError) as exc:
         console.print(f"[red]ResearchFlow ingest failed:[/red] {exc}")
         console.print(
@@ -1064,13 +1073,35 @@ def research_search(
     query: str = typer.Argument(..., help="Evidence query"),
     workspace: str | None = typer.Option(None, "--workspace", "-w"),
     top_k: int = typer.Option(6, "--top-k", min=1, max=20),
+    strategy: str = typer.Option("auto", "--strategy"),
+    no_answer_threshold: float | None = typer.Option(
+        None, "--no-answer-threshold", min=0, max=1
+    ),
+    rerank: bool = typer.Option(False, "--rerank"),
 ):
-    """Search indexed evidence with multilingual BM25."""
-    results = _research_store(workspace).search(query, top_k=top_k)
-    if not results:
-        console.print("[yellow]No matching evidence.[/yellow]")
+    """Search evidence with selectable BM25, dense, hybrid, or reflected hybrid retrieval."""
+    from nanobot.research.retrieval import DenseRetriever, FastEmbedReranker, RetrievalSuite
+
+    store = _research_store(workspace)
+    suite = RetrievalSuite(
+        store,
+        DenseRetriever(store),
+        reranker=FastEmbedReranker() if rerank else None,
+    )
+    outcome = suite.search(
+        query,
+        strategy=strategy,
+        top_k=top_k,
+        no_answer_threshold=no_answer_threshold,
+        rerank=rerank,
+    )
+    if outcome.no_answer:
+        console.print(
+            f"[yellow]Insufficient evidence (strategy={outcome.used_strategy}, "
+            f"confidence={outcome.confidence}, latency_ms={outcome.latency_ms}).[/yellow]"
+        )
         return
-    for item in results:
+    for item in outcome.results:
         location = f" page={item['page']}" if item.get("page") else ""
         console.print(
             f"[cyan][{item['citation']}][/cyan] {item['title']}{location} "
@@ -1078,6 +1109,11 @@ def research_search(
         )
         console.print(Text(item["content"][:800]))
         console.print()
+    console.print(
+        f"[dim]strategy={outcome.used_strategy} confidence={outcome.confidence} "
+        f"latency_ms={outcome.latency_ms} degraded={outcome.degraded} "
+        f"reranked={outcome.reranked}[/dim]"
+    )
 
 
 @research_app.command("sources")
@@ -1148,6 +1184,7 @@ def research_benchmark(
     ),
     output: str | None = typer.Option(None, "--output", "-o", help="Result JSON path"),
     rebuild_vectors: bool = typer.Option(False, "--rebuild-vectors"),
+    rerank: bool = typer.Option(False, "--rerank"),
 ):
     """Compare BM25, dense, hybrid RRF, and reflected hybrid retrieval."""
     import json
@@ -1155,7 +1192,7 @@ def research_benchmark(
 
     from nanobot.research.benchmark import benchmark_retrieval
     from nanobot.research.evaluate import load_cases
-    from nanobot.research.retrieval import DenseRetriever, RetrievalSuite
+    from nanobot.research.retrieval import DenseRetriever, FastEmbedReranker, RetrievalSuite
 
     store = _research_store(workspace)
     cases = load_cases(Path(dataset).expanduser())
@@ -1164,7 +1201,7 @@ def research_benchmark(
     index = dense.build_index(force=rebuild_vectors)
     result = benchmark_retrieval(
         store,
-        RetrievalSuite(store, dense),
+        RetrievalSuite(store, dense, reranker=FastEmbedReranker() if rerank else None),
         cases,
         ks=(1, 3, top_k),
     )
@@ -1200,6 +1237,67 @@ def research_benchmark(
     console.print(f"Results: [cyan]{output_path.resolve()}[/cyan]")
 
 
+@research_app.command("chunk-ablation")
+def research_chunk_ablation(
+    dataset: str = typer.Argument(..., help="Labeled JSONL dataset using current RF citations"),
+    workspace: str | None = typer.Option(None, "--workspace", "-w"),
+    model: str = typer.Option(
+        "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+        "--embedding-model",
+    ),
+    top_k: int = typer.Option(5, "--top-k", min=1, max=20),
+    output: str | None = typer.Option(None, "--output", "-o"),
+):
+    """Select chunk size/overlap/strategy on a development set, never a final holdout."""
+    import json
+    from datetime import datetime
+
+    from nanobot.research.ablation import run_chunk_ablation
+    from nanobot.research.evaluate import load_cases
+
+    store = _research_store(workspace)
+    cases = load_cases(Path(dataset).expanduser())
+    result = run_chunk_ablation(store, cases, model_name=model, top_k=top_k)
+    console.print_json(data=result)
+    if output:
+        output_path = Path(output).expanduser()
+    else:
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        output_path = store.root / "evaluations" / f"chunk-ablation-{timestamp}.json"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    console.print(f"Results: [cyan]{output_path.resolve()}[/cyan]")
+
+
+@research_app.command("calibrate-threshold")
+def research_calibrate_threshold(
+    dataset: str = typer.Argument(..., help="Dev JSONL with answerable and unanswerable cases"),
+    workspace: str | None = typer.Option(None, "--workspace", "-w"),
+    strategy: str = typer.Option("hybrid", "--strategy"),
+    top_k: int = typer.Option(5, "--top-k", min=1, max=20),
+    output: str | None = typer.Option(None, "--output", "-o"),
+):
+    """Calibrate the no-answer threshold on a development set."""
+    import json
+
+    from nanobot.research.evaluate import calibrate_no_answer_threshold, load_cases
+    from nanobot.research.retrieval import DenseRetriever, RetrievalSuite
+
+    store = _research_store(workspace)
+    cases = load_cases(Path(dataset).expanduser())
+    result = calibrate_no_answer_threshold(
+        RetrievalSuite(store, DenseRetriever(store)),
+        cases,
+        strategy=strategy,
+        top_k=top_k,
+    )
+    console.print_json(data=result)
+    if output:
+        output_path = Path(output).expanduser()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
 @research_app.command("e2e-evaluate")
 def research_e2e_evaluate(
     dataset: str = typer.Argument(..., help="End-to-end ResearchFlow JSONL dataset"),
@@ -1207,6 +1305,11 @@ def research_e2e_evaluate(
     config: str | None = typer.Option(None, "--config", "-c"),
     output: str | None = typer.Option(None, "--output", "-o"),
     limit: int | None = typer.Option(None, "--limit", min=1),
+    judge_model: str | None = typer.Option(None, "--judge-model"),
+    prompt_usd_per_million: float = typer.Option(0.0, "--prompt-usd-per-million", min=0),
+    completion_usd_per_million: float = typer.Option(
+        0.0, "--completion-usd-per-million", min=0
+    ),
 ):
     """Run independent grounded-answer tasks and score citations and answer coverage."""
     import json
@@ -1242,7 +1345,29 @@ def research_e2e_evaluate(
 
     async def run_evaluation():
         try:
-            return await evaluate_agent_answers(agent_loop, store, cases, limit=limit)
+            judge = None
+            claim_judge = None
+            if judge_model:
+                from nanobot.research.judge import judge_answer, judge_claim_entailment
+
+                async def run_judge(case, answer):
+                    return await judge_answer(provider, judge_model, store, case, answer)
+
+                judge = run_judge
+                async def run_claim_judge(answer):
+                    return await judge_claim_entailment(provider, judge_model, store, answer)
+
+                claim_judge = run_claim_judge
+            return await evaluate_agent_answers(
+                agent_loop,
+                store,
+                cases,
+                limit=limit,
+                judge=judge,
+                claim_judge=claim_judge,
+                prompt_usd_per_million=prompt_usd_per_million,
+                completion_usd_per_million=completion_usd_per_million,
+            )
         finally:
             await agent_loop.close_mcp()
 
@@ -1261,10 +1386,16 @@ def research_e2e_evaluate(
         "relevant_citation_recall",
         "paragraph_citation_coverage",
         "average_latency_seconds",
+        "p95_latency_seconds",
         "average_prompt_tokens",
         "average_completion_tokens",
+        "estimated_cost_usd",
+        "claim_support_rate",
+        "false_answer_rate",
+        "llm_judge_overall",
+        "semantic_claim_support_rate",
     ):
-        table.add_row(key, str(metrics[key]))
+        table.add_row(key, str(metrics.get(key)))
     console.print(table)
 
     if output:
@@ -1272,6 +1403,79 @@ def research_e2e_evaluate(
     else:
         timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         output_path = store.root / "evaluations" / f"e2e-{timestamp}.json"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    console.print(f"Results: [cyan]{output_path.resolve()}[/cyan]")
+
+
+@research_app.command("judge-evaluate")
+def research_judge_evaluate(
+    dataset: str = typer.Argument(..., help="Original end-to-end JSONL dataset"),
+    evaluation: str = typer.Argument(..., help="Saved e2e evaluation JSON with answers"),
+    judge_model: str = typer.Option("deepseek-v4-pro", "--judge-model"),
+    workspace: str | None = typer.Option(None, "--workspace", "-w"),
+    config: str | None = typer.Option(None, "--config", "-c"),
+    output: str | None = typer.Option(None, "--output", "-o"),
+    limit: int | None = typer.Option(None, "--limit", min=1),
+    concurrency: int = typer.Option(2, "--concurrency", min=1, max=4),
+    semantic_entailment: bool = typer.Option(
+        False,
+        "--semantic-entailment",
+        help="Also run the more expensive per-claim semantic verifier",
+    ),
+    prompt_usd_per_million: float = typer.Option(0.0, "--prompt-usd-per-million", min=0),
+    completion_usd_per_million: float = typer.Option(
+        0.0, "--completion-usd-per-million", min=0
+    ),
+):
+    """Apply a structured independent Judge to saved answers without regenerating them."""
+    import json
+    from datetime import datetime
+
+    from nanobot.research.end_to_end import load_end_to_end_cases
+    from nanobot.research.judge import judge_saved_evaluation
+    from nanobot.research.metrics import estimate_cost_usd
+    from nanobot.research.store import ResearchStore
+
+    runtime_config = _load_runtime_config(config, workspace)
+    provider = _make_provider(runtime_config)
+    store = ResearchStore(runtime_config.workspace_path)
+    cases = load_end_to_end_cases(Path(dataset).expanduser())
+    saved = json.loads(Path(evaluation).expanduser().read_text(encoding="utf-8"))
+    result = asyncio.run(
+        judge_saved_evaluation(
+            provider,
+            judge_model,
+            store,
+            cases,
+            saved,
+            limit=limit,
+            concurrency=concurrency,
+            semantic_entailment=semantic_entailment,
+        )
+    )
+    pricing_configured = bool(prompt_usd_per_million or completion_usd_per_million)
+    result["judge"]["estimated_cost_usd"] = (
+        estimate_cost_usd(
+            result["judge"]["prompt_tokens"],
+            result["judge"]["completion_tokens"],
+            prompt_usd_per_million=prompt_usd_per_million,
+            completion_usd_per_million=completion_usd_per_million,
+        )
+        if pricing_configured
+        else None
+    )
+    result["judge"]["pricing"] = {
+        "configured": pricing_configured,
+        "prompt_usd_per_million": prompt_usd_per_million,
+        "completion_usd_per_million": completion_usd_per_million,
+    }
+    console.print_json(data=result["judge"])
+    if output:
+        output_path = Path(output).expanduser()
+    else:
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        output_path = store.root / "evaluations" / f"judge-{timestamp}.json"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     console.print(f"Results: [cyan]{output_path.resolve()}[/cyan]")

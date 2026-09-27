@@ -13,7 +13,7 @@ reflects on missing information, verifies exact chunks, writes a cited report, a
 project decisions for future sessions.
 
 This differs from one-shot RAG: retrieval is a tool selected repeatedly by the Agent, and the
-workflow includes evidence-gap reflection, citation validation, durable project memory, and an
+workflow includes evidence-gap reflection, citation validation, a cited Evidence Ledger, and an
 auditable event log.
 
 ## Architecture
@@ -25,18 +25,19 @@ Persistent task state + resumable SSE events
        |
 nanobot AgentRunner (existing ReAct loop)
        |
-       +-- research_ingest  -> parsing + deterministic chunking
-       +-- research_search  -> multilingual BM25 evidence retrieval
+       +-- research_ingest  -> fixed/structure-aware configurable chunking
+       +-- research_search  -> BM25 / dense / RRF / reflection / optional reranking
        +-- research_read    -> exact evidence lookup
-       +-- research_memory  -> project decisions and constraints
-       +-- research_report  -> citation verification + Markdown output
+       +-- research_decision-> cited, versioned Evidence Ledger
+       +-- research_report  -> citation + Claim/Evidence verification
        +-- research_sources -> corpus and audit statistics
                               |
                         SQLite research.db
 ```
 
-The SQLite store contains sources, evidence chunks, project memories, and append-only research
-events. It also persists API task state and replayable task events. Citation IDs are stable
+The SQLite store contains sources, evidence chunks, an Evidence Ledger, and append-only research
+events. Generic conversation memory remains owned by the nanobot runtime. The store also persists
+API task state and replayable task events. Citation IDs are stable
 (`RF-<source>-<chunk>`) across unchanged re-indexing.
 
 ## Design references
@@ -66,7 +67,8 @@ this branch.
 nanobot research ingest .\papers --workspace .\demo-workspace
 
 # Inspect deterministic retrieval without spending model tokens.
-nanobot research search "消息重复消费 幂等" --workspace .\demo-workspace
+nanobot research search "消息重复消费 幂等" --workspace .\demo-workspace `
+  --strategy hybrid --no-answer-threshold 0.75
 
 # Run the normal nanobot Agent over the same workspace.
 nanobot agent --workspace .\demo-workspace
@@ -114,6 +116,19 @@ nanobot research benchmark `
 
 See the [benchmark protocol, raw results, and limitations](../benchmarks/researchflow/README.md).
 
+Select a chunk configuration on the development set and calibrate abstention with positive and
+negative questions:
+
+```powershell
+nanobot research chunk-ablation `
+  .\benchmarks\researchflow\cardinality_sketch_40.jsonl `
+  --workspace .\research-demo
+
+nanobot research calibrate-threshold `
+  .\benchmarks\researchflow\cardinality_abstention_dev_20.jsonl `
+  --workspace .\research-demo --strategy hybrid
+```
+
 Run the independent grounded-answer evaluation:
 
 ```powershell
@@ -121,6 +136,20 @@ nanobot research e2e-evaluate `
   .\benchmarks\researchflow\cardinality_e2e_holdout_16.jsonl `
   --workspace .\research-demo `
   --output .\benchmarks\researchflow\results\e2e-final.json
+
+# Offline Judge over saved answers (does not regenerate the answers).
+nanobot research judge-evaluate `
+  .\benchmarks\researchflow\cardinality_e2e_holdout_16.jsonl `
+  .\benchmarks\researchflow\results\e2e-p0-p1-final.json `
+  --workspace .\research-demo --judge-model deepseek-v4-pro `
+  --output .\benchmarks\researchflow\results\judge-deepseek-v4-pro.json
+
+# Optional, more expensive Claim—Evidence semantic verification.
+nanobot research judge-evaluate `
+  .\benchmarks\researchflow\cardinality_e2e_holdout_16.jsonl `
+  .\benchmarks\researchflow\results\e2e-p0-p1-final.json `
+  --workspace .\research-demo --judge-model deepseek-v4-pro `
+  --semantic-entailment --limit 1
 ```
 
 ## What is deliberately out of scope
@@ -129,8 +158,8 @@ nanobot research e2e-evaluate `
   adapters rather than the project's core contribution.
 - An external vector database. The benchmark layer uses a local FastEmbed/ONNX index with a
   corpus-addressed NumPy cache, keeping the project self-contained and reproducible.
-- An LLM-as-judge score. End-to-end metrics are deterministic and inspectable: required-concept
-  coverage, citation validity, relevant-label recall, paragraph coverage, latency, and tokens.
+- An online LLM judge in the serving hot path. The optional judge is evaluation-only; deterministic
+  retrieval, citation, Claim/Evidence, latency and token metrics remain the primary signals.
 
 ## Evaluation
 
@@ -140,7 +169,8 @@ The repository includes a 40-question bilingual retrieval development set and a 
 - Recall@K and MRR for evidence retrieval
 - citation validity and paragraph citation coverage
 - task completion rate
-- average tool calls, prompt tokens, and wall-clock latency
+- average/P50/P95 latency, tool calls, prompt/completion tokens, and explicit price-based cost
+- unanswerable recall, false-answer rate, Claim/Evidence support, and Bad Case taxonomy
 - changes after hybrid retrieval and deterministic query reflection
 
 Keep the dataset, evaluator, and raw JSON results in the repository so every resume number is

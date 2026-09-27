@@ -1,6 +1,6 @@
 ---
 name: research-flow
-description: Conduct evidence-grounded technical or academic research over local PDFs and documents with stable citations, project memory, and report verification.
+description: Conduct evidence-grounded technical or academic research over local PDFs and documents with stable citations, an Evidence Ledger, and report verification.
 ---
 
 # ResearchFlow
@@ -13,8 +13,9 @@ not a one-shot PDF summary.
 
 1. Call `research_sources` to inspect the available corpus.
 2. If the user supplied new local documents, call `research_ingest` before searching.
-3. Call `research_memory(action="search")` with a stable project name to recover prior
-   decisions, constraints, and preferences.
+3. Call `research_decision(action="search")` with a stable project name to recover prior
+   evidence-backed decisions and constraints. Use normal runtime memory for conversation context
+   and preferences.
 4. Break the request into explicit research questions. Search each question separately with
    `research_search`; do not use one broad query for everything.
 5. Review the evidence and identify missing or conflicting information. Refine the query and
@@ -24,8 +25,8 @@ not a one-shot PDF summary.
    after the supported claim. Never invent a citation ID.
 8. Call `research_report(action="verify")` before saving a long report. Fix missing or invalid
    citations, then call `research_report(action="save")`.
-9. Save only stable conclusions with `research_memory(action="remember")`. Do not save raw
-   search results, temporary plans, or uncertain guesses.
+9. Save only stable, cited conclusions with `research_decision(action="record")`. Do not save
+   raw search results, temporary plans, generic preferences, or uncertain guesses.
 
 ## Evidence Rules
 

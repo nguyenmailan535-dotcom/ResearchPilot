@@ -1,0 +1,121 @@
+{
+  "cases": 40,
+  "top_k": 5,
+  "selection_rule": "max recall_at_k, then max mrr, then min p95_latency_ms",
+  "recommended": {
+    "chunk_size": 768,
+    "overlap": 120,
+    "strategy": "fixed",
+    "chunks": 767,
+    "segments": 776,
+    "ingest_seconds": 13.284,
+    "recall_at_k": 0.95,
+    "mrr": 0.8042,
+    "p50_latency_ms": 123.4366,
+    "p95_latency_ms": 135.7164,
+    "bad_cases": [
+      "hll-02",
+      "hll-04"
+    ]
+  },
+  "results": [
+    {
+      "chunk_size": 256,
+      "overlap": 64,
+      "strategy": "fixed",
+      "chunks": 2761,
+      "segments": 2771,
+      "ingest_seconds": 12.354,
+      "recall_at_k": 0.75,
+      "mrr": 0.6392,
+      "p50_latency_ms": 139.7293,
+      "p95_latency_ms": 160.1253,
+      "bad_cases": [
+        "hll-01",
+        "hll-02",
+        "hll-04",
+        "drex-04",
+        "drex-09",
+        "drex-10",
+        "ull-02",
+        "ull-04",
+        "ull-06",
+        "seive-02"
+      ]
+    },
+    {
+      "chunk_size": 384,
+      "overlap": 64,
+      "strategy": "fixed",
+      "chunks": 1578,
+      "segments": 1587,
+      "ingest_seconds": 11.626,
+      "recall_at_k": 0.875,
+      "mrr": 0.685,
+      "p50_latency_ms": 113.9414,
+      "p95_latency_ms": 135.6266,
+      "bad_cases": [
+        "hll-01",
+        "hll-04",
+        "drex-09",
+        "ull-02",
+        "seive-02"
+      ]
+    },
+    {
+      "chunk_size": 480,
+      "overlap": 80,
+      "strategy": "fixed",
+      "chunks": 1248,
+      "segments": 1258,
+      "ingest_seconds": 11.052,
+      "recall_at_k": 0.85,
+      "mrr": 0.7217,
+      "p50_latency_ms": 159.4516,
+      "p95_latency_ms": 264.4729,
+      "bad_cases": [
+        "hll-02",
+        "hll-04",
+        "drex-09",
+        "ull-02",
+        "seive-02",
+        "distractor-02"
+      ]
+    },
+    {
+      "chunk_size": 768,
+      "overlap": 120,
+      "strategy": "fixed",
+      "chunks": 767,
+      "segments": 776,
+      "ingest_seconds": 13.284,
+      "recall_at_k": 0.95,
+      "mrr": 0.8042,
+      "p50_latency_ms": 123.4366,
+      "p95_latency_ms": 135.7164,
+      "bad_cases": [
+        "hll-02",
+        "hll-04"
+      ]
+    },
+    {
+      "chunk_size": 480,
+      "overlap": 80,
+      "strategy": "structure",
+      "chunks": 1251,
+      "segments": 1251,
+      "ingest_seconds": 11.877,
+      "recall_at_k": 0.875,
+      "mrr": 0.7154,
+      "p50_latency_ms": 117.5257,
+      "p95_latency_ms": 173.2956,
+      "bad_cases": [
+        "hll-02",
+        "hll-04",
+        "drex-09",
+        "ull-02",
+        "seive-02"
+      ]
+    }
+  ]
+}

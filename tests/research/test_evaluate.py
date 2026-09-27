@@ -5,7 +5,11 @@ from pathlib import Path
 
 import pytest
 
-from nanobot.research.evaluate import evaluate_retrieval, load_cases
+from nanobot.research.evaluate import (
+    calibrate_no_answer_threshold,
+    evaluate_retrieval,
+    load_cases,
+)
 from nanobot.research.store import ResearchStore
 
 
@@ -57,3 +61,38 @@ def test_load_cases_validates_jsonl(tmp_path: Path) -> None:
     dataset.write_text('{"query": "missing labels"}\n', encoding="utf-8")
     with pytest.raises(ValueError, match="relevant_citations"):
         load_cases(dataset)
+
+
+def test_calibrates_no_answer_threshold_on_answerable_and_negative_cases() -> None:
+    class FakeSuite:
+        def search(self, query, **_kwargs):
+            confidence = {"known": 0.8, "unknown": 0.1}[query]
+            return type(
+                "Outcome",
+                (),
+                {
+                    "confidence": confidence,
+                    "results": [{"citation": "RF-12345678-1"}],
+                },
+            )()
+
+    result = calibrate_no_answer_threshold(
+        FakeSuite(),
+        [
+            {
+                "id": "known",
+                "query": "known",
+                "answerable": True,
+                "relevant_citations": ["RF-12345678-1"],
+            },
+            {
+                "id": "unknown",
+                "query": "unknown",
+                "answerable": False,
+                "relevant_citations": [],
+            },
+        ],
+        thresholds=[0.05, 0.2, 0.9],
+    )
+    assert result["recommended"]["threshold"] == 0.2
+    assert result["recommended"]["balanced_accuracy"] == 1.0

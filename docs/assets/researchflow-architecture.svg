@@ -70,7 +70,7 @@
   <rect x="1044" y="248" width="306" height="46" rx="11" class="soft"/>
   <text x="1064" y="276" class="small-title">research-flow skill · grounded workflow</text>
   <text x="1044" y="324" class="small-text">research_search · research_read</text>
-  <text x="1044" y="347" class="small-text">research_report · research_memory</text>
+  <text x="1044" y="347" class="small-text">research_report · research_decision</text>
   <text x="1044" y="370" class="small-text">stream callbacks → task events → SSE</text>
 
   <path d="M284 280 H322" class="line"/>
@@ -100,7 +100,7 @@
     <rect x="328" y="674" width="220" height="72" rx="14" class="soft"/><text x="350" y="703" class="small-title">Hybrid retrieval</text><text x="350" y="726" class="small-text">BM25 · dense · weighted RRF</text>
     <rect x="568" y="674" width="220" height="72" rx="14" class="soft"/><text x="590" y="703" class="small-title">Stable citations</text><text x="590" y="726" class="small-text">RF-source-chunk · exact lookup</text>
     <rect x="808" y="674" width="220" height="72" rx="14" class="soft"/><text x="830" y="703" class="small-title">SQLite</text><text x="830" y="726" class="small-text">sources · chunks · tasks · events</text>
-    <rect x="1048" y="674" width="304" height="72" rx="14" class="soft"/><text x="1070" y="703" class="small-title">Durable outputs</text><text x="1070" y="726" class="small-text">vector cache · project memory · Markdown reports</text>
+    <rect x="1048" y="674" width="304" height="72" rx="14" class="soft"/><text x="1070" y="703" class="small-title">Durable outputs</text><text x="1070" y="726" class="small-text">vector cache · Evidence Ledger · reports</text>
   </g>
   <path d="M1197 394 C1197 430 1160 444 1160 462" class="line"/>
   <path d="M720 574 V639" class="line"/>

@@ -1,0 +1,2213 @@
+{
+  "dataset_cases": 20,
+  "ks": [
+    1,
+    3,
+    5
+  ],
+  "methods": {
+    "bm25": {
+      "elapsed_seconds": 2.532,
+      "p50_latency_ms": 120.778,
+      "p95_latency_ms": 158.0137,
+      "metrics": {
+        "at_1": {
+          "cases": 20,
+          "recall_at_k": 0.525,
+          "success_at_k": 0.55,
+          "mrr": 0.55
+        },
+        "at_3": {
+          "cases": 20,
+          "recall_at_k": 0.625,
+          "success_at_k": 0.65,
+          "mrr": 0.5917
+        },
+        "at_5": {
+          "cases": 20,
+          "recall_at_k": 0.65,
+          "success_at_k": 0.7,
+          "mrr": 0.6017
+        }
+      },
+      "by_language_at_max_k": {
+        "en": {
+          "cases": 10,
+          "recall_at_k": 0.85,
+          "success_at_k": 0.9,
+          "mrr": 0.85
+        },
+        "zh": {
+          "cases": 10,
+          "recall_at_k": 0.45,
+          "success_at_k": 0.5,
+          "mrr": 0.3533
+        }
+      },
+      "by_difficulty_at_max_k": {
+        "easy": {
+          "cases": 2,
+          "recall_at_k": 0.5,
+          "success_at_k": 0.5,
+          "mrr": 0.5
+        },
+        "hard": {
+          "cases": 10,
+          "recall_at_k": 0.6,
+          "success_at_k": 0.7,
+          "mrr": 0.62
+        },
+        "medium": {
+          "cases": 8,
+          "recall_at_k": 0.75,
+          "success_at_k": 0.75,
+          "mrr": 0.6042
+        }
+      },
+      "details": [
+        {
+          "id": "rap-v2-01",
+          "query": "How does RAP mine frequent patterns in one pass while reducing memory and reporting results in real time?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "RAP",
+          "relevant": [
+            "RF-EA8EE7AB-8"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-7",
+            "RF-EA8EE7AB-8",
+            "RF-EA8EE7AB-25",
+            "RF-EA8EE7AB-17",
+            "RF-EA8EE7AB-18"
+          ],
+          "latency_ms": 188.085
+        },
+        {
+          "id": "rap-v2-02",
+          "query": "RAP 在哪些平台实现，相比已有方案的数据包处理吞吐提升了多少？",
+          "language": "zh",
+          "difficulty": "easy",
+          "source": "RAP",
+          "relevant": [
+            "RF-EA8EE7AB-2"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-50",
+            "RF-EA8EE7AB-48",
+            "RF-EA8EE7AB-28",
+            "RF-EA8EE7AB-40",
+            "RF-EA8EE7AB-47"
+          ],
+          "latency_ms": 138.003
+        },
+        {
+          "id": "rap-v2-03",
+          "query": "What are RAP's theoretical space and time complexities in terms of X, b, m, epsilon, delta, and l?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "RAP",
+          "relevant": [
+            "RF-EA8EE7AB-35"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-35",
+            "RF-EA8EE7AB-29",
+            "RF-EA8EE7AB-40",
+            "RF-EA8EE7AB-28",
+            "RF-EA8EE7AB-38"
+          ],
+          "latency_ms": 130.399
+        },
+        {
+          "id": "rap-v2-04",
+          "query": "RAP 对频繁模式的估计误差、假阴性和小模式假阳性分别给出了什么概率保证？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "RAP",
+          "relevant": [
+            "RF-EA8EE7AB-12"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-50",
+            "RF-EA8EE7AB-48",
+            "RF-EA8EE7AB-28",
+            "RF-EA8EE7AB-40",
+            "RF-EA8EE7AB-47"
+          ],
+          "latency_ms": 122.616
+        },
+        {
+          "id": "rvcc-v2-01",
+          "query": "What problem do PFC storms and slow end-to-end feedback create, and what architecture does RVCC propose?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "RVCC",
+          "relevant": [
+            "RF-E26B02A3-1"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-1",
+            "RF-E26B02A3-7",
+            "RF-E26B02A3-59",
+            "RF-E26B02A3-18",
+            "RF-E26B02A3-17"
+          ],
+          "latency_ms": 118.3
+        },
+        {
+          "id": "rvcc-v2-02",
+          "query": "RVCC 如何在不增加主机 CPU 开销的情况下缓解队头阻塞，在 Incast 场景中尾延迟最多降低多少？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "RVCC",
+          "relevant": [
+            "RF-E26B02A3-2"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-32",
+            "RF-E26B02A3-84",
+            "RF-E26B02A3-60",
+            "RF-E26B02A3-10",
+            "RF-E26B02A3-82"
+          ],
+          "latency_ms": 123.643
+        },
+        {
+          "id": "rvcc-v2-03",
+          "query": "What tail-latency reductions does RVCC report for small flows generally and in an Incast scenario?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "RVCC",
+          "relevant": [
+            "RF-E26B02A3-10"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-10",
+            "RF-E26B02A3-78",
+            "RF-E26B02A3-62",
+            "RF-E26B02A3-84",
+            "RF-E26B02A3-25"
+          ],
+          "latency_ms": 129.119
+        },
+        {
+          "id": "rvcc-v2-04",
+          "query": "为什么端到端拥塞控制的反馈可能赶不上逐跳传播的 PFC storm？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "RVCC",
+          "relevant": [
+            "RF-E26B02A3-7"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-7",
+            "RF-E26B02A3-5",
+            "RF-E26B02A3-6",
+            "RF-E26B02A3-30",
+            "RF-E26B02A3-19"
+          ],
+          "latency_ms": 117.427
+        },
+        {
+          "id": "smb-v2-01",
+          "query": "How does a self-morphing bitmap automatically adapt its sampling probability as stream cardinality grows?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SMB",
+          "relevant": [
+            "RF-83330C9C-1"
+          ],
+          "retrieved": [
+            "RF-83330C9C-1",
+            "RF-83330C9C-34",
+            "RF-83330C9C-31",
+            "RF-83330C9C-35",
+            "RF-83330C9C-32"
+          ],
+          "latency_ms": 113.581
+        },
+        {
+          "id": "smb-v2-02",
+          "query": "为什么 HLL++ 不适合高频在线查询，而传统 bitmap 又受到估计范围限制？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "SMB",
+          "relevant": [
+            "RF-83330C9C-8"
+          ],
+          "retrieved": [
+            "RF-B40077A8-16",
+            "RF-83330C9C-21",
+            "RF-83330C9C-26",
+            "RF-83330C9C-63",
+            "RF-83330C9C-53"
+          ],
+          "latency_ms": 156.431
+        },
+        {
+          "id": "smb-v2-03",
+          "query": "What probability bound is reported for relative error below 0.1 when the SMB bitmap uses 10,000 bits?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "SMB",
+          "relevant": [
+            "RF-83330C9C-45"
+          ],
+          "retrieved": [
+            "RF-83330C9C-45",
+            "RF-83330C9C-10",
+            "RF-83330C9C-57",
+            "RF-83330C9C-56",
+            "RF-977C4044-21"
+          ],
+          "latency_ms": 119.445
+        },
+        {
+          "id": "smb-v2-04",
+          "query": "SMB 与 MRB 在 bitmap 数量、采样概率以及已记录信息利用方式上有何区别？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SMB",
+          "relevant": [
+            "RF-83330C9C-10"
+          ],
+          "retrieved": [
+            "RF-83330C9C-10",
+            "RF-83330C9C-53",
+            "RF-B40077A8-11",
+            "RF-83330C9C-50",
+            "RF-83330C9C-27"
+          ],
+          "latency_ms": 114.92
+        },
+        {
+          "id": "spread-v2-01",
+          "query": "What fan-out skew was observed in the UNI2 and enterprise traces used to justify SpreadSketch's scope?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SpreadSketch",
+          "relevant": [
+            "RF-977C4044-7"
+          ],
+          "retrieved": [
+            "RF-977C4044-7",
+            "RF-977C4044-6",
+            "RF-977C4044-8",
+            "RF-977C4044-5",
+            "RF-977C4044-3"
+          ],
+          "latency_ms": 121.27
+        },
+        {
+          "id": "spread-v2-02",
+          "query": "为什么继续增大 HP-Filter 的内存不一定提升准确率？论文修订增加了哪些相关实验？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SpreadSketch",
+          "relevant": [
+            "RF-977C4044-27"
+          ],
+          "retrieved": [
+            "RF-977C4044-27",
+            "RF-977C4044-15",
+            "RF-977C4044-26",
+            "RF-977C4044-14",
+            "RF-977C4044-18"
+          ],
+          "latency_ms": 119.153
+        },
+        {
+          "id": "spread-v2-03",
+          "query": "How was the hardware feasibility of HP-SpreadSketch demonstrated on a programmable switch?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SpreadSketch",
+          "relevant": [
+            "RF-977C4044-18"
+          ],
+          "retrieved": [
+            "RF-977C4044-18",
+            "RF-977C4044-19",
+            "RF-977C4044-26",
+            "RF-977C4044-15",
+            "RF-977C4044-3"
+          ],
+          "latency_ms": 117.224
+        },
+        {
+          "id": "spread-v2-04",
+          "query": "HP-SpreadSketch 相比 SpreadSketch 的更新性能与内存开销之间有什么权衡？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "SpreadSketch",
+          "relevant": [
+            "RF-977C4044-15"
+          ],
+          "retrieved": [
+            "RF-977C4044-18",
+            "RF-977C4044-27",
+            "RF-977C4044-15",
+            "RF-977C4044-19",
+            "RF-977C4044-26"
+          ],
+          "latency_ms": 112.663
+        },
+        {
+          "id": "cross-v2-01",
+          "query": "Compare how RAP and SMB adapt their maintained state as an initially unknown stream evolves.",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "cross-paper",
+          "relevant": [
+            "RF-83330C9C-10",
+            "RF-EA8EE7AB-8"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-76",
+            "RF-9B51FD1B-8",
+            "RF-EA8EE7AB-9",
+            "RF-83330C9C-36",
+            "RF-9B51FD1B-75"
+          ],
+          "latency_ms": 120.286
+        },
+        {
+          "id": "cross-v2-02",
+          "query": "RAP 与 RVCC 分别如何利用 P4 可编程数据平面解决网络测量和拥塞控制问题？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "cross-paper",
+          "relevant": [
+            "RF-E26B02A3-1",
+            "RF-EA8EE7AB-2"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-8",
+            "RF-EA8EE7AB-52",
+            "RF-EA8EE7AB-47",
+            "RF-E26B02A3-10",
+            "RF-E26B02A3-1"
+          ],
+          "latency_ms": 117.849
+        },
+        {
+          "id": "cross-v2-03",
+          "query": "How do RVCC and HP-SpreadSketch differ in what they deploy on Tofino switches and the objective they optimize?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "cross-paper",
+          "relevant": [
+            "RF-977C4044-18",
+            "RF-E26B02A3-1"
+          ],
+          "retrieved": [
+            "RF-977C4044-18",
+            "RF-E26B02A3-8",
+            "RF-977C4044-27",
+            "RF-977C4044-26",
+            "RF-E26B02A3-48"
+          ],
+          "latency_ms": 121.967
+        },
+        {
+          "id": "cross-v2-04",
+          "query": "比较 SMB 的流基数估计任务与 SpreadSketch 的网络级 superspreader 检测任务。",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "cross-paper",
+          "relevant": [
+            "RF-83330C9C-1",
+            "RF-977C4044-2"
+          ],
+          "retrieved": [
+            "RF-977C4044-28",
+            "RF-977C4044-17",
+            "RF-977C4044-24",
+            "RF-B40077A8-46",
+            "RF-977C4044-10"
+          ],
+          "latency_ms": 128.922
+        }
+      ],
+      "bad_cases": {
+        "retrieval_miss": [
+          "rap-v2-02",
+          "rap-v2-04",
+          "rvcc-v2-02",
+          "smb-v2-02",
+          "cross-v2-01",
+          "cross-v2-04"
+        ]
+      }
+    },
+    "vector": {
+      "elapsed_seconds": 2.155,
+      "p50_latency_ms": 12.7715,
+      "p95_latency_ms": 112.2533,
+      "metrics": {
+        "at_1": {
+          "cases": 20,
+          "recall_at_k": 0.425,
+          "success_at_k": 0.45,
+          "mrr": 0.45
+        },
+        "at_3": {
+          "cases": 20,
+          "recall_at_k": 0.475,
+          "success_at_k": 0.5,
+          "mrr": 0.4667
+        },
+        "at_5": {
+          "cases": 20,
+          "recall_at_k": 0.575,
+          "success_at_k": 0.6,
+          "mrr": 0.4917
+        }
+      },
+      "by_language_at_max_k": {
+        "en": {
+          "cases": 10,
+          "recall_at_k": 0.65,
+          "success_at_k": 0.7,
+          "mrr": 0.5583
+        },
+        "zh": {
+          "cases": 10,
+          "recall_at_k": 0.5,
+          "success_at_k": 0.5,
+          "mrr": 0.425
+        }
+      },
+      "by_difficulty_at_max_k": {
+        "easy": {
+          "cases": 2,
+          "recall_at_k": 0.5,
+          "success_at_k": 0.5,
+          "mrr": 0.125
+        },
+        "hard": {
+          "cases": 10,
+          "recall_at_k": 0.45,
+          "success_at_k": 0.5,
+          "mrr": 0.425
+        },
+        "medium": {
+          "cases": 8,
+          "recall_at_k": 0.75,
+          "success_at_k": 0.75,
+          "mrr": 0.6667
+        }
+      },
+      "details": [
+        {
+          "id": "rap-v2-01",
+          "query": "How does RAP mine frequent patterns in one pass while reducing memory and reporting results in real time?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "RAP",
+          "relevant": [
+            "RF-EA8EE7AB-8"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-8",
+            "RF-EA8EE7AB-25",
+            "RF-EA8EE7AB-52",
+            "RF-EA8EE7AB-2",
+            "RF-EA8EE7AB-41"
+          ],
+          "latency_ms": 1904.224
+        },
+        {
+          "id": "rap-v2-02",
+          "query": "RAP 在哪些平台实现，相比已有方案的数据包处理吞吐提升了多少？",
+          "language": "zh",
+          "difficulty": "easy",
+          "source": "RAP",
+          "relevant": [
+            "RF-EA8EE7AB-2"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-52",
+            "RF-EA8EE7AB-46",
+            "RF-EA8EE7AB-9",
+            "RF-EA8EE7AB-8",
+            "RF-EA8EE7AB-47"
+          ],
+          "latency_ms": 10.348
+        },
+        {
+          "id": "rap-v2-03",
+          "query": "What are RAP's theoretical space and time complexities in terms of X, b, m, epsilon, delta, and l?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "RAP",
+          "relevant": [
+            "RF-EA8EE7AB-35"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-35",
+            "RF-EA8EE7AB-41",
+            "RF-F6B914C4-47",
+            "RF-EA8EE7AB-28",
+            "RF-EA8EE7AB-22"
+          ],
+          "latency_ms": 15.28
+        },
+        {
+          "id": "rap-v2-04",
+          "query": "RAP 对频繁模式的估计误差、假阴性和小模式假阳性分别给出了什么概率保证？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "RAP",
+          "relevant": [
+            "RF-EA8EE7AB-12"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-50",
+            "RF-EA8EE7AB-39",
+            "RF-EA8EE7AB-36",
+            "RF-EA8EE7AB-38",
+            "RF-EA8EE7AB-40"
+          ],
+          "latency_ms": 17.518
+        },
+        {
+          "id": "rvcc-v2-01",
+          "query": "What problem do PFC storms and slow end-to-end feedback create, and what architecture does RVCC propose?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "RVCC",
+          "relevant": [
+            "RF-E26B02A3-1"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-7",
+            "RF-E26B02A3-30",
+            "RF-E26B02A3-5",
+            "RF-E26B02A3-6",
+            "RF-E26B02A3-92"
+          ],
+          "latency_ms": 11.065
+        },
+        {
+          "id": "rvcc-v2-02",
+          "query": "RVCC 如何在不增加主机 CPU 开销的情况下缓解队头阻塞，在 Incast 场景中尾延迟最多降低多少？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "RVCC",
+          "relevant": [
+            "RF-E26B02A3-2"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-91",
+            "RF-E26B02A3-92",
+            "RF-E26B02A3-41",
+            "RF-E26B02A3-62",
+            "RF-E26B02A3-10"
+          ],
+          "latency_ms": 15.026
+        },
+        {
+          "id": "rvcc-v2-03",
+          "query": "What tail-latency reductions does RVCC report for small flows generally and in an Incast scenario?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "RVCC",
+          "relevant": [
+            "RF-E26B02A3-10"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-78",
+            "RF-E26B02A3-62",
+            "RF-E26B02A3-71",
+            "RF-E26B02A3-10",
+            "RF-E26B02A3-91"
+          ],
+          "latency_ms": 14.063
+        },
+        {
+          "id": "rvcc-v2-04",
+          "query": "为什么端到端拥塞控制的反馈可能赶不上逐跳传播的 PFC storm？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "RVCC",
+          "relevant": [
+            "RF-E26B02A3-7"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-7",
+            "RF-E26B02A3-5",
+            "RF-E26B02A3-6",
+            "RF-E26B02A3-30",
+            "RF-58AA680D-46"
+          ],
+          "latency_ms": 10.827
+        },
+        {
+          "id": "smb-v2-01",
+          "query": "How does a self-morphing bitmap automatically adapt its sampling probability as stream cardinality grows?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SMB",
+          "relevant": [
+            "RF-83330C9C-1"
+          ],
+          "retrieved": [
+            "RF-83330C9C-1",
+            "RF-83330C9C-2",
+            "RF-83330C9C-34",
+            "RF-83330C9C-32",
+            "RF-83330C9C-26"
+          ],
+          "latency_ms": 9.514
+        },
+        {
+          "id": "smb-v2-02",
+          "query": "为什么 HLL++ 不适合高频在线查询，而传统 bitmap 又受到估计范围限制？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "SMB",
+          "relevant": [
+            "RF-83330C9C-8"
+          ],
+          "retrieved": [
+            "RF-83330C9C-8",
+            "RF-83330C9C-25",
+            "RF-B40077A8-12",
+            "RF-B40077A8-48",
+            "RF-2DCCFEB5-64"
+          ],
+          "latency_ms": 12.403
+        },
+        {
+          "id": "smb-v2-03",
+          "query": "What probability bound is reported for relative error below 0.1 when the SMB bitmap uses 10,000 bits?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "SMB",
+          "relevant": [
+            "RF-83330C9C-45"
+          ],
+          "retrieved": [
+            "RF-83330C9C-31",
+            "RF-83330C9C-32",
+            "RF-F6B914C4-41",
+            "RF-83330C9C-42",
+            "RF-977C4044-21"
+          ],
+          "latency_ms": 12.708
+        },
+        {
+          "id": "smb-v2-04",
+          "query": "SMB 与 MRB 在 bitmap 数量、采样概率以及已记录信息利用方式上有何区别？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SMB",
+          "relevant": [
+            "RF-83330C9C-10"
+          ],
+          "retrieved": [
+            "RF-B40077A8-11",
+            "RF-83330C9C-58",
+            "RF-83330C9C-41",
+            "RF-83330C9C-10",
+            "RF-83330C9C-33"
+          ],
+          "latency_ms": 16.807
+        },
+        {
+          "id": "spread-v2-01",
+          "query": "What fan-out skew was observed in the UNI2 and enterprise traces used to justify SpreadSketch's scope?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SpreadSketch",
+          "relevant": [
+            "RF-977C4044-7"
+          ],
+          "retrieved": [
+            "RF-977C4044-6",
+            "RF-977C4044-8",
+            "RF-977C4044-7",
+            "RF-977C4044-2",
+            "RF-977C4044-3"
+          ],
+          "latency_ms": 17.939
+        },
+        {
+          "id": "spread-v2-02",
+          "query": "为什么继续增大 HP-Filter 的内存不一定提升准确率？论文修订增加了哪些相关实验？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SpreadSketch",
+          "relevant": [
+            "RF-977C4044-27"
+          ],
+          "retrieved": [
+            "RF-977C4044-27",
+            "RF-977C4044-15",
+            "RF-977C4044-3",
+            "RF-977C4044-13",
+            "RF-9B51FD1B-67"
+          ],
+          "latency_ms": 12.53
+        },
+        {
+          "id": "spread-v2-03",
+          "query": "How was the hardware feasibility of HP-SpreadSketch demonstrated on a programmable switch?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SpreadSketch",
+          "relevant": [
+            "RF-977C4044-18"
+          ],
+          "retrieved": [
+            "RF-977C4044-18",
+            "RF-977C4044-19",
+            "RF-977C4044-3",
+            "RF-977C4044-15",
+            "RF-977C4044-27"
+          ],
+          "latency_ms": 8.218
+        },
+        {
+          "id": "spread-v2-04",
+          "query": "HP-SpreadSketch 相比 SpreadSketch 的更新性能与内存开销之间有什么权衡？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "SpreadSketch",
+          "relevant": [
+            "RF-977C4044-15"
+          ],
+          "retrieved": [
+            "RF-977C4044-15",
+            "RF-977C4044-19",
+            "RF-977C4044-27",
+            "RF-977C4044-28",
+            "RF-977C4044-26"
+          ],
+          "latency_ms": 13.809
+        },
+        {
+          "id": "cross-v2-01",
+          "query": "Compare how RAP and SMB adapt their maintained state as an initially unknown stream evolves.",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "cross-paper",
+          "relevant": [
+            "RF-83330C9C-10",
+            "RF-EA8EE7AB-8"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-9",
+            "RF-EA8EE7AB-17",
+            "RF-83330C9C-52",
+            "RF-EA8EE7AB-52",
+            "RF-EA8EE7AB-26"
+          ],
+          "latency_ms": 12.835
+        },
+        {
+          "id": "cross-v2-02",
+          "query": "RAP 与 RVCC 分别如何利用 P4 可编程数据平面解决网络测量和拥塞控制问题？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "cross-paper",
+          "relevant": [
+            "RF-E26B02A3-1",
+            "RF-EA8EE7AB-2"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-10",
+            "RF-EA8EE7AB-52",
+            "RF-E26B02A3-60",
+            "RF-E26B02A3-11",
+            "RF-EA8EE7AB-8"
+          ],
+          "latency_ms": 12.122
+        },
+        {
+          "id": "cross-v2-03",
+          "query": "How do RVCC and HP-SpreadSketch differ in what they deploy on Tofino switches and the objective they optimize?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "cross-paper",
+          "relevant": [
+            "RF-977C4044-18",
+            "RF-E26B02A3-1"
+          ],
+          "retrieved": [
+            "RF-977C4044-18",
+            "RF-E26B02A3-89",
+            "RF-E26B02A3-88",
+            "RF-E26B02A3-52",
+            "RF-E26B02A3-47"
+          ],
+          "latency_ms": 12.648
+        },
+        {
+          "id": "cross-v2-04",
+          "query": "比较 SMB 的流基数估计任务与 SpreadSketch 的网络级 superspreader 检测任务。",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "cross-paper",
+          "relevant": [
+            "RF-83330C9C-1",
+            "RF-977C4044-2"
+          ],
+          "retrieved": [
+            "RF-977C4044-10",
+            "RF-B40077A8-47",
+            "RF-977C4044-13",
+            "RF-EA8EE7AB-58",
+            "RF-977C4044-17"
+          ],
+          "latency_ms": 14.446
+        }
+      ],
+      "bad_cases": {
+        "retrieval_miss": [
+          "rap-v2-02",
+          "rap-v2-04",
+          "rvcc-v2-01",
+          "rvcc-v2-02",
+          "smb-v2-03",
+          "cross-v2-01",
+          "cross-v2-02",
+          "cross-v2-04"
+        ]
+      }
+    },
+    "hybrid_rrf": {
+      "elapsed_seconds": 2.835,
+      "p50_latency_ms": 142.664,
+      "p95_latency_ms": 151.7646,
+      "metrics": {
+        "at_1": {
+          "cases": 20,
+          "recall_at_k": 0.475,
+          "success_at_k": 0.5,
+          "mrr": 0.5
+        },
+        "at_3": {
+          "cases": 20,
+          "recall_at_k": 0.625,
+          "success_at_k": 0.65,
+          "mrr": 0.5667
+        },
+        "at_5": {
+          "cases": 20,
+          "recall_at_k": 0.65,
+          "success_at_k": 0.7,
+          "mrr": 0.5792
+        }
+      },
+      "by_language_at_max_k": {
+        "en": {
+          "cases": 10,
+          "recall_at_k": 0.75,
+          "success_at_k": 0.8,
+          "mrr": 0.7
+        },
+        "zh": {
+          "cases": 10,
+          "recall_at_k": 0.55,
+          "success_at_k": 0.6,
+          "mrr": 0.4583
+        }
+      },
+      "by_difficulty_at_max_k": {
+        "easy": {
+          "cases": 2,
+          "recall_at_k": 0.5,
+          "success_at_k": 0.5,
+          "mrr": 0.25
+        },
+        "hard": {
+          "cases": 10,
+          "recall_at_k": 0.5,
+          "success_at_k": 0.6,
+          "mrr": 0.525
+        },
+        "medium": {
+          "cases": 8,
+          "recall_at_k": 0.875,
+          "success_at_k": 0.875,
+          "mrr": 0.7292
+        }
+      },
+      "details": [
+        {
+          "id": "rap-v2-01",
+          "query": "How does RAP mine frequent patterns in one pass while reducing memory and reporting results in real time?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "RAP",
+          "relevant": [
+            "RF-EA8EE7AB-8"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-8",
+            "RF-EA8EE7AB-25",
+            "RF-EA8EE7AB-17",
+            "RF-EA8EE7AB-7",
+            "RF-EA8EE7AB-2"
+          ],
+          "latency_ms": 136.435
+        },
+        {
+          "id": "rap-v2-02",
+          "query": "RAP 在哪些平台实现，相比已有方案的数据包处理吞吐提升了多少？",
+          "language": "zh",
+          "difficulty": "easy",
+          "source": "RAP",
+          "relevant": [
+            "RF-EA8EE7AB-2"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-50",
+            "RF-EA8EE7AB-48",
+            "RF-EA8EE7AB-46",
+            "RF-EA8EE7AB-47",
+            "RF-EA8EE7AB-8"
+          ],
+          "latency_ms": 143.03
+        },
+        {
+          "id": "rap-v2-03",
+          "query": "What are RAP's theoretical space and time complexities in terms of X, b, m, epsilon, delta, and l?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "RAP",
+          "relevant": [
+            "RF-EA8EE7AB-35"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-35",
+            "RF-EA8EE7AB-40",
+            "RF-EA8EE7AB-28",
+            "RF-EA8EE7AB-41",
+            "RF-EA8EE7AB-22"
+          ],
+          "latency_ms": 143.477
+        },
+        {
+          "id": "rap-v2-04",
+          "query": "RAP 对频繁模式的估计误差、假阴性和小模式假阳性分别给出了什么概率保证？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "RAP",
+          "relevant": [
+            "RF-EA8EE7AB-12"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-50",
+            "RF-EA8EE7AB-40",
+            "RF-EA8EE7AB-39",
+            "RF-EA8EE7AB-35",
+            "RF-EA8EE7AB-8"
+          ],
+          "latency_ms": 130.629
+        },
+        {
+          "id": "rvcc-v2-01",
+          "query": "What problem do PFC storms and slow end-to-end feedback create, and what architecture does RVCC propose?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "RVCC",
+          "relevant": [
+            "RF-E26B02A3-1"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-7",
+            "RF-E26B02A3-1",
+            "RF-E26B02A3-30",
+            "RF-E26B02A3-59",
+            "RF-E26B02A3-83"
+          ],
+          "latency_ms": 144.985
+        },
+        {
+          "id": "rvcc-v2-02",
+          "query": "RVCC 如何在不增加主机 CPU 开销的情况下缓解队头阻塞，在 Incast 场景中尾延迟最多降低多少？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "RVCC",
+          "relevant": [
+            "RF-E26B02A3-2"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-84",
+            "RF-E26B02A3-10",
+            "RF-E26B02A3-92",
+            "RF-E26B02A3-91",
+            "RF-E26B02A3-61"
+          ],
+          "latency_ms": 152.669
+        },
+        {
+          "id": "rvcc-v2-03",
+          "query": "What tail-latency reductions does RVCC report for small flows generally and in an Incast scenario?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "RVCC",
+          "relevant": [
+            "RF-E26B02A3-10"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-78",
+            "RF-E26B02A3-10",
+            "RF-E26B02A3-62",
+            "RF-E26B02A3-91",
+            "RF-E26B02A3-84"
+          ],
+          "latency_ms": 138.35
+        },
+        {
+          "id": "rvcc-v2-04",
+          "query": "为什么端到端拥塞控制的反馈可能赶不上逐跳传播的 PFC storm？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "RVCC",
+          "relevant": [
+            "RF-E26B02A3-7"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-7",
+            "RF-E26B02A3-5",
+            "RF-E26B02A3-6",
+            "RF-E26B02A3-30",
+            "RF-E26B02A3-55"
+          ],
+          "latency_ms": 140.673
+        },
+        {
+          "id": "smb-v2-01",
+          "query": "How does a self-morphing bitmap automatically adapt its sampling probability as stream cardinality grows?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SMB",
+          "relevant": [
+            "RF-83330C9C-1"
+          ],
+          "retrieved": [
+            "RF-83330C9C-1",
+            "RF-83330C9C-34",
+            "RF-83330C9C-31",
+            "RF-83330C9C-32",
+            "RF-83330C9C-35"
+          ],
+          "latency_ms": 142.298
+        },
+        {
+          "id": "smb-v2-02",
+          "query": "为什么 HLL++ 不适合高频在线查询，而传统 bitmap 又受到估计范围限制？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "SMB",
+          "relevant": [
+            "RF-83330C9C-8"
+          ],
+          "retrieved": [
+            "RF-B40077A8-12",
+            "RF-83330C9C-26",
+            "RF-83330C9C-8",
+            "RF-83330C9C-19",
+            "RF-83330C9C-22"
+          ],
+          "latency_ms": 131.182
+        },
+        {
+          "id": "smb-v2-03",
+          "query": "What probability bound is reported for relative error below 0.1 when the SMB bitmap uses 10,000 bits?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "SMB",
+          "relevant": [
+            "RF-83330C9C-45"
+          ],
+          "retrieved": [
+            "RF-977C4044-21",
+            "RF-83330C9C-10",
+            "RF-83330C9C-54",
+            "RF-B40077A8-42",
+            "RF-83330C9C-41"
+          ],
+          "latency_ms": 141.528
+        },
+        {
+          "id": "smb-v2-04",
+          "query": "SMB 与 MRB 在 bitmap 数量、采样概率以及已记录信息利用方式上有何区别？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SMB",
+          "relevant": [
+            "RF-83330C9C-10"
+          ],
+          "retrieved": [
+            "RF-83330C9C-10",
+            "RF-B40077A8-11",
+            "RF-83330C9C-53",
+            "RF-83330C9C-58",
+            "RF-83330C9C-33"
+          ],
+          "latency_ms": 151.357
+        },
+        {
+          "id": "spread-v2-01",
+          "query": "What fan-out skew was observed in the UNI2 and enterprise traces used to justify SpreadSketch's scope?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SpreadSketch",
+          "relevant": [
+            "RF-977C4044-7"
+          ],
+          "retrieved": [
+            "RF-977C4044-7",
+            "RF-977C4044-6",
+            "RF-977C4044-8",
+            "RF-977C4044-3",
+            "RF-977C4044-5"
+          ],
+          "latency_ms": 146.142
+        },
+        {
+          "id": "spread-v2-02",
+          "query": "为什么继续增大 HP-Filter 的内存不一定提升准确率？论文修订增加了哪些相关实验？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SpreadSketch",
+          "relevant": [
+            "RF-977C4044-27"
+          ],
+          "retrieved": [
+            "RF-977C4044-27",
+            "RF-977C4044-15",
+            "RF-977C4044-26",
+            "RF-977C4044-13",
+            "RF-977C4044-14"
+          ],
+          "latency_ms": 143.378
+        },
+        {
+          "id": "spread-v2-03",
+          "query": "How was the hardware feasibility of HP-SpreadSketch demonstrated on a programmable switch?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SpreadSketch",
+          "relevant": [
+            "RF-977C4044-18"
+          ],
+          "retrieved": [
+            "RF-977C4044-18",
+            "RF-977C4044-19",
+            "RF-977C4044-15",
+            "RF-977C4044-3",
+            "RF-977C4044-26"
+          ],
+          "latency_ms": 135.13
+        },
+        {
+          "id": "spread-v2-04",
+          "query": "HP-SpreadSketch 相比 SpreadSketch 的更新性能与内存开销之间有什么权衡？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "SpreadSketch",
+          "relevant": [
+            "RF-977C4044-15"
+          ],
+          "retrieved": [
+            "RF-977C4044-15",
+            "RF-977C4044-27",
+            "RF-977C4044-19",
+            "RF-977C4044-18",
+            "RF-977C4044-26"
+          ],
+          "latency_ms": 130.777
+        },
+        {
+          "id": "cross-v2-01",
+          "query": "Compare how RAP and SMB adapt their maintained state as an initially unknown stream evolves.",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "cross-paper",
+          "relevant": [
+            "RF-83330C9C-10",
+            "RF-EA8EE7AB-8"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-9",
+            "RF-EA8EE7AB-46",
+            "RF-EA8EE7AB-52",
+            "RF-EA8EE7AB-18",
+            "RF-EA8EE7AB-41"
+          ],
+          "latency_ms": 139.089
+        },
+        {
+          "id": "cross-v2-02",
+          "query": "RAP 与 RVCC 分别如何利用 P4 可编程数据平面解决网络测量和拥塞控制问题？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "cross-paper",
+          "relevant": [
+            "RF-E26B02A3-1",
+            "RF-EA8EE7AB-2"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-52",
+            "RF-EA8EE7AB-8",
+            "RF-E26B02A3-10",
+            "RF-E26B02A3-1",
+            "RF-EA8EE7AB-47"
+          ],
+          "latency_ms": 143.941
+        },
+        {
+          "id": "cross-v2-03",
+          "query": "How do RVCC and HP-SpreadSketch differ in what they deploy on Tofino switches and the objective they optimize?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "cross-paper",
+          "relevant": [
+            "RF-977C4044-18",
+            "RF-E26B02A3-1"
+          ],
+          "retrieved": [
+            "RF-977C4044-18",
+            "RF-E26B02A3-88",
+            "RF-977C4044-27",
+            "RF-977C4044-3",
+            "RF-E26B02A3-60"
+          ],
+          "latency_ms": 151.717
+        },
+        {
+          "id": "cross-v2-04",
+          "query": "比较 SMB 的流基数估计任务与 SpreadSketch 的网络级 superspreader 检测任务。",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "cross-paper",
+          "relevant": [
+            "RF-83330C9C-1",
+            "RF-977C4044-2"
+          ],
+          "retrieved": [
+            "RF-977C4044-17",
+            "RF-977C4044-10",
+            "RF-977C4044-13",
+            "RF-977C4044-24",
+            "RF-977C4044-14"
+          ],
+          "latency_ms": 147.965
+        }
+      ],
+      "bad_cases": {
+        "retrieval_miss": [
+          "rap-v2-02",
+          "rap-v2-04",
+          "rvcc-v2-02",
+          "smb-v2-03",
+          "cross-v2-01",
+          "cross-v2-04"
+        ]
+      }
+    },
+    "reflected_hybrid": {
+      "elapsed_seconds": 6.024,
+      "p50_latency_ms": 294.665,
+      "p95_latency_ms": 334.7334,
+      "metrics": {
+        "at_1": {
+          "cases": 20,
+          "recall_at_k": 0.475,
+          "success_at_k": 0.5,
+          "mrr": 0.5
+        },
+        "at_3": {
+          "cases": 20,
+          "recall_at_k": 0.575,
+          "success_at_k": 0.6,
+          "mrr": 0.55
+        },
+        "at_5": {
+          "cases": 20,
+          "recall_at_k": 0.65,
+          "success_at_k": 0.7,
+          "mrr": 0.575
+        }
+      },
+      "by_language_at_max_k": {
+        "en": {
+          "cases": 10,
+          "recall_at_k": 0.75,
+          "success_at_k": 0.8,
+          "mrr": 0.7
+        },
+        "zh": {
+          "cases": 10,
+          "recall_at_k": 0.55,
+          "success_at_k": 0.6,
+          "mrr": 0.45
+        }
+      },
+      "by_difficulty_at_max_k": {
+        "easy": {
+          "cases": 2,
+          "recall_at_k": 0.5,
+          "success_at_k": 0.5,
+          "mrr": 0.25
+        },
+        "hard": {
+          "cases": 10,
+          "recall_at_k": 0.5,
+          "success_at_k": 0.6,
+          "mrr": 0.525
+        },
+        "medium": {
+          "cases": 8,
+          "recall_at_k": 0.875,
+          "success_at_k": 0.875,
+          "mrr": 0.7188
+        }
+      },
+      "details": [
+        {
+          "id": "rap-v2-01",
+          "query": "How does RAP mine frequent patterns in one pass while reducing memory and reporting results in real time?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "RAP",
+          "relevant": [
+            "RF-EA8EE7AB-8"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-8",
+            "RF-EA8EE7AB-25",
+            "RF-EA8EE7AB-52",
+            "RF-EA8EE7AB-2",
+            "RF-EA8EE7AB-24"
+          ],
+          "latency_ms": 292.418,
+          "reflected_query": "How does RAP mine frequent patterns in one pass while reducing memory and reporting results in real time? memory space bits bytes registers counters MVP"
+        },
+        {
+          "id": "rap-v2-02",
+          "query": "RAP 在哪些平台实现，相比已有方案的数据包处理吞吐提升了多少？",
+          "language": "zh",
+          "difficulty": "easy",
+          "source": "RAP",
+          "relevant": [
+            "RF-EA8EE7AB-2"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-46",
+            "RF-EA8EE7AB-50",
+            "RF-EA8EE7AB-52",
+            "RF-EA8EE7AB-45",
+            "RF-B40077A8-47"
+          ],
+          "latency_ms": 280.775,
+          "reflected_query": "RAP 在哪些平台实现，相比已有方案的数据包处理吞吐提升了多少？ update throughput query throughput Mops"
+        },
+        {
+          "id": "rap-v2-03",
+          "query": "What are RAP's theoretical space and time complexities in terms of X, b, m, epsilon, delta, and l?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "RAP",
+          "relevant": [
+            "RF-EA8EE7AB-35"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-35",
+            "RF-EA8EE7AB-41",
+            "RF-EA8EE7AB-40",
+            "RF-EA8EE7AB-28",
+            "RF-EA8EE7AB-22"
+          ],
+          "latency_ms": 319.216,
+          "reflected_query": "What are RAP's theoretical space and time complexities in terms of X, b, m, epsilon, delta, and l? memory space bits bytes registers counters MVP"
+        },
+        {
+          "id": "rap-v2-04",
+          "query": "RAP 对频繁模式的估计误差、假阴性和小模式假阳性分别给出了什么概率保证？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "RAP",
+          "relevant": [
+            "RF-EA8EE7AB-12"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-50",
+            "RF-EA8EE7AB-44",
+            "RF-9B51FD1B-55",
+            "RF-EA8EE7AB-40",
+            "RF-B40077A8-42"
+          ],
+          "latency_ms": 289.784,
+          "reflected_query": "RAP 对频繁模式的估计误差、假阴性和小模式假阳性分别给出了什么概率保证？ accuracy relative error standard error ARE"
+        },
+        {
+          "id": "rvcc-v2-01",
+          "query": "What problem do PFC storms and slow end-to-end feedback create, and what architecture does RVCC propose?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "RVCC",
+          "relevant": [
+            "RF-E26B02A3-1"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-7",
+            "RF-E26B02A3-1",
+            "RF-E26B02A3-30",
+            "RF-E26B02A3-59",
+            "RF-E26B02A3-83"
+          ],
+          "latency_ms": 334.484,
+          "reflected_query": "What problem do PFC storms and slow end-to-end feedback create, and what architecture does RVCC propose?"
+        },
+        {
+          "id": "rvcc-v2-02",
+          "query": "RVCC 如何在不增加主机 CPU 开销的情况下缓解队头阻塞，在 Incast 场景中尾延迟最多降低多少？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "RVCC",
+          "relevant": [
+            "RF-E26B02A3-2"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-84",
+            "RF-E26B02A3-10",
+            "RF-E26B02A3-92",
+            "RF-E26B02A3-91",
+            "RF-E26B02A3-61"
+          ],
+          "latency_ms": 306.667,
+          "reflected_query": "RVCC 如何在不增加主机 CPU 开销的情况下缓解队头阻塞，在 Incast 场景中尾延迟最多降低多少？"
+        },
+        {
+          "id": "rvcc-v2-03",
+          "query": "What tail-latency reductions does RVCC report for small flows generally and in an Incast scenario?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "RVCC",
+          "relevant": [
+            "RF-E26B02A3-10"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-78",
+            "RF-E26B02A3-10",
+            "RF-E26B02A3-62",
+            "RF-E26B02A3-91",
+            "RF-E26B02A3-84"
+          ],
+          "latency_ms": 339.472,
+          "reflected_query": "What tail-latency reductions does RVCC report for small flows generally and in an Incast scenario?"
+        },
+        {
+          "id": "rvcc-v2-04",
+          "query": "为什么端到端拥塞控制的反馈可能赶不上逐跳传播的 PFC storm？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "RVCC",
+          "relevant": [
+            "RF-E26B02A3-7"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-7",
+            "RF-E26B02A3-5",
+            "RF-E26B02A3-6",
+            "RF-E26B02A3-30",
+            "RF-E26B02A3-55"
+          ],
+          "latency_ms": 288.284,
+          "reflected_query": "为什么端到端拥塞控制的反馈可能赶不上逐跳传播的 PFC storm？"
+        },
+        {
+          "id": "smb-v2-01",
+          "query": "How does a self-morphing bitmap automatically adapt its sampling probability as stream cardinality grows?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SMB",
+          "relevant": [
+            "RF-83330C9C-1"
+          ],
+          "retrieved": [
+            "RF-83330C9C-1",
+            "RF-83330C9C-34",
+            "RF-83330C9C-31",
+            "RF-83330C9C-32",
+            "RF-83330C9C-35"
+          ],
+          "latency_ms": 300.587,
+          "reflected_query": "How does a self-morphing bitmap automatically adapt its sampling probability as stream cardinality grows?"
+        },
+        {
+          "id": "smb-v2-02",
+          "query": "为什么 HLL++ 不适合高频在线查询，而传统 bitmap 又受到估计范围限制？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "SMB",
+          "relevant": [
+            "RF-83330C9C-8"
+          ],
+          "retrieved": [
+            "RF-B40077A8-12",
+            "RF-83330C9C-26",
+            "RF-B40077A8-16",
+            "RF-83330C9C-8",
+            "RF-83330C9C-19"
+          ],
+          "latency_ms": 296.507,
+          "reflected_query": "为什么 HLL++ 不适合高频在线查询，而传统 bitmap 又受到估计范围限制？"
+        },
+        {
+          "id": "smb-v2-03",
+          "query": "What probability bound is reported for relative error below 0.1 when the SMB bitmap uses 10,000 bits?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "SMB",
+          "relevant": [
+            "RF-83330C9C-45"
+          ],
+          "retrieved": [
+            "RF-977C4044-21",
+            "RF-83330C9C-57",
+            "RF-83330C9C-10",
+            "RF-B40077A8-42",
+            "RF-83330C9C-54"
+          ],
+          "latency_ms": 291.775,
+          "reflected_query": "What probability bound is reported for relative error below 0.1 when the SMB bitmap uses 10,000 bits? accuracy relative error standard error ARE"
+        },
+        {
+          "id": "smb-v2-04",
+          "query": "SMB 与 MRB 在 bitmap 数量、采样概率以及已记录信息利用方式上有何区别？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SMB",
+          "relevant": [
+            "RF-83330C9C-10"
+          ],
+          "retrieved": [
+            "RF-83330C9C-10",
+            "RF-B40077A8-11",
+            "RF-83330C9C-53",
+            "RF-83330C9C-58",
+            "RF-83330C9C-33"
+          ],
+          "latency_ms": 275.905,
+          "reflected_query": "SMB 与 MRB 在 bitmap 数量、采样概率以及已记录信息利用方式上有何区别？"
+        },
+        {
+          "id": "spread-v2-01",
+          "query": "What fan-out skew was observed in the UNI2 and enterprise traces used to justify SpreadSketch's scope?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SpreadSketch",
+          "relevant": [
+            "RF-977C4044-7"
+          ],
+          "retrieved": [
+            "RF-977C4044-7",
+            "RF-977C4044-6",
+            "RF-977C4044-8",
+            "RF-977C4044-3",
+            "RF-977C4044-5"
+          ],
+          "latency_ms": 297.959,
+          "reflected_query": "What fan-out skew was observed in the UNI2 and enterprise traces used to justify SpreadSketch's scope?"
+        },
+        {
+          "id": "spread-v2-02",
+          "query": "为什么继续增大 HP-Filter 的内存不一定提升准确率？论文修订增加了哪些相关实验？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SpreadSketch",
+          "relevant": [
+            "RF-977C4044-27"
+          ],
+          "retrieved": [
+            "RF-977C4044-27",
+            "RF-977C4044-26",
+            "RF-977C4044-15",
+            "RF-977C4044-3",
+            "RF-977C4044-14"
+          ],
+          "latency_ms": 306.756,
+          "reflected_query": "为什么继续增大 HP-Filter 的内存不一定提升准确率？论文修订增加了哪些相关实验？ memory space bits bytes registers counters MVP"
+        },
+        {
+          "id": "spread-v2-03",
+          "query": "How was the hardware feasibility of HP-SpreadSketch demonstrated on a programmable switch?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SpreadSketch",
+          "relevant": [
+            "RF-977C4044-18"
+          ],
+          "retrieved": [
+            "RF-977C4044-18",
+            "RF-977C4044-19",
+            "RF-977C4044-15",
+            "RF-977C4044-3",
+            "RF-977C4044-26"
+          ],
+          "latency_ms": 292.823,
+          "reflected_query": "How was the hardware feasibility of HP-SpreadSketch demonstrated on a programmable switch?"
+        },
+        {
+          "id": "spread-v2-04",
+          "query": "HP-SpreadSketch 相比 SpreadSketch 的更新性能与内存开销之间有什么权衡？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "SpreadSketch",
+          "relevant": [
+            "RF-977C4044-15"
+          ],
+          "retrieved": [
+            "RF-977C4044-15",
+            "RF-977C4044-27",
+            "RF-977C4044-19",
+            "RF-977C4044-26",
+            "RF-977C4044-18"
+          ],
+          "latency_ms": 292.739,
+          "reflected_query": "HP-SpreadSketch 相比 SpreadSketch 的更新性能与内存开销之间有什么权衡？ memory space bits bytes registers counters MVP update throughput query throughput Mops"
+        },
+        {
+          "id": "cross-v2-01",
+          "query": "Compare how RAP and SMB adapt their maintained state as an initially unknown stream evolves.",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "cross-paper",
+          "relevant": [
+            "RF-83330C9C-10",
+            "RF-EA8EE7AB-8"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-9",
+            "RF-EA8EE7AB-46",
+            "RF-EA8EE7AB-52",
+            "RF-EA8EE7AB-18",
+            "RF-9B51FD1B-76"
+          ],
+          "latency_ms": 290.412,
+          "reflected_query": "Compare how RAP and SMB adapt their maintained state as an initially unknown stream evolves."
+        },
+        {
+          "id": "cross-v2-02",
+          "query": "RAP 与 RVCC 分别如何利用 P4 可编程数据平面解决网络测量和拥塞控制问题？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "cross-paper",
+          "relevant": [
+            "RF-E26B02A3-1",
+            "RF-EA8EE7AB-2"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-52",
+            "RF-EA8EE7AB-8",
+            "RF-E26B02A3-10",
+            "RF-E26B02A3-1",
+            "RF-EA8EE7AB-47"
+          ],
+          "latency_ms": 287.89,
+          "reflected_query": "RAP 与 RVCC 分别如何利用 P4 可编程数据平面解决网络测量和拥塞控制问题？"
+        },
+        {
+          "id": "cross-v2-03",
+          "query": "How do RVCC and HP-SpreadSketch differ in what they deploy on Tofino switches and the objective they optimize?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "cross-paper",
+          "relevant": [
+            "RF-977C4044-18",
+            "RF-E26B02A3-1"
+          ],
+          "retrieved": [
+            "RF-977C4044-18",
+            "RF-E26B02A3-88",
+            "RF-977C4044-27",
+            "RF-977C4044-3",
+            "RF-E26B02A3-60"
+          ],
+          "latency_ms": 326.161,
+          "reflected_query": "How do RVCC and HP-SpreadSketch differ in what they deploy on Tofino switches and the objective they optimize?"
+        },
+        {
+          "id": "cross-v2-04",
+          "query": "比较 SMB 的流基数估计任务与 SpreadSketch 的网络级 superspreader 检测任务。",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "cross-paper",
+          "relevant": [
+            "RF-83330C9C-1",
+            "RF-977C4044-2"
+          ],
+          "retrieved": [
+            "RF-977C4044-10",
+            "RF-977C4044-17",
+            "RF-977C4044-24",
+            "RF-83330C9C-27",
+            "RF-B40077A8-44"
+          ],
+          "latency_ms": 312.015,
+          "reflected_query": "比较 SMB 的流基数估计任务与 SpreadSketch 的网络级 superspreader 检测任务。 cardinality distinct count estimation"
+        }
+      ],
+      "bad_cases": {
+        "retrieval_miss": [
+          "rap-v2-02",
+          "rap-v2-04",
+          "rvcc-v2-02",
+          "smb-v2-03",
+          "cross-v2-01",
+          "cross-v2-04"
+        ]
+      }
+    },
+    "hybrid_reranked": {
+      "elapsed_seconds": 182.166,
+      "p50_latency_ms": 9100.0625,
+      "p95_latency_ms": 10749.9753,
+      "metrics": {
+        "at_1": {
+          "cases": 20,
+          "recall_at_k": 0.65,
+          "success_at_k": 0.65,
+          "mrr": 0.65
+        },
+        "at_3": {
+          "cases": 20,
+          "recall_at_k": 0.725,
+          "success_at_k": 0.75,
+          "mrr": 0.7
+        },
+        "at_5": {
+          "cases": 20,
+          "recall_at_k": 0.8,
+          "success_at_k": 0.85,
+          "mrr": 0.7225
+        }
+      },
+      "by_language_at_max_k": {
+        "en": {
+          "cases": 10,
+          "recall_at_k": 0.85,
+          "success_at_k": 0.9,
+          "mrr": 0.8
+        },
+        "zh": {
+          "cases": 10,
+          "recall_at_k": 0.75,
+          "success_at_k": 0.8,
+          "mrr": 0.645
+        }
+      },
+      "by_difficulty_at_max_k": {
+        "easy": {
+          "cases": 2,
+          "recall_at_k": 0.5,
+          "success_at_k": 0.5,
+          "mrr": 0.5
+        },
+        "hard": {
+          "cases": 10,
+          "recall_at_k": 0.7,
+          "success_at_k": 0.8,
+          "mrr": 0.595
+        },
+        "medium": {
+          "cases": 8,
+          "recall_at_k": 1.0,
+          "success_at_k": 1.0,
+          "mrr": 0.9375
+        }
+      },
+      "details": [
+        {
+          "id": "rap-v2-01",
+          "query": "How does RAP mine frequent patterns in one pass while reducing memory and reporting results in real time?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "RAP",
+          "relevant": [
+            "RF-EA8EE7AB-8"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-25",
+            "RF-EA8EE7AB-8",
+            "RF-EA8EE7AB-24",
+            "RF-EA8EE7AB-2",
+            "RF-EA8EE7AB-1"
+          ],
+          "latency_ms": 10658.478
+        },
+        {
+          "id": "rap-v2-02",
+          "query": "RAP 在哪些平台实现，相比已有方案的数据包处理吞吐提升了多少？",
+          "language": "zh",
+          "difficulty": "easy",
+          "source": "RAP",
+          "relevant": [
+            "RF-EA8EE7AB-2"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-8",
+            "RF-EA8EE7AB-52",
+            "RF-EA8EE7AB-50",
+            "RF-EA8EE7AB-47",
+            "RF-EA8EE7AB-45"
+          ],
+          "latency_ms": 9702.558
+        },
+        {
+          "id": "rap-v2-03",
+          "query": "What are RAP's theoretical space and time complexities in terms of X, b, m, epsilon, delta, and l?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "RAP",
+          "relevant": [
+            "RF-EA8EE7AB-35"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-35",
+            "RF-EA8EE7AB-41",
+            "RF-EA8EE7AB-40",
+            "RF-EA8EE7AB-29",
+            "RF-EA8EE7AB-2"
+          ],
+          "latency_ms": 10247.538
+        },
+        {
+          "id": "rap-v2-04",
+          "query": "RAP 对频繁模式的估计误差、假阴性和小模式假阳性分别给出了什么概率保证？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "RAP",
+          "relevant": [
+            "RF-EA8EE7AB-12"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-39",
+            "RF-EA8EE7AB-29",
+            "RF-EA8EE7AB-40",
+            "RF-EA8EE7AB-38",
+            "RF-EA8EE7AB-8"
+          ],
+          "latency_ms": 10353.817
+        },
+        {
+          "id": "rvcc-v2-01",
+          "query": "What problem do PFC storms and slow end-to-end feedback create, and what architecture does RVCC propose?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "RVCC",
+          "relevant": [
+            "RF-E26B02A3-1"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-1",
+            "RF-E26B02A3-10",
+            "RF-E26B02A3-59",
+            "RF-E26B02A3-92",
+            "RF-E26B02A3-91"
+          ],
+          "latency_ms": 12488.424
+        },
+        {
+          "id": "rvcc-v2-02",
+          "query": "RVCC 如何在不增加主机 CPU 开销的情况下缓解队头阻塞，在 Incast 场景中尾延迟最多降低多少？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "RVCC",
+          "relevant": [
+            "RF-E26B02A3-2"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-2",
+            "RF-E26B02A3-10",
+            "RF-E26B02A3-91",
+            "RF-E26B02A3-1",
+            "RF-E26B02A3-85"
+          ],
+          "latency_ms": 7842.851
+        },
+        {
+          "id": "rvcc-v2-03",
+          "query": "What tail-latency reductions does RVCC report for small flows generally and in an Incast scenario?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "RVCC",
+          "relevant": [
+            "RF-E26B02A3-10"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-10",
+            "RF-E26B02A3-78",
+            "RF-E26B02A3-2",
+            "RF-E26B02A3-62",
+            "RF-E26B02A3-84"
+          ],
+          "latency_ms": 8206.83
+        },
+        {
+          "id": "rvcc-v2-04",
+          "query": "为什么端到端拥塞控制的反馈可能赶不上逐跳传播的 PFC storm？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "RVCC",
+          "relevant": [
+            "RF-E26B02A3-7"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-7",
+            "RF-E26B02A3-18",
+            "RF-E26B02A3-8",
+            "RF-E26B02A3-1",
+            "RF-E26B02A3-30"
+          ],
+          "latency_ms": 7705.031
+        },
+        {
+          "id": "smb-v2-01",
+          "query": "How does a self-morphing bitmap automatically adapt its sampling probability as stream cardinality grows?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SMB",
+          "relevant": [
+            "RF-83330C9C-1"
+          ],
+          "retrieved": [
+            "RF-83330C9C-1",
+            "RF-83330C9C-31",
+            "RF-B40077A8-11",
+            "RF-83330C9C-35",
+            "RF-B40077A8-10"
+          ],
+          "latency_ms": 9110.756
+        },
+        {
+          "id": "smb-v2-02",
+          "query": "为什么 HLL++ 不适合高频在线查询，而传统 bitmap 又受到估计范围限制？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "SMB",
+          "relevant": [
+            "RF-83330C9C-8"
+          ],
+          "retrieved": [
+            "RF-83330C9C-8",
+            "RF-83330C9C-29",
+            "RF-83330C9C-28",
+            "RF-83330C9C-9",
+            "RF-B40077A8-12"
+          ],
+          "latency_ms": 9716.541
+        },
+        {
+          "id": "smb-v2-03",
+          "query": "What probability bound is reported for relative error below 0.1 when the SMB bitmap uses 10,000 bits?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "SMB",
+          "relevant": [
+            "RF-83330C9C-45"
+          ],
+          "retrieved": [
+            "RF-83330C9C-45",
+            "RF-83330C9C-43",
+            "RF-977C4044-21",
+            "RF-83330C9C-56",
+            "RF-83330C9C-54"
+          ],
+          "latency_ms": 9170.841
+        },
+        {
+          "id": "smb-v2-04",
+          "query": "SMB 与 MRB 在 bitmap 数量、采样概率以及已记录信息利用方式上有何区别？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SMB",
+          "relevant": [
+            "RF-83330C9C-10"
+          ],
+          "retrieved": [
+            "RF-83330C9C-10",
+            "RF-83330C9C-9",
+            "RF-B40077A8-11",
+            "RF-83330C9C-33",
+            "RF-83330C9C-34"
+          ],
+          "latency_ms": 9089.369
+        },
+        {
+          "id": "spread-v2-01",
+          "query": "What fan-out skew was observed in the UNI2 and enterprise traces used to justify SpreadSketch's scope?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SpreadSketch",
+          "relevant": [
+            "RF-977C4044-7"
+          ],
+          "retrieved": [
+            "RF-977C4044-7",
+            "RF-977C4044-6",
+            "RF-977C4044-8",
+            "RF-977C4044-3",
+            "RF-977C4044-5"
+          ],
+          "latency_ms": 7825.031
+        },
+        {
+          "id": "spread-v2-02",
+          "query": "为什么继续增大 HP-Filter 的内存不一定提升准确率？论文修订增加了哪些相关实验？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SpreadSketch",
+          "relevant": [
+            "RF-977C4044-27"
+          ],
+          "retrieved": [
+            "RF-977C4044-27",
+            "RF-977C4044-3",
+            "RF-977C4044-15",
+            "RF-977C4044-26",
+            "RF-977C4044-18"
+          ],
+          "latency_ms": 10288.468
+        },
+        {
+          "id": "spread-v2-03",
+          "query": "How was the hardware feasibility of HP-SpreadSketch demonstrated on a programmable switch?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SpreadSketch",
+          "relevant": [
+            "RF-977C4044-18"
+          ],
+          "retrieved": [
+            "RF-977C4044-18",
+            "RF-977C4044-19",
+            "RF-977C4044-3",
+            "RF-977C4044-15",
+            "RF-977C4044-28"
+          ],
+          "latency_ms": 8019.011
+        },
+        {
+          "id": "spread-v2-04",
+          "query": "HP-SpreadSketch 相比 SpreadSketch 的更新性能与内存开销之间有什么权衡？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "SpreadSketch",
+          "relevant": [
+            "RF-977C4044-15"
+          ],
+          "retrieved": [
+            "RF-977C4044-15",
+            "RF-977C4044-19",
+            "RF-977C4044-27",
+            "RF-977C4044-2",
+            "RF-977C4044-18"
+          ],
+          "latency_ms": 7802.486
+        },
+        {
+          "id": "cross-v2-01",
+          "query": "Compare how RAP and SMB adapt their maintained state as an initially unknown stream evolves.",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "cross-paper",
+          "relevant": [
+            "RF-83330C9C-10",
+            "RF-EA8EE7AB-8"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-52",
+            "RF-EA8EE7AB-41",
+            "RF-EA8EE7AB-9",
+            "RF-EA8EE7AB-18",
+            "RF-EA8EE7AB-40"
+          ],
+          "latency_ms": 8246.319
+        },
+        {
+          "id": "cross-v2-02",
+          "query": "RAP 与 RVCC 分别如何利用 P4 可编程数据平面解决网络测量和拥塞控制问题？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "cross-paper",
+          "relevant": [
+            "RF-E26B02A3-1",
+            "RF-EA8EE7AB-2"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-8",
+            "RF-EA8EE7AB-52",
+            "RF-EA8EE7AB-33",
+            "RF-E26B02A3-1",
+            "RF-EA8EE7AB-2"
+          ],
+          "latency_ms": 9416.936
+        },
+        {
+          "id": "cross-v2-03",
+          "query": "How do RVCC and HP-SpreadSketch differ in what they deploy on Tofino switches and the objective they optimize?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "cross-paper",
+          "relevant": [
+            "RF-977C4044-18",
+            "RF-E26B02A3-1"
+          ],
+          "retrieved": [
+            "RF-E26B02A3-11",
+            "RF-977C4044-18",
+            "RF-E26B02A3-88",
+            "RF-977C4044-3",
+            "RF-E26B02A3-61"
+          ],
+          "latency_ms": 8001.182
+        },
+        {
+          "id": "cross-v2-04",
+          "query": "比较 SMB 的流基数估计任务与 SpreadSketch 的网络级 superspreader 检测任务。",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "cross-paper",
+          "relevant": [
+            "RF-83330C9C-1",
+            "RF-977C4044-2"
+          ],
+          "retrieved": [
+            "RF-83330C9C-27",
+            "RF-B40077A8-44",
+            "RF-977C4044-17",
+            "RF-977C4044-5",
+            "RF-977C4044-2"
+          ],
+          "latency_ms": 8272.58
+        }
+      ],
+      "bad_cases": {
+        "retrieval_miss": [
+          "rap-v2-02",
+          "rap-v2-04",
+          "cross-v2-01"
+        ]
+      }
+    }
+  },
+  "embedding_index": {
+    "status": "cached",
+    "chunks": 752,
+    "segments": 2162,
+    "dimensions": 384,
+    "model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    "cache": "E:\\agent\\nanobot-v0.1.4-era\\research-demo\\research\\vectors\\sentence-transformers-paraphrase-multilingual-minilm-l12-v2-seg480-e917c046df1284b2.npz"
+  },
+  "dataset": "E:\\agent\\nanobot-v0.1.4-era\\benchmarks\\researchflow\\cardinality_retrieval_v2_20.jsonl"
+}

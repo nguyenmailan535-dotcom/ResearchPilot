@@ -1,0 +1,283 @@
+{
+  "cases": 16,
+  "metrics": {
+    "task_completion_rate": 1.0,
+    "answer_pass_rate": 0.9375,
+    "concept_coverage": 0.8594,
+    "citation_validity": 1.0,
+    "relevant_citation_recall": 0.8229,
+    "paragraph_citation_coverage": 0.8344,
+    "claim_support_rate": 0.7833,
+    "average_latency_seconds": 11.1692,
+    "p50_latency_seconds": 10.818,
+    "p95_latency_seconds": 16.9055,
+    "average_prompt_tokens": 18344.75,
+    "average_completion_tokens": 994.25,
+    "total_prompt_tokens": 293516,
+    "total_completion_tokens": 15908,
+    "estimated_cost_usd": 0.0,
+    "average_tool_events": 3.6875,
+    "unanswerable_recall": null,
+    "false_answer_rate": null,
+    "answerable_accuracy": 0.9375,
+    "llm_judge_overall": null
+  },
+  "bad_case_summary": {
+    "retrieval_or_ranking_miss": 1,
+    "uncited_claim": 9,
+    "unsupported_claim": 8
+  },
+  "pricing": {
+    "prompt_usd_per_million": 0.0,
+    "completion_usd_per_million": 0.0
+  },
+  "details": [
+    {
+      "id": "e2e-01",
+      "query": "如果只能使用约 1.5KB 内存估计十亿级基数，HyperLogLog 能提供什么精度，其误差如何随寄存器数量变化？",
+      "language": "zh",
+      "difficulty": "medium",
+      "answer": "## 直接答案\n\n若只能用约 **1.5 KB** 内存来估计十亿级基数，HyperLogLog（HLL）能提供约 **2% 的典型精度**。具体配置是：$m = 2048$ 个寄存器、32 位哈希、每个寄存器用 5 位\"短字节\"存储，此时可估计超过 $N = 10^9$ 的基数，典型精度约 2%，仅占用 1.5 KB 存储 [RF-f6b914c4-10]；论文开篇也给出同一结论：可估计远超 $10^9$ 的基数、典型精度 2%、内存仅 1.5 KB [RF-f6b914c4-1]。\n\n## 误差如何随寄存器数量变化\n\nHLL 的相对精度（标准误差）随寄存器数 $m$ 按平方根倒数缩放，典型值为 $1.04/\\sqrt{m}$ [RF-f6b914c4-1]。更精确地，Theorem 1 给出标准误差为 $\\beta_m/\\sqrt{m}$，其中 $\\beta_\\infty = \\sqrt{3\\log 2 - 1} \\approx 1.03896$，且有限 $m$ 时的常数有界：$\\beta_{16}\\approx1.106$、$\\beta_{32}\\approx1.070$、$\\beta_{64}\\approx1.054$、$\\beta_{128}\\approx1.046$ [RF-f6b914c4-15]；寄存器数越多，$\\beta_m$ 越趋近于 $\\beta_\\infty$，误差随之下降 [RF-f6b914c4-9]。\n\n估计值近似服从高斯分布（由平均效应与中心极限定理），因此估计落在精确值 $\\sigma$、$2\\sigma$、$3\\sigma$ 范围内的概率分别约为 65%、95%、99% [RF-f6b914c4-41]。论文模拟给出的经验标准误差为：$m=256$ 时约 ±7%、$m=1024$ 时约 ±3%、$m=65536$ 时约 ±0.5% [RF-f6b914c4-44]。\n\n## 寄存器成本与算法范围\n\n每个寄存器只需至多 $\\log_2\\log_2 N + O(1)$ 位，因此可逐级增加 $m$ 而保持很小的内存开销 [RF-f6b914c4-9]。论文中的程序按最大基数范围 $[0..10^9]$ 和常见实用值 $m = 2^4,\\dots,2^{16}$ 进行配置，并以约 $\\pm1.04/\\sqrt{m}$ 的相对误差返回估计 [RF-f6b914c4-37]。相对于此前最优的 LOGLOG，HLL 只需消耗其 64% 的内存即可达到同等精度 [RF-f6b914c4-10]。\n\n## 小 $m$ 时的退化（对照证据）\n\n第三方评测也印证了同一标度关系：假设 5 位寄存器时，HLL 的误差为 $2.33/\\sqrt{m}$，且误差只取决于计数单元数（即 $m$），当内存很小时误差显著；例如内存为 128 位时 HLL 误差接近 50% [RF-b40077a8-15]。HLL 可覆盖大范围基数，但在内存小于 $2^7$ 时误差偏大 [RF-b40077a8-43]。",
+      "error": null,
+      "elapsed_seconds": 16.847,
+      "prompt_tokens": 16931,
+      "completion_tokens": 1923,
+      "tool_events": [
+        "read_file(\"E:\\agent\\nanobot-v0.1.4-era\\nanobot\\skil…\"), research_sources",
+        "research_decision(\"search\"), research_search(\"HyperLogLog standard error 1.04/sqrt(m) …\"), research_search(\"1.5 KB memory estimate cardinality billi…\"), research_search(\"16384 registers 6 bits standard error 0.…\")"
+      ],
+      "streamed_chars": 1426,
+      "response_ok": true,
+      "expected_answerable": true,
+      "abstained": false,
+      "completed": true,
+      "answer_pass": true,
+      "concept_coverage": 0.6667,
+      "concepts": [
+        {
+          "aliases": [
+            "1.5 KB",
+            "1.5KB"
+          ],
+          "matched": "1.5 KB"
+        },
+        {
+          "aliases": [
+            "2%"
+          ],
+          "matched": "2%"
+        },
+        {
+          "aliases": [
+            "1.04/√m",
+            "1.04 / √m",
+            "1.04/sqrt(m)"
+          ],
+          "matched": null
+        }
+      ],
+      "citations": [
+        "RF-F6B914C4-10",
+        "RF-F6B914C4-1",
+        "RF-F6B914C4-15",
+        "RF-F6B914C4-9",
+        "RF-F6B914C4-41",
+        "RF-F6B914C4-44",
+        "RF-F6B914C4-37",
+        "RF-B40077A8-15",
+        "RF-B40077A8-43"
+      ],
+      "valid_citations": [
+        "RF-F6B914C4-10",
+        "RF-F6B914C4-1",
+        "RF-F6B914C4-15",
+        "RF-F6B914C4-9",
+        "RF-F6B914C4-41",
+        "RF-F6B914C4-44",
+        "RF-F6B914C4-37",
+        "RF-B40077A8-15",
+        "RF-B40077A8-43"
+      ],
+      "missing_citations": [],
+      "citation_validity": 1.0,
+      "relevant_citation_recall": 1.0,
+      "relevant_label_precision": 0.1111,
+      "relevant_hits": [
+        "RF-F6B914C4-1"
+      ],
+      "paragraph_citation_coverage": 1.0,
+      "entailment": {
+        "claims": 5,
+        "entailed": 0,
+        "partially_supported": 1,
+        "unsupported": 4,
+        "support_rate": 0.2,
+        "details": [
+          {
+            "claim": "若只能用约 **1.5 KB** 内存来估计十亿级基数，HyperLogLog（HLL）能提供约 **2% 的典型精度**。具体配置是：$m = 2048$ 个寄存器、32 位哈希、每个寄存器用 5 位\"短字节\"存储，此时可估计超过 $N = 10^9$ 的基数，典型精度约 2%，仅占用 1.5 KB 存储 ；论文开篇也给出同一结论：可估计远超 $10^9$ 的基数、典型精度 2%、内存仅 1.5 KB 。",
+            "citations": [
+              "RF-F6B914C4-10",
+              "RF-F6B914C4-1"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.0484,
+            "missing_numbers": [
+              "10",
+              "9"
+            ],
+            "missing_citations": [],
+            "evidence_excerpt": "s≤N need to be estimated. In particular,\nHYPER LOGLOG achieves an accuracy matching that of standard L OGLOG by consuming only 64% of\nthe corresponding memory. As a consequence, using m = 2048, hashing on 32 bits, and short bytes of 5\nbit length each: cardinalities till values over N = 109 can be estimated with a typical accuracy of 2%\nusing 1.5kB (kilobyte) of storage.\nThe proofs base themselves in part on techniques that are now standard in analysis of algorithms,\nlike poissonization, Mellin transforms, and saddle-point depoissonization. Some nonstandard problems\nhowever present themselves d"
+          },
+          {
+            "claim": "HLL 的相对精度（标准误差）随寄存器数 $m$ 按平方根倒数缩放，典型值为 $1.04/\\sqrt{m}$ 。更精确地，Theorem 1 给出标准误差为 $\\beta_m/\\sqrt{m}$，其中 $\\beta_\\infty = \\sqrt{3\\log 2 - 1} \\approx 1.03896$，且有限 $m$ 时的常数有界：$\\beta_{16}\\approx1.106$、$\\beta_{32}\\approx1.070$、$\\beta_{64}\\approx1.054$、$\\beta_{128}\\approx1.046$ ；寄存器数越多，$\\beta_m$ 越趋近于 $\\beta_\\infty$，误差随之下降 。",
+            "citations": [
+              "RF-F6B914C4-1",
+              "RF-F6B914C4-15",
+              "RF-F6B914C4-9"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.1905,
+            "missing_numbers": [
+              "128",
+              "32",
+              "64"
+            ],
+            "missing_citations": [],
+            "evidence_excerpt": "2007 Conference on Analysis of Algorithms, AofA 07 DMTCS proc. AH, 2007, 137–156\nHyperLogLog: the analysis of a near-optimal\ncardinality estimation algorithm\nPhilippe Flajolet1 and Éric Fusy 1 and Olivier Gandouet2 and Frédéric\nMeunier1\n1Algorithms Project, INRIA–Rocquencourt, F78153 Le Chesnay (France)\n2LIRMM, 161 rue Ada, 34392 Montpellier (France)\nThis extended abstract describes and analyses a near-optimal probabilistic algorithm, H YPER LOGLOG, dedicated to\nestimating the number of distinct elements (the cardinality) of very large data ensembles. Using an auxiliary memory\nofm units (typic"
+          },
+          {
+            "claim": "估计值近似服从高斯分布（由平均效应与中心极限定理），因此估计落在精确值 $\\sigma$、$2\\sigma$、$3\\sigma$ 范围内的概率分别约为 65%、95%、99% 。论文模拟给出的经验标准误差为：$m=256$ 时约 ±7%、$m=1024$ 时约 ±3%、$m=65536$ 时约 ±0.5% 。",
+            "citations": [
+              "RF-F6B914C4-41",
+              "RF-F6B914C4-44"
+            ],
+            "label": "PARTIALLY_SUPPORTED",
+            "lexical_overlap": 0.1034,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "In other words, the quantity E of\nHYPER LOGLOG estimates the number of different hashed values, which is with high probability,\nabout 2L(1−e−Λ), where Λ =n/2L. The inversion of that relation then gives us the approximate\nequationn =−2L log(1−E/2L), which is the one used in the program.\nRegarding registers, their values a priori range in the interval 0..L + 1− log2m. With hashed values\nof 32 bits, this means that 5 bits (“short bytes”) are sufﬁcient to store registers (of course, standard 8–bit\nbytes can also be used in some implementations). Regarding the quality of results returned, we expect"
+          },
+          {
+            "claim": "每个寄存器只需至多 $\\log_2\\log_2 N + O(1)$ 位，因此可逐级增加 $m$ 而保持很小的内存开销 。论文中的程序按最大基数范围 $[0..10^9]$ 和常见实用值 $m = 2^4,\\dots,2^{16}$ 进行配置，并以约 $\\pm1.04/\\sqrt{m}$ 的相对误差返回估计 。相对于此前最优的 LOGLOG，HLL 只需消耗其 64% 的内存即可达到同等精度 。",
+            "citations": [
+              "RF-F6B914C4-9",
+              "RF-F6B914C4-37",
+              "RF-F6B914C4-10"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.05,
+            "missing_numbers": [
+              "9"
+            ],
+            "missing_citations": [],
+            "evidence_excerpt": "OG, namely\nthe largestρ value obtained, whereρ(x) is the position of the leftmost 1-bit in binary stringx. Stochastic\naveraging in the sense above is employed. However, our algorithm differs from standard LOGLOG by its\nevaluation function: its is based on harmonic means, while the standard algorithm uses what amounts to\na geometric mean 1. The idea of using harmonic means originally drew its inspiration from an insight-\nful note of Chassaing and Gérin [6]: such means have the effect of taming probability distributions with\nslow-decaying right tails, and here they operate as a variance reductio"
+          },
+          {
+            "claim": "第三方评测也印证了同一标度关系：假设 5 位寄存器时，HLL 的误差为 $2.33/\\sqrt{m}$，且误差只取决于计数单元数（即 $m$），当内存很小时误差显著；例如内存为 128 位时 HLL 误差接近 50% 。HLL 可覆盖大范围基数，但在内存小于 $2^7$ 时误差偏大 。",
+            "citations": [
+              "RF-B40077A8-15",
+              "RF-B40077A8-43"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.0625,
+            "missing_numbers": [
+              "7"
+            ],
+            "missing_citations": [],
+            "evidence_excerpt": "can count\nup toO(2 32)with 32-bit counters.\nStandard error.The standard error of LC is\nq\net−t−1\ntN\ndepending on both m and N. Given a fixed m, an increasingly\nlarge N results in a large load factor t, and hence a large error.\nThis makes LC unable to count cardinalities that may span a\nwide range with limited memory. However, if t remains small\n(e.g., 1≤t≤5 ), LC can achieve a very low standard error of\nO( 1√\nN ). HLL and KMV have errors depending on m only, or\nmore precisely, the number of counting units used. As discussed\nearlier, the error of HLL and KMV are 2.33√m (assuming 5-bit\nregisters "
+          }
+        ]
+      },
+      "estimated_cost_usd": 0.0,
+      "bad_case_labels": [
+        "unsupported_claim"
+      ],
+      "llm_judge": {
+        "correctness": 2,
+        "faithfulness": 2,
+        "completeness": 2,
+        "citation_alignment": 2,
+        "unsupported_claims": [],
+        "contradictions": [],
+        "evidence_spans": [
+          "RF-f6b914c4-1",
+          "RF-f6b914c4-10",
+          "RF-f6b914c4-15",
+          "RF-f6b914c4-9",
+          "RF-f6b914c4-41",
+          "RF-f6b914c4-44",
+          "RF-f6b914c4-37",
+          "RF-b40077a8-15",
+          "RF-b40077a8-43"
+        ],
+        "reason": "The answer correctly states that ~1.5KB memory yields ~2% typical accuracy for cardinalities beyond 10^9, matching gold evidence RF-f6b914c4-1 and RF-f6b914c4-10. It correctly gives the error scaling as 1.04/√m (β∞/√m with β∞≈1.03896) and the finite-m β values from Theorem 1 (RF-f6b914c4-15), plus the Gaussian confidence intervals (RF-f6b914c4-41) and empirical errors (RF-f6b914c4-44). All required concepts (1.5KB, 2%, 1.04/√m) are covered. Every claim is supported by the cited evidence, and citations align with the claims they support. No unsupported claims or contradictions found.",
+        "confidence": 0.98,
+        "overall": 1.0,
+        "usage": {
+          "prompt_tokens": 5021,
+          "completion_tokens": 454,
+          "total_tokens": 5475
+        }
+      },
+      "semantic_entailment": {
+        "claims": 5,
+        "support_rate": 1.0,
+        "verdicts": [
+          {
+            "claim_index": 0,
+            "label": "ENTAILED",
+            "evidence_span": "using m = 2048, hashing on 32 bits, and short bytes of 5 bit length each: cardinalities till values over N = 109 can be estimated with a typical accuracy of 2% using 1.5kB (kilobyte) of storage.",
+            "reason": "The cited evidence directly states m=2048, 32-bit hashing, 5-bit short bytes, cardinalities over N=10^9, typical accuracy 2%, and 1.5kB storage, matching all parts of the claim. The second citation (abstract) also confirms the same conclusion."
+          },
+          {
+            "claim_index": 1,
+            "label": "ENTAILED",
+            "evidence_span": "the relative accuracy (the standard error) is typically about 1.04/√m ... the constants βm being bounded, with β16 .= 1.106, β32 .= 1.070, β64 .= 1.054, β128 .= 1.046, and β∞ = √3 log(2) − 1 .= 1.03896.",
+            "reason": "The evidence confirms the 1.04/√m typical standard error, the βm/√m formula, β∞ = √(3 log 2 − 1) ≈ 1.03896, and the specific finite-m constants β16≈1.106, β32≈1.070, β64≈1.054, β128≈1.046, with βm approaching β∞ as m increases."
+          },
+          {
+            "claim_index": 2,
+            "label": "ENTAILED",
+            "evidence_span": "the estimates provided by HYPER LOGLOG are expected to be within σ, 2σ, 3σ of the exact count in respectively 65%, 95%, 99% of all the cases. ... ±7% for m = 256, ±3% for m = 1024, and ±0.5% for m = 65536.",
+            "reason": "The evidence confirms the Gaussian approximation (averaging effect and Central Limit Theorem), the 65%/95%/99% probabilities for σ/2σ/3σ, and the empirical standard errors ±7% (m=256), ±3% (m=1024), ±0.5% (m=65536)."
+          },
+          {
+            "claim_index": 3,
+            "label": "ENTAILED",
+            "evidence_span": "each of which is at most log2 log2 N + O(1) bits ... dimensioned for maximal cardinalities in the range [0..10^9] and for common 'practical' values m = 2^4,...,2^16 ... return cardinality estimate E⋆ with typical relative error ±1.04/√m ... consuming only 64% of the corresponding memory.",
+            "reason": "The evidence confirms registers need at most log2 log2 N + O(1) bits, the program is dimensioned for [0..10^9] with m=2^4..2^16, returns estimate with typical relative error ±1.04/√m, and HLL achieves matching accuracy consuming only 64% of LOGLOG's memory."
+          },
+          {
+            "claim_index": 4,
+            "label": "ENTAILED",
+            "evidence_span": "the error of HLL and KMV are 2.33/√m (assuming 5-bit registers in HLL) ... the error of HLL is almost 50% with a memory of 128 bits ... they have large errors when the memory size is small (e.g., smaller than 2^7).",
+            "reason": "The evidence confirms the 2.33/√m error (assuming 5-bit registers), that error depends only on m (number of counting units), the ~50% error at 128-bit memory, and large errors when memory is smaller than 2^7."
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 5486,
+          "completion_tokens": 884,
+          "total_tokens": 6370
+        }
+      }
+    }
+  ],
+  "dataset": "E:\\agent\\nanobot-v0.1.4-era\\benchmarks\\researchflow\\cardinality_e2e_holdout_16.jsonl",
+  "model": "deepseek-flash",
+  "judge": {
+    "model": "deepseek-v4-pro",
+    "cases": 1,
+    "concurrency": 1,
+    "semantic_entailment_enabled": true,
+    "average_overall": 1.0,
+    "semantic_claim_support_rate": 1.0,
+    "prompt_tokens": 10507,
+    "completion_tokens": 1338,
+    "estimated_cost_usd": null,
+    "pricing": {
+      "configured": false,
+      "prompt_usd_per_million": 0.0,
+      "completion_usd_per_million": 0.0
+    }
+  }
+}

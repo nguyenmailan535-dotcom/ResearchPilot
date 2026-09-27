@@ -113,3 +113,28 @@ def test_project_memory_is_isolated_and_audited(tmp_path: Path) -> None:
     assert store.supersede_memory(memory["id"]) is True
     assert store.search_memories("agent-runtime", "RabbitMQ") == []
     assert store.stats()["events"] >= 4
+
+
+def test_evidence_ledger_is_separate_versioned_and_citation_backed(tmp_path: Path) -> None:
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    source = workspace / "paper.md"
+    source.write_text("Hybrid retrieval combines lexical and semantic evidence." * 4)
+    store = ResearchStore(workspace)
+    store.ingest_file(source)
+    citation = store.search("hybrid retrieval lexical semantic")[0]["citation"]
+
+    first = store.record_evidence_decision(
+        "retrieval", "decision", "Use hybrid retrieval.", [citation]
+    )
+    second = store.record_evidence_decision(
+        "retrieval",
+        "decision",
+        "Use hybrid retrieval followed by reranking.",
+        [citation],
+        supersedes_id=first["id"],
+    )
+
+    active = store.search_evidence_decisions("retrieval", "reranking")
+    assert [item["id"] for item in active] == [second["id"]]
+    assert store.stats()["active_evidence_decisions"] == 1

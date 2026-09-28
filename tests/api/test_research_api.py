@@ -7,30 +7,49 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
+import httpx
 import pytest
 import pytest_asyncio
 
 from nanobot.api.research import ResearchTaskManager, ResearchTaskStore
 from nanobot.api.server import create_app
 
-try:
-    from aiohttp import FormData
-    from aiohttp.test_utils import TestClient, TestServer
 
-    HAS_AIOHTTP = True
-except ImportError:
-    HAS_AIOHTTP = False
+class _Response:
+    def __init__(self, response: httpx.Response) -> None:
+        self._response = response
+        self.status = response.status_code
 
-pytestmark = pytest.mark.skipif(not HAS_AIOHTTP, reason="aiohttp not installed")
+    async def json(self):
+        return self._response.json()
+
+    async def text(self):
+        return self._response.text
+
+
+class _Client:
+    def __init__(self, app) -> None:
+        self.app = app
+        self._client = httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://test"
+        )
+
+    async def post(self, *args, **kwargs):
+        return _Response(await self._client.post(*args, **kwargs))
+
+    async def get(self, *args, **kwargs):
+        return _Response(await self._client.get(*args, **kwargs))
+
+    async def close(self):
+        await self._client.aclose()
 
 
 @pytest_asyncio.fixture
-async def aiohttp_client():
-    clients: list[TestClient] = []
+async def api_client():
+    clients: list[_Client] = []
 
     async def factory(app):
-        client = TestClient(TestServer(app))
-        await client.start_server()
+        client = _Client(app)
         clients.append(client)
         return client
 
@@ -46,7 +65,7 @@ def _agent(workspace: Path, process) -> MagicMock:
     return agent
 
 
-async def _wait_for_terminal(client: TestClient, task_id: str) -> dict:
+async def _wait_for_terminal(client: _Client, task_id: str) -> dict:
     for _ in range(100):
         response = await client.get(f"/api/v1/research/tasks/{task_id}")
         task = (await response.json())["task"]
@@ -67,19 +86,21 @@ async def _wait_until(predicate, *, timeout: float = 1.0) -> None:
 
 
 @pytest.mark.asyncio
-async def test_upload_and_read_document(aiohttp_client, tmp_path: Path) -> None:
+async def test_upload_and_read_document(api_client, tmp_path: Path) -> None:
     async def process(**_):
         return SimpleNamespace(content="done")
 
-    client = await aiohttp_client(create_app(_agent(tmp_path, process), workspace=tmp_path))
-    form = FormData()
-    form.add_field(
-        "file",
-        b"HyperLogLog estimates distinct cardinality with compact registers.",
-        filename="sample.txt",
-        content_type="text/plain",
+    client = await api_client(create_app(_agent(tmp_path, process), workspace=tmp_path))
+    response = await client.post(
+        "/api/v1/documents",
+        files={
+            "file": (
+                "sample.txt",
+                b"HyperLogLog estimates distinct cardinality with compact registers.",
+                "text/plain",
+            )
+        },
     )
-    response = await client.post("/api/v1/documents", data=form)
     assert response.status == 201
     document = (await response.json())["document"]
     assert document["status"] == "indexed"
@@ -96,7 +117,7 @@ async def test_upload_and_read_document(aiohttp_client, tmp_path: Path) -> None:
 
 
 @pytest.mark.asyncio
-async def test_task_lifecycle_and_sse_replay(aiohttp_client, tmp_path: Path) -> None:
+async def test_task_lifecycle_and_sse_replay(api_client, tmp_path: Path) -> None:
     async def process(**kwargs):
         await kwargs["on_progress"]("research_search(\"HLL\")", tool_hint=True)
         await kwargs["on_stream"]("grounded ")
@@ -104,7 +125,7 @@ async def test_task_lifecycle_and_sse_replay(aiohttp_client, tmp_path: Path) -> 
         await kwargs["on_stream_end"](resuming=False)
         return SimpleNamespace(content="grounded answer [RF-12345678-1]")
 
-    client = await aiohttp_client(create_app(_agent(tmp_path, process), workspace=tmp_path))
+    client = await api_client(create_app(_agent(tmp_path, process), workspace=tmp_path))
     response = await client.post(
         "/api/v1/research/tasks",
         json={"query": "Compare cardinality estimators", "project": "benchmark"},
@@ -125,14 +146,14 @@ async def test_task_lifecycle_and_sse_replay(aiohttp_client, tmp_path: Path) -> 
 
 
 @pytest.mark.asyncio
-async def test_task_can_be_cancelled(aiohttp_client, tmp_path: Path) -> None:
+async def test_task_can_be_cancelled(api_client, tmp_path: Path) -> None:
     started = asyncio.Event()
 
     async def process(**_):
         started.set()
         await asyncio.Event().wait()
 
-    client = await aiohttp_client(create_app(_agent(tmp_path, process), workspace=tmp_path))
+    client = await api_client(create_app(_agent(tmp_path, process), workspace=tmp_path))
     response = await client.post("/api/v1/research/tasks", json={"query": "long task"})
     task_id = (await response.json())["task"]["id"]
     await asyncio.wait_for(started.wait(), timeout=1)
@@ -144,12 +165,12 @@ async def test_task_can_be_cancelled(aiohttp_client, tmp_path: Path) -> None:
 
 
 @pytest.mark.asyncio
-async def test_report_listing_and_verification(aiohttp_client, tmp_path: Path) -> None:
+async def test_report_listing_and_verification(api_client, tmp_path: Path) -> None:
     async def process(**_):
         return SimpleNamespace(content="done")
 
-    client = await aiohttp_client(create_app(_agent(tmp_path, process), workspace=tmp_path))
-    manager = client.app["research_manager"]
+    client = await api_client(create_app(_agent(tmp_path, process), workspace=tmp_path))
+    manager = client.app.state.research_manager
     source = tmp_path / "source.txt"
     source.write_text("evidence for report", encoding="utf-8")
     indexed = manager.research.ingest_file(source)
@@ -164,17 +185,17 @@ async def test_report_listing_and_verification(aiohttp_client, tmp_path: Path) -
 
 
 @pytest.mark.asyncio
-async def test_research_routes_require_workspace(aiohttp_client) -> None:
+async def test_research_routes_require_workspace(api_client) -> None:
     agent = MagicMock(spec=[])
-    client = await aiohttp_client(create_app(agent))
+    client = await api_client(create_app(agent))
     response = await client.get("/api/v1/research/tasks")
     assert response.status == 503
 
 
 @pytest.mark.asyncio
-async def test_web_client_is_served(aiohttp_client) -> None:
+async def test_web_client_is_served(api_client) -> None:
     agent = MagicMock(spec=[])
-    client = await aiohttp_client(create_app(agent))
+    client = await api_client(create_app(agent))
     response = await client.get("/")
     assert response.status == 200
     assert "ResearchFlow" in await response.text()

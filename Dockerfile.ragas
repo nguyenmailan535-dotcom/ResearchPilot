@@ -1,0 +1,7 @@
+ARG RESEARCHFLOW_BASE_IMAGE=researchflow-agent:local
+FROM ${RESEARCHFLOW_BASE_IMAGE}
+
+COPY requirements-ragas.txt /tmp/requirements-ragas.txt
+RUN pip install --no-cache-dir -r /tmp/requirements-ragas.txt
+
+ENV RAGAS_MAX_TOKENS=8192

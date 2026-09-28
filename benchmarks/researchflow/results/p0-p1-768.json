@@ -1,0 +1,3279 @@
+{
+  "dataset_cases": 40,
+  "ks": [
+    1,
+    3,
+    5
+  ],
+  "methods": {
+    "bm25": {
+      "elapsed_seconds": 8.278,
+      "p50_latency_ms": 211.555,
+      "p95_latency_ms": 253.1959,
+      "metrics": {
+        "at_1": {
+          "cases": 40,
+          "recall_at_k": 0.3375,
+          "success_at_k": 0.35,
+          "mrr": 0.35
+        },
+        "at_3": {
+          "cases": 40,
+          "recall_at_k": 0.4125,
+          "success_at_k": 0.425,
+          "mrr": 0.3875
+        },
+        "at_5": {
+          "cases": 40,
+          "recall_at_k": 0.4875,
+          "success_at_k": 0.5,
+          "mrr": 0.405
+        }
+      },
+      "by_language_at_max_k": {
+        "en": {
+          "cases": 24,
+          "recall_at_k": 0.7292,
+          "success_at_k": 0.75,
+          "mrr": 0.6125
+        },
+        "zh": {
+          "cases": 16,
+          "recall_at_k": 0.125,
+          "success_at_k": 0.125,
+          "mrr": 0.0938
+        }
+      },
+      "by_difficulty_at_max_k": {
+        "easy": {
+          "cases": 7,
+          "recall_at_k": 0.5,
+          "success_at_k": 0.5714,
+          "mrr": 0.5
+        },
+        "hard": {
+          "cases": 19,
+          "recall_at_k": 0.4737,
+          "success_at_k": 0.4737,
+          "mrr": 0.4079
+        },
+        "medium": {
+          "cases": 14,
+          "recall_at_k": 0.5,
+          "success_at_k": 0.5,
+          "mrr": 0.3536
+        }
+      },
+      "details": [
+        {
+          "id": "hll-01",
+          "query": "What is the asymptotic standard error of HyperLogLog with m registers?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-1"
+          ],
+          "retrieved": [
+            "RF-F6B914C4-15",
+            "RF-F6B914C4-52",
+            "RF-B40077A8-24",
+            "RF-B40077A8-20",
+            "RF-B40077A8-59"
+          ],
+          "latency_ms": 141.129
+        },
+        {
+          "id": "hll-02",
+          "query": "HLL 使用约 1.5KB 内存时可以达到怎样的基数估计精度？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-1"
+          ],
+          "retrieved": [
+            "RF-F6B914C4-16",
+            "RF-83330C9C-35",
+            "RF-83330C9C-86",
+            "RF-83330C9C-98",
+            "RF-83330C9C-95"
+          ],
+          "latency_ms": 144.156
+        },
+        {
+          "id": "hll-03",
+          "query": "How many bits are sufficient for each HyperLogLog register with 32-bit hashes?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-64"
+          ],
+          "retrieved": [
+            "RF-B40077A8-17",
+            "RF-83330C9C-101",
+            "RF-B40077A8-19",
+            "RF-EA8EE7AB-27",
+            "RF-B40077A8-18"
+          ],
+          "latency_ms": 148.869
+        },
+        {
+          "id": "hll-04",
+          "query": "为什么 HLL 的估计结果可以近似看作高斯分布，其标准差如何表示？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-64"
+          ],
+          "retrieved": [
+            "RF-83330C9C-39",
+            "RF-83330C9C-86",
+            "RF-83330C9C-35",
+            "RF-83330C9C-31",
+            "RF-83330C9C-98"
+          ],
+          "latency_ms": 159.331
+        },
+        {
+          "id": "hll-05",
+          "query": "Describe how HyperLogLog chooses a register and updates it using the leftmost one bit.",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-19"
+          ],
+          "retrieved": [
+            "RF-F6B914C4-19",
+            "RF-2DCCFEB5-78",
+            "RF-F6B914C4-57",
+            "RF-2DCCFEB5-82",
+            "RF-83330C9C-81"
+          ],
+          "latency_ms": 176.935
+        },
+        {
+          "id": "hll-06",
+          "query": "How do the relative accuracy constants of LOGLOG and HYPERLOGLOG compare?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-13"
+          ],
+          "retrieved": [
+            "RF-F6B914C4-54",
+            "RF-F6B914C4-2",
+            "RF-2DCCFEB5-87",
+            "RF-F6B914C4-19",
+            "RF-F6B914C4-13"
+          ],
+          "latency_ms": 164.298
+        },
+        {
+          "id": "hll-07",
+          "query": "哪种经典去重计数算法能够最优并行化，并以 1.04 除以根号 m 的误差工作？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-1"
+          ],
+          "retrieved": [
+            "RF-F6B914C4-13",
+            "RF-F6B914C4-58",
+            "RF-B40077A8-19",
+            "RF-B40077A8-20",
+            "RF-02FC78C3-132"
+          ],
+          "latency_ms": 197.797
+        },
+        {
+          "id": "hll-08",
+          "query": "Why can querying HLL be slow when it must aggregate every register with a harmonic mean?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-19"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-28",
+            "RF-2DCCFEB5-46",
+            "RF-83330C9C-29",
+            "RF-83330C9C-82",
+            "RF-F6B914C4-21"
+          ],
+          "latency_ms": 247.268
+        },
+        {
+          "id": "drex-01",
+          "query": "Why do database-oriented distinct counters struggle with dynamic network traffic under tight memory?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-8"
+          ],
+          "retrieved": [
+            "RF-B40077A8-8",
+            "RF-B40077A8-1",
+            "RF-B40077A8-7",
+            "RF-977C4044-5",
+            "RF-977C4044-29"
+          ],
+          "latency_ms": 230.44
+        },
+        {
+          "id": "drex-02",
+          "query": "DREX 如何通过自适应采样在固定小内存下扩展可计数范围？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-8"
+          ],
+          "retrieved": [
+            "RF-B40077A8-12",
+            "RF-B40077A8-64",
+            "RF-B40077A8-80",
+            "RF-B40077A8-39",
+            "RF-B40077A8-13"
+          ],
+          "latency_ms": 234.623
+        },
+        {
+          "id": "drex-03",
+          "query": "What standard-error expression is derived for DREX when t equals pN divided by m?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-59"
+          ],
+          "retrieved": [
+            "RF-B40077A8-59",
+            "RF-B40077A8-58",
+            "RF-B40077A8-61",
+            "RF-B40077A8-64",
+            "RF-F6B914C4-25"
+          ],
+          "latency_ms": 193.65
+        },
+        {
+          "id": "drex-04",
+          "query": "实验为什么表明 DREX 的每个计数单元使用 2 bit 就足够？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-67"
+          ],
+          "retrieved": [
+            "RF-B40077A8-78",
+            "RF-B40077A8-35",
+            "RF-B40077A8-40",
+            "RF-B40077A8-10",
+            "RF-B40077A8-36"
+          ],
+          "latency_ms": 179.539
+        },
+        {
+          "id": "drex-05",
+          "query": "Across wide cardinality ranges, how much can DREX reduce relative error versus HLL and KMV?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-69"
+          ],
+          "retrieved": [
+            "RF-B40077A8-69",
+            "RF-B40077A8-70",
+            "RF-B40077A8-67",
+            "RF-B40077A8-12",
+            "RF-B40077A8-80"
+          ],
+          "latency_ms": 206.181
+        },
+        {
+          "id": "drex-06",
+          "query": "在指定 F1 分数的超级扩散者检测中，DREX 相比 HLL 能节省多少内存？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-76"
+          ],
+          "retrieved": [
+            "RF-B40077A8-76",
+            "RF-B40077A8-75",
+            "RF-B40077A8-77",
+            "RF-B40077A8-79",
+            "RF-B40077A8-64"
+          ],
+          "latency_ms": 211.078
+        },
+        {
+          "id": "drex-07",
+          "query": "What peak update throughput in Mops is reported for DREX and why is it fast at high cardinality?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-77"
+          ],
+          "retrieved": [
+            "RF-B40077A8-78",
+            "RF-B40077A8-77",
+            "RF-B40077A8-80",
+            "RF-B40077A8-12",
+            "RF-977C4044-17"
+          ],
+          "latency_ms": 238.253
+        },
+        {
+          "id": "drex-08",
+          "query": "How are two DREX instances aligned and combined to compute their union?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-51",
+            "RF-B40077A8-53"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-53",
+            "RF-B40077A8-51",
+            "RF-B40077A8-53",
+            "RF-58AA680D-81",
+            "RF-F6B914C4-11"
+          ],
+          "latency_ms": 268.99
+        },
+        {
+          "id": "drex-09",
+          "query": "DREX 如何利用容斥原理由两个实例估计集合交集？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-53"
+          ],
+          "retrieved": [
+            "RF-B40077A8-12",
+            "RF-B40077A8-64",
+            "RF-B40077A8-80",
+            "RF-B40077A8-39",
+            "RF-B40077A8-13"
+          ],
+          "latency_ms": 259.958
+        },
+        {
+          "id": "drex-10",
+          "query": "Which network cardinality sketch keeps accuracy nearly unchanged when counter width q varies from two to five?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-67"
+          ],
+          "retrieved": [
+            "RF-B40077A8-45",
+            "RF-9B51FD1B-25",
+            "RF-9B51FD1B-17",
+            "RF-B40077A8-54",
+            "RF-9B51FD1B-122"
+          ],
+          "latency_ms": 215.456
+        },
+        {
+          "id": "ull-01",
+          "query": "How much less space does UltraLogLog require than HLL for the same distinct-count information?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-1",
+            "RF-2DCCFEB5-22"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-1",
+            "RF-2DCCFEB5-2",
+            "RF-2DCCFEB5-49",
+            "RF-2DCCFEB5-4",
+            "RF-2DCCFEB5-3"
+          ],
+          "latency_ms": 198.231
+        },
+        {
+          "id": "ull-02",
+          "query": "ULL 具备哪些适合分布式系统的代数性质和插入复杂度？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-1"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-107",
+            "RF-2DCCFEB5-86",
+            "RF-2DCCFEB5-49",
+            "RF-2DCCFEB5-108",
+            "RF-2DCCFEB5-76"
+          ],
+          "latency_ms": 219.661
+        },
+        {
+          "id": "ull-03",
+          "query": "What space reduction does the simpler fast UltraLogLog estimator retain at HLL-like estimation speed?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-1"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-2",
+            "RF-2DCCFEB5-110",
+            "RF-2DCCFEB5-109",
+            "RF-2DCCFEB5-1",
+            "RF-83330C9C-54"
+          ],
+          "latency_ms": 173.057
+        },
+        {
+          "id": "ull-04",
+          "query": "UltraLogLog 的 MVP 数值是多少，它比 HyperLogLog 低多少？",
+          "language": "zh",
+          "difficulty": "easy",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-22"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-46",
+            "RF-2DCCFEB5-22",
+            "RF-2DCCFEB5-73",
+            "RF-2DCCFEB5-3",
+            "RF-2DCCFEB5-118"
+          ],
+          "latency_ms": 186.345
+        },
+        {
+          "id": "ull-05",
+          "query": "How does maximum-likelihood estimation in ULL relate to the Cramér-Rao variance bound?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-38"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-38",
+            "RF-2DCCFEB5-23",
+            "RF-2DCCFEB5-107",
+            "RF-2DCCFEB5-108",
+            "RF-2DCCFEB5-50"
+          ],
+          "latency_ms": 198.023
+        },
+        {
+          "id": "ull-06",
+          "query": "为什么 ULL 的寄存器表示经过无损压缩后通常比 HLL 更紧凑？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-22"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-107",
+            "RF-2DCCFEB5-86",
+            "RF-2DCCFEB5-108",
+            "RF-2DCCFEB5-49",
+            "RF-2DCCFEB5-101"
+          ],
+          "latency_ms": 215.321
+        },
+        {
+          "id": "ull-07",
+          "query": "What happens to HLL memory-variance product when martingale or HIP estimation is allowed without merging?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-20"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-73",
+            "RF-2DCCFEB5-72",
+            "RF-2DCCFEB5-46",
+            "RF-2DCCFEB5-37",
+            "RF-2DCCFEB5-19"
+          ],
+          "latency_ms": 222.675
+        },
+        {
+          "id": "ull-08",
+          "query": "不可合并的 distinct-count sketch 理论 MVP 下限大约是多少？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-20"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-12",
+            "RF-2DCCFEB5-16",
+            "RF-2DCCFEB5-101",
+            "RF-2DCCFEB5-49",
+            "RF-9B51FD1B-17"
+          ],
+          "latency_ms": 229.866
+        },
+        {
+          "id": "ull-09",
+          "query": "Why is mergeability important for ULL when partial counts are distributed over space or time?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-81"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-81",
+            "RF-2DCCFEB5-8",
+            "RF-2DCCFEB5-110",
+            "RF-2DCCFEB5-19",
+            "RF-2DCCFEB5-106"
+          ],
+          "latency_ms": 245.765
+        },
+        {
+          "id": "ull-10",
+          "query": "How can UltraLogLog sketches with different precision be merged or downsized?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-81"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-81",
+            "RF-2DCCFEB5-85",
+            "RF-2DCCFEB5-91",
+            "RF-2DCCFEB5-73",
+            "RF-83330C9C-73"
+          ],
+          "latency_ms": 252.84
+        },
+        {
+          "id": "seive-01",
+          "query": "What stream-processing task is SeiveSketch designed to solve?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-1"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-12",
+            "RF-9B51FD1B-122",
+            "RF-9B51FD1B-57",
+            "RF-9B51FD1B-3",
+            "RF-9B51FD1B-123"
+          ],
+          "latency_ms": 228.999
+        },
+        {
+          "id": "seive-02",
+          "query": "SeiveSketch 为什么使用 4-bit 计数器处理大量冷门项？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-3"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-83",
+            "RF-83330C9C-32",
+            "RF-2DCCFEB5-84",
+            "RF-9B51FD1B-32",
+            "RF-9B51FD1B-51"
+          ],
+          "latency_ms": 177.274
+        },
+        {
+          "id": "seive-03",
+          "query": "By what maximum factor does SeiveSketch reduce estimation error compared with the state of the art?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-3"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-3",
+            "RF-9B51FD1B-124",
+            "RF-2DCCFEB5-9",
+            "RF-E26B02A3-145",
+            "RF-9B51FD1B-94"
+          ],
+          "latency_ms": 176.831
+        },
+        {
+          "id": "seive-04",
+          "query": "自适应缩放如何在不增加计数器位数的情况下适应不同数据集的冷项频率范围？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-24"
+          ],
+          "retrieved": [],
+          "latency_ms": 212.032
+        },
+        {
+          "id": "seive-05",
+          "query": "Which theorem provides the relative-error bound for every item in SeiveSketch?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-73"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-73",
+            "RF-83330C9C-68",
+            "RF-9B51FD1B-3",
+            "RF-B40077A8-58",
+            "RF-83330C9C-72"
+          ],
+          "latency_ms": 232.874
+        },
+        {
+          "id": "seive-06",
+          "query": "在 CAIDA 数据集上，SeiveSketch 相比 CM、CU、AS、CF 等方法的 ARE 改善如何？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-87"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-95",
+            "RF-9B51FD1B-86",
+            "RF-9B51FD1B-94",
+            "RF-9B51FD1B-21",
+            "RF-9B51FD1B-91"
+          ],
+          "latency_ms": 243.025
+        },
+        {
+          "id": "seive-07",
+          "query": "Why can CU estimate hot items more accurately than SeiveSketch even when SeiveSketch wins overall?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-87"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-87",
+            "RF-9B51FD1B-89",
+            "RF-9B51FD1B-123",
+            "RF-9B51FD1B-95",
+            "RF-9B51FD1B-94"
+          ],
+          "latency_ms": 237.128
+        },
+        {
+          "id": "seive-08",
+          "query": "How are local SeiveSketch instances combined in a distributed counting deployment?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-51"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-51",
+            "RF-9B51FD1B-122",
+            "RF-9B51FD1B-123",
+            "RF-9B51FD1B-52",
+            "RF-EA8EE7AB-27"
+          ],
+          "latency_ms": 201.378
+        },
+        {
+          "id": "seive-09",
+          "query": "为什么在单节点内存较小时，增加分布式实例并合并反而可能降低估计误差？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-123"
+          ],
+          "retrieved": [],
+          "latency_ms": 161.034
+        },
+        {
+          "id": "seive-10",
+          "query": "What parallel processing speedup range is reported for SeiveSketch?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-121"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-121",
+            "RF-9B51FD1B-57",
+            "RF-9B51FD1B-2",
+            "RF-9B51FD1B-14",
+            "RF-9B51FD1B-122"
+          ],
+          "latency_ms": 222.181
+        },
+        {
+          "id": "distractor-01",
+          "query": "Which system exposes hidden collective-communication dependencies for root-cause analysis in unreliable LLM training?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "Mycroft",
+          "relevant": [
+            "RF-02FC78C3-3"
+          ],
+          "retrieved": [
+            "RF-02FC78C3-4",
+            "RF-02FC78C3-12",
+            "RF-02FC78C3-13",
+            "RF-02FC78C3-3",
+            "RF-02FC78C3-115"
+          ],
+          "latency_ms": 203.332
+        },
+        {
+          "id": "distractor-02",
+          "query": "哪篇论文介绍了用于大规模语言模型训练的 Astral 数据中心基础设施？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "Astral",
+          "relevant": [
+            "RF-58AA680D-1"
+          ],
+          "retrieved": [
+            "RF-58AA680D-15",
+            "RF-58AA680D-80",
+            "RF-58AA680D-36",
+            "RF-58AA680D-79",
+            "RF-58AA680D-11"
+          ],
+          "latency_ms": 220.59
+        }
+      ],
+      "bad_cases": {
+        "retrieval_miss": [
+          "hll-01",
+          "hll-02",
+          "hll-03",
+          "hll-04",
+          "hll-07",
+          "hll-08",
+          "drex-02",
+          "drex-04",
+          "drex-09",
+          "drex-10",
+          "ull-02",
+          "ull-06",
+          "ull-07",
+          "ull-08",
+          "seive-01",
+          "seive-02",
+          "seive-04",
+          "seive-06",
+          "seive-09",
+          "distractor-02"
+        ]
+      }
+    },
+    "vector": {
+      "elapsed_seconds": 0.716,
+      "p50_latency_ms": 16.372,
+      "p95_latency_ms": 30.7848,
+      "metrics": {
+        "at_1": {
+          "cases": 40,
+          "recall_at_k": 0.1,
+          "success_at_k": 0.1,
+          "mrr": 0.1
+        },
+        "at_3": {
+          "cases": 40,
+          "recall_at_k": 0.3125,
+          "success_at_k": 0.325,
+          "mrr": 0.1958
+        },
+        "at_5": {
+          "cases": 40,
+          "recall_at_k": 0.4,
+          "success_at_k": 0.425,
+          "mrr": 0.2183
+        }
+      },
+      "by_language_at_max_k": {
+        "en": {
+          "cases": 24,
+          "recall_at_k": 0.5,
+          "success_at_k": 0.5417,
+          "mrr": 0.3049
+        },
+        "zh": {
+          "cases": 16,
+          "recall_at_k": 0.25,
+          "success_at_k": 0.25,
+          "mrr": 0.0885
+        }
+      },
+      "by_difficulty_at_max_k": {
+        "easy": {
+          "cases": 7,
+          "recall_at_k": 0.3571,
+          "success_at_k": 0.4286,
+          "mrr": 0.1714
+        },
+        "hard": {
+          "cases": 19,
+          "recall_at_k": 0.4474,
+          "success_at_k": 0.4737,
+          "mrr": 0.2368
+        },
+        "medium": {
+          "cases": 14,
+          "recall_at_k": 0.3571,
+          "success_at_k": 0.3571,
+          "mrr": 0.2167
+        }
+      },
+      "details": [
+        {
+          "id": "hll-01",
+          "query": "What is the asymptotic standard error of HyperLogLog with m registers?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-1"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-40",
+            "RF-F6B914C4-58",
+            "RF-2DCCFEB5-15",
+            "RF-F6B914C4-67",
+            "RF-2DCCFEB5-83"
+          ],
+          "latency_ms": 39.789
+        },
+        {
+          "id": "hll-02",
+          "query": "HLL 使用约 1.5KB 内存时可以达到怎样的基数估计精度？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-1"
+          ],
+          "retrieved": [
+            "RF-B40077A8-20",
+            "RF-2DCCFEB5-44",
+            "RF-B40077A8-25",
+            "RF-2DCCFEB5-46",
+            "RF-2DCCFEB5-48"
+          ],
+          "latency_ms": 17.682
+        },
+        {
+          "id": "hll-03",
+          "query": "How many bits are sufficient for each HyperLogLog register with 32-bit hashes?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-64"
+          ],
+          "retrieved": [
+            "RF-F6B914C4-16",
+            "RF-F6B914C4-57",
+            "RF-2DCCFEB5-11",
+            "RF-B40077A8-19",
+            "RF-83330C9C-32"
+          ],
+          "latency_ms": 13.283
+        },
+        {
+          "id": "hll-04",
+          "query": "为什么 HLL 的估计结果可以近似看作高斯分布，其标准差如何表示？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-64"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-98",
+            "RF-2DCCFEB5-21",
+            "RF-B40077A8-20",
+            "RF-2DCCFEB5-24",
+            "RF-2DCCFEB5-25"
+          ],
+          "latency_ms": 17.813
+        },
+        {
+          "id": "hll-05",
+          "query": "Describe how HyperLogLog chooses a register and updates it using the leftmost one bit.",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-19"
+          ],
+          "retrieved": [
+            "RF-F6B914C4-19",
+            "RF-2DCCFEB5-1",
+            "RF-2DCCFEB5-15",
+            "RF-F6B914C4-6",
+            "RF-2DCCFEB5-11"
+          ],
+          "latency_ms": 24.118
+        },
+        {
+          "id": "hll-06",
+          "query": "How do the relative accuracy constants of LOGLOG and HYPERLOGLOG compare?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-13"
+          ],
+          "retrieved": [
+            "RF-F6B914C4-2",
+            "RF-F6B914C4-65",
+            "RF-2DCCFEB5-87",
+            "RF-F6B914C4-67",
+            "RF-F6B914C4-16"
+          ],
+          "latency_ms": 14.867
+        },
+        {
+          "id": "hll-07",
+          "query": "哪种经典去重计数算法能够最优并行化，并以 1.04 除以根号 m 的误差工作？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-1"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-47",
+            "RF-83330C9C-110",
+            "RF-F6B914C4-14",
+            "RF-2DCCFEB5-95",
+            "RF-F6B914C4-17"
+          ],
+          "latency_ms": 30.991
+        },
+        {
+          "id": "hll-08",
+          "query": "Why can querying HLL be slow when it must aggregate every register with a harmonic mean?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-19"
+          ],
+          "retrieved": [
+            "RF-B40077A8-20",
+            "RF-83330C9C-87",
+            "RF-2DCCFEB5-102",
+            "RF-B40077A8-21",
+            "RF-B40077A8-79"
+          ],
+          "latency_ms": 18.474
+        },
+        {
+          "id": "drex-01",
+          "query": "Why do database-oriented distinct counters struggle with dynamic network traffic under tight memory?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-8"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-10",
+            "RF-EA8EE7AB-28",
+            "RF-EA8EE7AB-38",
+            "RF-02FC78C3-113",
+            "RF-B40077A8-6"
+          ],
+          "latency_ms": 17.191
+        },
+        {
+          "id": "drex-02",
+          "query": "DREX 如何通过自适应采样在固定小内存下扩展可计数范围？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-8"
+          ],
+          "retrieved": [
+            "RF-B40077A8-13",
+            "RF-B40077A8-9",
+            "RF-B40077A8-35",
+            "RF-B40077A8-80",
+            "RF-B40077A8-10"
+          ],
+          "latency_ms": 15.729
+        },
+        {
+          "id": "drex-03",
+          "query": "What standard-error expression is derived for DREX when t equals pN divided by m?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-59"
+          ],
+          "retrieved": [
+            "RF-B40077A8-58",
+            "RF-B40077A8-59",
+            "RF-B40077A8-61",
+            "RF-B40077A8-60",
+            "RF-B40077A8-12"
+          ],
+          "latency_ms": 16.072
+        },
+        {
+          "id": "drex-04",
+          "query": "实验为什么表明 DREX 的每个计数单元使用 2 bit 就足够？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-67"
+          ],
+          "retrieved": [
+            "RF-B40077A8-61",
+            "RF-B40077A8-35",
+            "RF-B40077A8-60",
+            "RF-B40077A8-80",
+            "RF-B40077A8-12"
+          ],
+          "latency_ms": 13.805
+        },
+        {
+          "id": "drex-05",
+          "query": "Across wide cardinality ranges, how much can DREX reduce relative error versus HLL and KMV?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-69"
+          ],
+          "retrieved": [
+            "RF-83330C9C-90",
+            "RF-B40077A8-68",
+            "RF-B40077A8-78",
+            "RF-B40077A8-69",
+            "RF-B40077A8-60"
+          ],
+          "latency_ms": 15.461
+        },
+        {
+          "id": "drex-06",
+          "query": "在指定 F1 分数的超级扩散者检测中，DREX 相比 HLL 能节省多少内存？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-76"
+          ],
+          "retrieved": [
+            "RF-B40077A8-77",
+            "RF-B40077A8-64",
+            "RF-B40077A8-76",
+            "RF-B40077A8-78",
+            "RF-B40077A8-71"
+          ],
+          "latency_ms": 16.727
+        },
+        {
+          "id": "drex-07",
+          "query": "What peak update throughput in Mops is reported for DREX and why is it fast at high cardinality?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-77"
+          ],
+          "retrieved": [
+            "RF-B40077A8-78",
+            "RF-83330C9C-88",
+            "RF-B40077A8-80",
+            "RF-B40077A8-62",
+            "RF-B40077A8-77"
+          ],
+          "latency_ms": 16.384
+        },
+        {
+          "id": "drex-08",
+          "query": "How are two DREX instances aligned and combined to compute their union?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-51",
+            "RF-B40077A8-53"
+          ],
+          "retrieved": [
+            "RF-B40077A8-12",
+            "RF-B40077A8-2",
+            "RF-B40077A8-51",
+            "RF-B40077A8-80",
+            "RF-B40077A8-47"
+          ],
+          "latency_ms": 11.082
+        },
+        {
+          "id": "drex-09",
+          "query": "DREX 如何利用容斥原理由两个实例估计集合交集？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-53"
+          ],
+          "retrieved": [
+            "RF-B40077A8-35",
+            "RF-B40077A8-12",
+            "RF-B40077A8-80",
+            "RF-B40077A8-13",
+            "RF-B40077A8-47"
+          ],
+          "latency_ms": 13.517
+        },
+        {
+          "id": "drex-10",
+          "query": "Which network cardinality sketch keeps accuracy nearly unchanged when counter width q varies from two to five?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-67"
+          ],
+          "retrieved": [
+            "RF-B40077A8-67",
+            "RF-977C4044-32",
+            "RF-B40077A8-6",
+            "RF-977C4044-12",
+            "RF-EA8EE7AB-32"
+          ],
+          "latency_ms": 17.82
+        },
+        {
+          "id": "ull-01",
+          "query": "How much less space does UltraLogLog require than HLL for the same distinct-count information?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-1",
+            "RF-2DCCFEB5-22"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-15",
+            "RF-B40077A8-21",
+            "RF-2DCCFEB5-2",
+            "RF-2DCCFEB5-4",
+            "RF-2DCCFEB5-1"
+          ],
+          "latency_ms": 15.813
+        },
+        {
+          "id": "ull-02",
+          "query": "ULL 具备哪些适合分布式系统的代数性质和插入复杂度？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-1"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-79",
+            "RF-2DCCFEB5-111",
+            "RF-2DCCFEB5-110",
+            "RF-2DCCFEB5-90",
+            "RF-2DCCFEB5-48"
+          ],
+          "latency_ms": 16.347
+        },
+        {
+          "id": "ull-03",
+          "query": "What space reduction does the simpler fast UltraLogLog estimator retain at HLL-like estimation speed?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-1"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-2",
+            "RF-2DCCFEB5-15",
+            "RF-2DCCFEB5-110",
+            "RF-2DCCFEB5-3",
+            "RF-2DCCFEB5-46"
+          ],
+          "latency_ms": 26.837
+        },
+        {
+          "id": "ull-04",
+          "query": "UltraLogLog 的 MVP 数值是多少，它比 HyperLogLog 低多少？",
+          "language": "zh",
+          "difficulty": "easy",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-22"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-73",
+            "RF-2DCCFEB5-47",
+            "RF-2DCCFEB5-15",
+            "RF-2DCCFEB5-1",
+            "RF-2DCCFEB5-21"
+          ],
+          "latency_ms": 16.19
+        },
+        {
+          "id": "ull-05",
+          "query": "How does maximum-likelihood estimation in ULL relate to the Cramér-Rao variance bound?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-38"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-50",
+            "RF-2DCCFEB5-56",
+            "RF-2DCCFEB5-53",
+            "RF-2DCCFEB5-108",
+            "RF-83330C9C-67"
+          ],
+          "latency_ms": 17.228
+        },
+        {
+          "id": "ull-06",
+          "query": "为什么 ULL 的寄存器表示经过无损压缩后通常比 HLL 更紧凑？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-22"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-100",
+            "RF-2DCCFEB5-49",
+            "RF-2DCCFEB5-102",
+            "RF-2DCCFEB5-46",
+            "RF-2DCCFEB5-23"
+          ],
+          "latency_ms": 19.278
+        },
+        {
+          "id": "ull-07",
+          "query": "What happens to HLL memory-variance product when martingale or HIP estimation is allowed without merging?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-20"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-46",
+            "RF-2DCCFEB5-20",
+            "RF-2DCCFEB5-102",
+            "RF-2DCCFEB5-48",
+            "RF-2DCCFEB5-19"
+          ],
+          "latency_ms": 15.462
+        },
+        {
+          "id": "ull-08",
+          "query": "不可合并的 distinct-count sketch 理论 MVP 下限大约是多少？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-20"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-13",
+            "RF-2DCCFEB5-73",
+            "RF-2DCCFEB5-47",
+            "RF-2DCCFEB5-21",
+            "RF-2DCCFEB5-39"
+          ],
+          "latency_ms": 30.774
+        },
+        {
+          "id": "ull-09",
+          "query": "Why is mergeability important for ULL when partial counts are distributed over space or time?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-81"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-111",
+            "RF-2DCCFEB5-110",
+            "RF-2DCCFEB5-81",
+            "RF-2DCCFEB5-102",
+            "RF-2DCCFEB5-53"
+          ],
+          "latency_ms": 19.532
+        },
+        {
+          "id": "ull-10",
+          "query": "How can UltraLogLog sketches with different precision be merged or downsized?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-81"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-1",
+            "RF-2DCCFEB5-86",
+            "RF-2DCCFEB5-91",
+            "RF-2DCCFEB5-3",
+            "RF-2DCCFEB5-13"
+          ],
+          "latency_ms": 18.677
+        },
+        {
+          "id": "seive-01",
+          "query": "What stream-processing task is SeiveSketch designed to solve?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-1"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-57",
+            "RF-9B51FD1B-136",
+            "RF-9B51FD1B-2",
+            "RF-9B51FD1B-36",
+            "RF-9B51FD1B-3"
+          ],
+          "latency_ms": 13.742
+        },
+        {
+          "id": "seive-02",
+          "query": "SeiveSketch 为什么使用 4-bit 计数器处理大量冷门项？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-3"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-32",
+            "RF-977C4044-32",
+            "RF-9B51FD1B-95",
+            "RF-9B51FD1B-23",
+            "RF-9B51FD1B-101"
+          ],
+          "latency_ms": 14.282
+        },
+        {
+          "id": "seive-03",
+          "query": "By what maximum factor does SeiveSketch reduce estimation error compared with the state of the art?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-3"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-123",
+            "RF-9B51FD1B-3",
+            "RF-9B51FD1B-95",
+            "RF-9B51FD1B-115",
+            "RF-2DCCFEB5-21"
+          ],
+          "latency_ms": 15.365
+        },
+        {
+          "id": "seive-04",
+          "query": "自适应缩放如何在不增加计数器位数的情况下适应不同数据集的冷项频率范围？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-24"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-25",
+            "RF-9B51FD1B-32",
+            "RF-9B51FD1B-14",
+            "RF-B40077A8-31",
+            "RF-EA8EE7AB-51"
+          ],
+          "latency_ms": 16.063
+        },
+        {
+          "id": "seive-05",
+          "query": "Which theorem provides the relative-error bound for every item in SeiveSketch?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-73"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-74",
+            "RF-B40077A8-59",
+            "RF-9B51FD1B-146",
+            "RF-EA8EE7AB-56",
+            "RF-9B51FD1B-95"
+          ],
+          "latency_ms": 11.253
+        },
+        {
+          "id": "seive-06",
+          "query": "在 CAIDA 数据集上，SeiveSketch 相比 CM、CU、AS、CF 等方法的 ARE 改善如何？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-87"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-26",
+            "RF-9B51FD1B-108",
+            "RF-9B51FD1B-152",
+            "RF-9B51FD1B-87",
+            "RF-9B51FD1B-115"
+          ],
+          "latency_ms": 22.626
+        },
+        {
+          "id": "seive-07",
+          "query": "Why can CU estimate hot items more accurately than SeiveSketch even when SeiveSketch wins overall?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-87"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-87",
+            "RF-9B51FD1B-95",
+            "RF-9B51FD1B-75",
+            "RF-9B51FD1B-18",
+            "RF-9B51FD1B-123"
+          ],
+          "latency_ms": 18.314
+        },
+        {
+          "id": "seive-08",
+          "query": "How are local SeiveSketch instances combined in a distributed counting deployment?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-51"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-51",
+            "RF-9B51FD1B-52",
+            "RF-2DCCFEB5-126",
+            "RF-9B51FD1B-55",
+            "RF-B40077A8-27"
+          ],
+          "latency_ms": 16.36
+        },
+        {
+          "id": "seive-09",
+          "query": "为什么在单节点内存较小时，增加分布式实例并合并反而可能降低估计误差？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-123"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-105",
+            "RF-B40077A8-8",
+            "RF-9B51FD1B-123",
+            "RF-EA8EE7AB-51",
+            "RF-2DCCFEB5-109"
+          ],
+          "latency_ms": 18.473
+        },
+        {
+          "id": "seive-10",
+          "query": "What parallel processing speedup range is reported for SeiveSketch?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-121"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-96",
+            "RF-9B51FD1B-121",
+            "RF-9B51FD1B-101",
+            "RF-9B51FD1B-57",
+            "RF-977C4044-18"
+          ],
+          "latency_ms": 13.044
+        },
+        {
+          "id": "distractor-01",
+          "query": "Which system exposes hidden collective-communication dependencies for root-cause analysis in unreliable LLM training?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "Mycroft",
+          "relevant": [
+            "RF-02FC78C3-3"
+          ],
+          "retrieved": [
+            "RF-02FC78C3-54",
+            "RF-02FC78C3-115",
+            "RF-02FC78C3-21",
+            "RF-02FC78C3-31",
+            "RF-58AA680D-50"
+          ],
+          "latency_ms": 17.379
+        },
+        {
+          "id": "distractor-02",
+          "query": "哪篇论文介绍了用于大规模语言模型训练的 Astral 数据中心基础设施？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "Astral",
+          "relevant": [
+            "RF-58AA680D-1"
+          ],
+          "retrieved": [
+            "RF-58AA680D-63",
+            "RF-58AA680D-1",
+            "RF-58AA680D-118",
+            "RF-58AA680D-79",
+            "RF-58AA680D-177"
+          ],
+          "latency_ms": 10.586
+        }
+      ],
+      "bad_cases": {
+        "retrieval_miss": [
+          "hll-01",
+          "hll-02",
+          "hll-03",
+          "hll-04",
+          "hll-06",
+          "hll-07",
+          "hll-08",
+          "drex-01",
+          "drex-02",
+          "drex-04",
+          "drex-09",
+          "ull-02",
+          "ull-03",
+          "ull-04",
+          "ull-05",
+          "ull-06",
+          "ull-08",
+          "ull-10",
+          "seive-01",
+          "seive-02",
+          "seive-04",
+          "seive-05",
+          "distractor-01"
+        ]
+      }
+    },
+    "hybrid_rrf": {
+      "elapsed_seconds": 9.427,
+      "p50_latency_ms": 229.0905,
+      "p95_latency_ms": 311.9749,
+      "metrics": {
+        "at_1": {
+          "cases": 40,
+          "recall_at_k": 0.25,
+          "success_at_k": 0.275,
+          "mrr": 0.275
+        },
+        "at_3": {
+          "cases": 40,
+          "recall_at_k": 0.4,
+          "success_at_k": 0.425,
+          "mrr": 0.3292
+        },
+        "at_5": {
+          "cases": 40,
+          "recall_at_k": 0.475,
+          "success_at_k": 0.5,
+          "mrr": 0.3467
+        }
+      },
+      "by_language_at_max_k": {
+        "en": {
+          "cases": 24,
+          "recall_at_k": 0.625,
+          "success_at_k": 0.6667,
+          "mrr": 0.4944
+        },
+        "zh": {
+          "cases": 16,
+          "recall_at_k": 0.25,
+          "success_at_k": 0.25,
+          "mrr": 0.125
+        }
+      },
+      "by_difficulty_at_max_k": {
+        "easy": {
+          "cases": 7,
+          "recall_at_k": 0.3571,
+          "success_at_k": 0.4286,
+          "mrr": 0.4286
+        },
+        "hard": {
+          "cases": 19,
+          "recall_at_k": 0.5526,
+          "success_at_k": 0.5789,
+          "mrr": 0.3526
+        },
+        "medium": {
+          "cases": 14,
+          "recall_at_k": 0.4286,
+          "success_at_k": 0.4286,
+          "mrr": 0.2976
+        }
+      },
+      "details": [
+        {
+          "id": "hll-01",
+          "query": "What is the asymptotic standard error of HyperLogLog with m registers?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-1"
+          ],
+          "retrieved": [
+            "RF-F6B914C4-58",
+            "RF-F6B914C4-57",
+            "RF-F6B914C4-15",
+            "RF-F6B914C4-52",
+            "RF-B40077A8-24"
+          ],
+          "latency_ms": 221.555
+        },
+        {
+          "id": "hll-02",
+          "query": "HLL 使用约 1.5KB 内存时可以达到怎样的基数估计精度？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-1"
+          ],
+          "retrieved": [
+            "RF-B40077A8-25",
+            "RF-2DCCFEB5-100",
+            "RF-B40077A8-20",
+            "RF-F6B914C4-16",
+            "RF-83330C9C-35"
+          ],
+          "latency_ms": 355.712
+        },
+        {
+          "id": "hll-03",
+          "query": "How many bits are sufficient for each HyperLogLog register with 32-bit hashes?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-64"
+          ],
+          "retrieved": [
+            "RF-B40077A8-19",
+            "RF-2DCCFEB5-11",
+            "RF-F6B914C4-57",
+            "RF-B40077A8-18",
+            "RF-2DCCFEB5-77"
+          ],
+          "latency_ms": 204.768
+        },
+        {
+          "id": "hll-04",
+          "query": "为什么 HLL 的估计结果可以近似看作高斯分布，其标准差如何表示？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-64"
+          ],
+          "retrieved": [
+            "RF-83330C9C-30",
+            "RF-B40077A8-20",
+            "RF-83330C9C-95",
+            "RF-2DCCFEB5-107",
+            "RF-2DCCFEB5-108"
+          ],
+          "latency_ms": 309.673
+        },
+        {
+          "id": "hll-05",
+          "query": "Describe how HyperLogLog chooses a register and updates it using the leftmost one bit.",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-19"
+          ],
+          "retrieved": [
+            "RF-F6B914C4-19",
+            "RF-F6B914C4-57",
+            "RF-2DCCFEB5-11",
+            "RF-2DCCFEB5-2",
+            "RF-2DCCFEB5-83"
+          ],
+          "latency_ms": 229.756
+        },
+        {
+          "id": "hll-06",
+          "query": "How do the relative accuracy constants of LOGLOG and HYPERLOGLOG compare?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-13"
+          ],
+          "retrieved": [
+            "RF-F6B914C4-2",
+            "RF-2DCCFEB5-87",
+            "RF-F6B914C4-67",
+            "RF-F6B914C4-58",
+            "RF-EA8EE7AB-66"
+          ],
+          "latency_ms": 207.699
+        },
+        {
+          "id": "hll-07",
+          "query": "哪种经典去重计数算法能够最优并行化，并以 1.04 除以根号 m 的误差工作？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-1"
+          ],
+          "retrieved": [
+            "RF-F6B914C4-13",
+            "RF-F6B914C4-58",
+            "RF-B40077A8-19",
+            "RF-B40077A8-20",
+            "RF-02FC78C3-132"
+          ],
+          "latency_ms": 231.465
+        },
+        {
+          "id": "hll-08",
+          "query": "Why can querying HLL be slow when it must aggregate every register with a harmonic mean?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-19"
+          ],
+          "retrieved": [
+            "RF-B40077A8-20",
+            "RF-83330C9C-29",
+            "RF-EA8EE7AB-38",
+            "RF-EA8EE7AB-21",
+            "RF-83330C9C-45"
+          ],
+          "latency_ms": 428.933
+        },
+        {
+          "id": "drex-01",
+          "query": "Why do database-oriented distinct counters struggle with dynamic network traffic under tight memory?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-8"
+          ],
+          "retrieved": [
+            "RF-EA8EE7AB-10",
+            "RF-02FC78C3-113",
+            "RF-EA8EE7AB-8",
+            "RF-B40077A8-8",
+            "RF-B40077A8-1"
+          ],
+          "latency_ms": 235.496
+        },
+        {
+          "id": "drex-02",
+          "query": "DREX 如何通过自适应采样在固定小内存下扩展可计数范围？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-8"
+          ],
+          "retrieved": [
+            "RF-B40077A8-12",
+            "RF-B40077A8-80",
+            "RF-B40077A8-13",
+            "RF-B40077A8-64",
+            "RF-B40077A8-9"
+          ],
+          "latency_ms": 257.637
+        },
+        {
+          "id": "drex-03",
+          "query": "What standard-error expression is derived for DREX when t equals pN divided by m?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-59"
+          ],
+          "retrieved": [
+            "RF-B40077A8-59",
+            "RF-B40077A8-58",
+            "RF-B40077A8-61",
+            "RF-B40077A8-60",
+            "RF-83330C9C-72"
+          ],
+          "latency_ms": 274.937
+        },
+        {
+          "id": "drex-04",
+          "query": "实验为什么表明 DREX 的每个计数单元使用 2 bit 就足够？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-67"
+          ],
+          "retrieved": [
+            "RF-B40077A8-35",
+            "RF-B40077A8-10",
+            "RF-B40077A8-45",
+            "RF-B40077A8-44",
+            "RF-B40077A8-61"
+          ],
+          "latency_ms": 272.851
+        },
+        {
+          "id": "drex-05",
+          "query": "Across wide cardinality ranges, how much can DREX reduce relative error versus HLL and KMV?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-69"
+          ],
+          "retrieved": [
+            "RF-B40077A8-69",
+            "RF-B40077A8-70",
+            "RF-B40077A8-67",
+            "RF-B40077A8-12",
+            "RF-B40077A8-68"
+          ],
+          "latency_ms": 262.457
+        },
+        {
+          "id": "drex-06",
+          "query": "在指定 F1 分数的超级扩散者检测中，DREX 相比 HLL 能节省多少内存？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-76"
+          ],
+          "retrieved": [
+            "RF-B40077A8-76",
+            "RF-B40077A8-77",
+            "RF-B40077A8-64",
+            "RF-B40077A8-78",
+            "RF-B40077A8-71"
+          ],
+          "latency_ms": 228.425
+        },
+        {
+          "id": "drex-07",
+          "query": "What peak update throughput in Mops is reported for DREX and why is it fast at high cardinality?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-77"
+          ],
+          "retrieved": [
+            "RF-B40077A8-78",
+            "RF-B40077A8-77",
+            "RF-B40077A8-80",
+            "RF-977C4044-17",
+            "RF-B40077A8-12"
+          ],
+          "latency_ms": 268.679
+        },
+        {
+          "id": "drex-08",
+          "query": "How are two DREX instances aligned and combined to compute their union?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-51",
+            "RF-B40077A8-53"
+          ],
+          "retrieved": [
+            "RF-B40077A8-51",
+            "RF-9B51FD1B-53",
+            "RF-B40077A8-47",
+            "RF-B40077A8-12",
+            "RF-B40077A8-50"
+          ],
+          "latency_ms": 208.964
+        },
+        {
+          "id": "drex-09",
+          "query": "DREX 如何利用容斥原理由两个实例估计集合交集？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-53"
+          ],
+          "retrieved": [
+            "RF-B40077A8-12",
+            "RF-B40077A8-80",
+            "RF-B40077A8-64",
+            "RF-B40077A8-13",
+            "RF-B40077A8-39"
+          ],
+          "latency_ms": 213.231
+        },
+        {
+          "id": "drex-10",
+          "query": "Which network cardinality sketch keeps accuracy nearly unchanged when counter width q varies from two to five?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-67"
+          ],
+          "retrieved": [
+            "RF-B40077A8-6",
+            "RF-B40077A8-45",
+            "RF-9B51FD1B-25",
+            "RF-9B51FD1B-17",
+            "RF-B40077A8-54"
+          ],
+          "latency_ms": 246.237
+        },
+        {
+          "id": "ull-01",
+          "query": "How much less space does UltraLogLog require than HLL for the same distinct-count information?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-1",
+            "RF-2DCCFEB5-22"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-1",
+            "RF-2DCCFEB5-2",
+            "RF-2DCCFEB5-4",
+            "RF-2DCCFEB5-3",
+            "RF-2DCCFEB5-49"
+          ],
+          "latency_ms": 205.591
+        },
+        {
+          "id": "ull-02",
+          "query": "ULL 具备哪些适合分布式系统的代数性质和插入复杂度？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-1"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-49",
+            "RF-2DCCFEB5-110",
+            "RF-2DCCFEB5-25",
+            "RF-2DCCFEB5-23",
+            "RF-2DCCFEB5-46"
+          ],
+          "latency_ms": 169.576
+        },
+        {
+          "id": "ull-03",
+          "query": "What space reduction does the simpler fast UltraLogLog estimator retain at HLL-like estimation speed?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-1"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-2",
+            "RF-2DCCFEB5-110",
+            "RF-2DCCFEB5-1",
+            "RF-2DCCFEB5-24",
+            "RF-2DCCFEB5-3"
+          ],
+          "latency_ms": 215.0
+        },
+        {
+          "id": "ull-04",
+          "query": "UltraLogLog 的 MVP 数值是多少，它比 HyperLogLog 低多少？",
+          "language": "zh",
+          "difficulty": "easy",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-22"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-73",
+            "RF-2DCCFEB5-46",
+            "RF-2DCCFEB5-1",
+            "RF-2DCCFEB5-3",
+            "RF-2DCCFEB5-47"
+          ],
+          "latency_ms": 194.501
+        },
+        {
+          "id": "ull-05",
+          "query": "How does maximum-likelihood estimation in ULL relate to the Cramér-Rao variance bound?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-38"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-50",
+            "RF-2DCCFEB5-108",
+            "RF-2DCCFEB5-107",
+            "RF-2DCCFEB5-38",
+            "RF-2DCCFEB5-23"
+          ],
+          "latency_ms": 170.351
+        },
+        {
+          "id": "ull-06",
+          "query": "为什么 ULL 的寄存器表示经过无损压缩后通常比 HLL 更紧凑？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-22"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-49",
+            "RF-2DCCFEB5-107",
+            "RF-2DCCFEB5-86",
+            "RF-2DCCFEB5-100",
+            "RF-2DCCFEB5-101"
+          ],
+          "latency_ms": 213.688
+        },
+        {
+          "id": "ull-07",
+          "query": "What happens to HLL memory-variance product when martingale or HIP estimation is allowed without merging?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-20"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-46",
+            "RF-2DCCFEB5-19",
+            "RF-2DCCFEB5-110",
+            "RF-2DCCFEB5-73",
+            "RF-2DCCFEB5-72"
+          ],
+          "latency_ms": 221.34
+        },
+        {
+          "id": "ull-08",
+          "query": "不可合并的 distinct-count sketch 理论 MVP 下限大约是多少？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-20"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-16",
+            "RF-2DCCFEB5-24",
+            "RF-9B51FD1B-17",
+            "RF-2DCCFEB5-21",
+            "RF-2DCCFEB5-73"
+          ],
+          "latency_ms": 242.515
+        },
+        {
+          "id": "ull-09",
+          "query": "Why is mergeability important for ULL when partial counts are distributed over space or time?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-81"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-81",
+            "RF-2DCCFEB5-110",
+            "RF-2DCCFEB5-19",
+            "RF-2DCCFEB5-106",
+            "RF-2DCCFEB5-46"
+          ],
+          "latency_ms": 201.409
+        },
+        {
+          "id": "ull-10",
+          "query": "How can UltraLogLog sketches with different precision be merged or downsized?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-81"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-91",
+            "RF-2DCCFEB5-85",
+            "RF-2DCCFEB5-81",
+            "RF-2DCCFEB5-73",
+            "RF-2DCCFEB5-86"
+          ],
+          "latency_ms": 205.198
+        },
+        {
+          "id": "seive-01",
+          "query": "What stream-processing task is SeiveSketch designed to solve?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-1"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-57",
+            "RF-9B51FD1B-3",
+            "RF-9B51FD1B-122",
+            "RF-9B51FD1B-123",
+            "RF-9B51FD1B-2"
+          ],
+          "latency_ms": 179.22
+        },
+        {
+          "id": "seive-02",
+          "query": "SeiveSketch 为什么使用 4-bit 计数器处理大量冷门项？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-3"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-32",
+            "RF-9B51FD1B-2",
+            "RF-9B51FD1B-95",
+            "RF-9B51FD1B-103",
+            "RF-2DCCFEB5-83"
+          ],
+          "latency_ms": 184.66
+        },
+        {
+          "id": "seive-03",
+          "query": "By what maximum factor does SeiveSketch reduce estimation error compared with the state of the art?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-3"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-3",
+            "RF-9B51FD1B-95",
+            "RF-9B51FD1B-123",
+            "RF-9B51FD1B-124",
+            "RF-2DCCFEB5-9"
+          ],
+          "latency_ms": 201.786
+        },
+        {
+          "id": "seive-04",
+          "query": "自适应缩放如何在不增加计数器位数的情况下适应不同数据集的冷项频率范围？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-24"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-25",
+            "RF-9B51FD1B-32",
+            "RF-9B51FD1B-14",
+            "RF-B40077A8-31",
+            "RF-EA8EE7AB-51"
+          ],
+          "latency_ms": 258.699
+        },
+        {
+          "id": "seive-05",
+          "query": "Which theorem provides the relative-error bound for every item in SeiveSketch?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-73"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-3",
+            "RF-B40077A8-58",
+            "RF-9B51FD1B-74",
+            "RF-9B51FD1B-146",
+            "RF-83330C9C-106"
+          ],
+          "latency_ms": 244.541
+        },
+        {
+          "id": "seive-06",
+          "query": "在 CAIDA 数据集上，SeiveSketch 相比 CM、CU、AS、CF 等方法的 ARE 改善如何？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-87"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-95",
+            "RF-9B51FD1B-83",
+            "RF-9B51FD1B-87",
+            "RF-9B51FD1B-86",
+            "RF-9B51FD1B-94"
+          ],
+          "latency_ms": 273.176
+        },
+        {
+          "id": "seive-07",
+          "query": "Why can CU estimate hot items more accurately than SeiveSketch even when SeiveSketch wins overall?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-87"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-87",
+            "RF-9B51FD1B-95",
+            "RF-9B51FD1B-123",
+            "RF-9B51FD1B-94",
+            "RF-9B51FD1B-28"
+          ],
+          "latency_ms": 231.385
+        },
+        {
+          "id": "seive-08",
+          "query": "How are local SeiveSketch instances combined in a distributed counting deployment?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-51"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-51",
+            "RF-9B51FD1B-52",
+            "RF-9B51FD1B-122",
+            "RF-9B51FD1B-123",
+            "RF-9B51FD1B-53"
+          ],
+          "latency_ms": 254.376
+        },
+        {
+          "id": "seive-09",
+          "query": "为什么在单节点内存较小时，增加分布式实例并合并反而可能降低估计误差？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-123"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-105",
+            "RF-B40077A8-8",
+            "RF-9B51FD1B-123",
+            "RF-EA8EE7AB-51",
+            "RF-2DCCFEB5-109"
+          ],
+          "latency_ms": 236.864
+        },
+        {
+          "id": "seive-10",
+          "query": "What parallel processing speedup range is reported for SeiveSketch?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-121"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-121",
+            "RF-9B51FD1B-57",
+            "RF-9B51FD1B-122",
+            "RF-9B51FD1B-95",
+            "RF-9B51FD1B-3"
+          ],
+          "latency_ms": 202.113
+        },
+        {
+          "id": "distractor-01",
+          "query": "Which system exposes hidden collective-communication dependencies for root-cause analysis in unreliable LLM training?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "Mycroft",
+          "relevant": [
+            "RF-02FC78C3-3"
+          ],
+          "retrieved": [
+            "RF-02FC78C3-115",
+            "RF-02FC78C3-13",
+            "RF-02FC78C3-4",
+            "RF-02FC78C3-54",
+            "RF-02FC78C3-3"
+          ],
+          "latency_ms": 212.504
+        },
+        {
+          "id": "distractor-02",
+          "query": "哪篇论文介绍了用于大规模语言模型训练的 Astral 数据中心基础设施？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "Astral",
+          "relevant": [
+            "RF-58AA680D-1"
+          ],
+          "retrieved": [
+            "RF-58AA680D-79",
+            "RF-58AA680D-15",
+            "RF-58AA680D-1",
+            "RF-58AA680D-2",
+            "RF-58AA680D-116"
+          ],
+          "latency_ms": 249.768
+        }
+      ],
+      "bad_cases": {
+        "retrieval_miss": [
+          "hll-01",
+          "hll-02",
+          "hll-03",
+          "hll-04",
+          "hll-06",
+          "hll-07",
+          "hll-08",
+          "drex-02",
+          "drex-04",
+          "drex-09",
+          "drex-10",
+          "ull-02",
+          "ull-04",
+          "ull-06",
+          "ull-07",
+          "ull-08",
+          "seive-01",
+          "seive-02",
+          "seive-04",
+          "seive-05"
+        ]
+      }
+    },
+    "reflected_hybrid": {
+      "elapsed_seconds": 19.286,
+      "p50_latency_ms": 483.5575,
+      "p95_latency_ms": 596.6068,
+      "metrics": {
+        "at_1": {
+          "cases": 40,
+          "recall_at_k": 0.2375,
+          "success_at_k": 0.25,
+          "mrr": 0.25
+        },
+        "at_3": {
+          "cases": 40,
+          "recall_at_k": 0.35,
+          "success_at_k": 0.375,
+          "mrr": 0.3042
+        },
+        "at_5": {
+          "cases": 40,
+          "recall_at_k": 0.45,
+          "success_at_k": 0.475,
+          "mrr": 0.3254
+        }
+      },
+      "by_language_at_max_k": {
+        "en": {
+          "cases": 24,
+          "recall_at_k": 0.625,
+          "success_at_k": 0.6667,
+          "mrr": 0.4764
+        },
+        "zh": {
+          "cases": 16,
+          "recall_at_k": 0.1875,
+          "success_at_k": 0.1875,
+          "mrr": 0.099
+        }
+      },
+      "by_difficulty_at_max_k": {
+        "easy": {
+          "cases": 7,
+          "recall_at_k": 0.3571,
+          "success_at_k": 0.4286,
+          "mrr": 0.3571
+        },
+        "hard": {
+          "cases": 19,
+          "recall_at_k": 0.5,
+          "success_at_k": 0.5263,
+          "mrr": 0.3412
+        },
+        "medium": {
+          "cases": 14,
+          "recall_at_k": 0.4286,
+          "success_at_k": 0.4286,
+          "mrr": 0.2881
+        }
+      },
+      "details": [
+        {
+          "id": "hll-01",
+          "query": "What is the asymptotic standard error of HyperLogLog with m registers?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-1"
+          ],
+          "retrieved": [
+            "RF-B40077A8-20",
+            "RF-F6B914C4-58",
+            "RF-B40077A8-24",
+            "RF-F6B914C4-16",
+            "RF-B40077A8-59"
+          ],
+          "latency_ms": 480.123,
+          "reflected_query": "What is the asymptotic standard error of HyperLogLog with m registers? accuracy relative error standard error ARE"
+        },
+        {
+          "id": "hll-02",
+          "query": "HLL 使用约 1.5KB 内存时可以达到怎样的基数估计精度？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-1"
+          ],
+          "retrieved": [
+            "RF-B40077A8-20",
+            "RF-F6B914C4-16",
+            "RF-83330C9C-86",
+            "RF-83330C9C-95",
+            "RF-2DCCFEB5-108"
+          ],
+          "latency_ms": 434.406,
+          "reflected_query": "HLL 使用约 1.5KB 内存时可以达到怎样的基数估计精度？ cardinality distinct count estimation accuracy relative error standard error ARE memory space bits bytes registers counters MVP"
+        },
+        {
+          "id": "hll-03",
+          "query": "How many bits are sufficient for each HyperLogLog register with 32-bit hashes?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-64"
+          ],
+          "retrieved": [
+            "RF-B40077A8-19",
+            "RF-2DCCFEB5-11",
+            "RF-F6B914C4-57",
+            "RF-B40077A8-18",
+            "RF-2DCCFEB5-77"
+          ],
+          "latency_ms": 533.676,
+          "reflected_query": "How many bits are sufficient for each HyperLogLog register with 32-bit hashes?"
+        },
+        {
+          "id": "hll-04",
+          "query": "为什么 HLL 的估计结果可以近似看作高斯分布，其标准差如何表示？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-64"
+          ],
+          "retrieved": [
+            "RF-83330C9C-30",
+            "RF-B40077A8-20",
+            "RF-83330C9C-95",
+            "RF-83330C9C-39",
+            "RF-2DCCFEB5-107"
+          ],
+          "latency_ms": 494.522,
+          "reflected_query": "为什么 HLL 的估计结果可以近似看作高斯分布，其标准差如何表示？"
+        },
+        {
+          "id": "hll-05",
+          "query": "Describe how HyperLogLog chooses a register and updates it using the leftmost one bit.",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-19"
+          ],
+          "retrieved": [
+            "RF-F6B914C4-19",
+            "RF-F6B914C4-57",
+            "RF-2DCCFEB5-11",
+            "RF-2DCCFEB5-82",
+            "RF-2DCCFEB5-2"
+          ],
+          "latency_ms": 527.549,
+          "reflected_query": "Describe how HyperLogLog chooses a register and updates it using the leftmost one bit."
+        },
+        {
+          "id": "hll-06",
+          "query": "How do the relative accuracy constants of LOGLOG and HYPERLOGLOG compare?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-13"
+          ],
+          "retrieved": [
+            "RF-F6B914C4-2",
+            "RF-B40077A8-8",
+            "RF-EA8EE7AB-66",
+            "RF-B40077A8-66",
+            "RF-B40077A8-68"
+          ],
+          "latency_ms": 456.22,
+          "reflected_query": "How do the relative accuracy constants of LOGLOG and HYPERLOGLOG compare? accuracy relative error standard error ARE"
+        },
+        {
+          "id": "hll-07",
+          "query": "哪种经典去重计数算法能够最优并行化，并以 1.04 除以根号 m 的误差工作？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "HLL",
+          "relevant": [
+            "RF-F6B914C4-1"
+          ],
+          "retrieved": [
+            "RF-83330C9C-91",
+            "RF-F6B914C4-2",
+            "RF-B40077A8-20",
+            "RF-B40077A8-19",
+            "RF-F6B914C4-13"
+          ],
+          "latency_ms": 522.994,
+          "reflected_query": "哪种经典去重计数算法能够最优并行化，并以 1.04 除以根号 m 的误差工作？ cardinality distinct count estimation accuracy relative error standard error ARE parallelization throughput speedup"
+        },
+        {
+          "id": "hll-08",
+          "query": "Why can querying HLL be slow when it must aggregate every register with a harmonic mean?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-19"
+          ],
+          "retrieved": [
+            "RF-B40077A8-20",
+            "RF-83330C9C-29",
+            "RF-2DCCFEB5-46",
+            "RF-EA8EE7AB-38",
+            "RF-EA8EE7AB-21"
+          ],
+          "latency_ms": 447.785,
+          "reflected_query": "Why can querying HLL be slow when it must aggregate every register with a harmonic mean?"
+        },
+        {
+          "id": "drex-01",
+          "query": "Why do database-oriented distinct counters struggle with dynamic network traffic under tight memory?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-8"
+          ],
+          "retrieved": [
+            "RF-B40077A8-1",
+            "RF-EA8EE7AB-8",
+            "RF-B40077A8-8",
+            "RF-B40077A8-14",
+            "RF-B40077A8-7"
+          ],
+          "latency_ms": 495.458,
+          "reflected_query": "Why do database-oriented distinct counters struggle with dynamic network traffic under tight memory? cardinality distinct count estimation memory space bits bytes registers counters MVP"
+        },
+        {
+          "id": "drex-02",
+          "query": "DREX 如何通过自适应采样在固定小内存下扩展可计数范围？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-8"
+          ],
+          "retrieved": [
+            "RF-B40077A8-13",
+            "RF-B40077A8-9",
+            "RF-B40077A8-76",
+            "RF-B40077A8-72",
+            "RF-B40077A8-71"
+          ],
+          "latency_ms": 517.341,
+          "reflected_query": "DREX 如何通过自适应采样在固定小内存下扩展可计数范围？ memory space bits bytes registers counters MVP"
+        },
+        {
+          "id": "drex-03",
+          "query": "What standard-error expression is derived for DREX when t equals pN divided by m?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-59"
+          ],
+          "retrieved": [
+            "RF-B40077A8-59",
+            "RF-B40077A8-58",
+            "RF-B40077A8-61",
+            "RF-B40077A8-67",
+            "RF-83330C9C-72"
+          ],
+          "latency_ms": 495.467,
+          "reflected_query": "What standard-error expression is derived for DREX when t equals pN divided by m? accuracy relative error standard error ARE"
+        },
+        {
+          "id": "drex-04",
+          "query": "实验为什么表明 DREX 的每个计数单元使用 2 bit 就足够？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-67"
+          ],
+          "retrieved": [
+            "RF-B40077A8-35",
+            "RF-B40077A8-10",
+            "RF-B40077A8-78",
+            "RF-B40077A8-45",
+            "RF-B40077A8-44"
+          ],
+          "latency_ms": 486.992,
+          "reflected_query": "实验为什么表明 DREX 的每个计数单元使用 2 bit 就足够？"
+        },
+        {
+          "id": "drex-05",
+          "query": "Across wide cardinality ranges, how much can DREX reduce relative error versus HLL and KMV?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-69"
+          ],
+          "retrieved": [
+            "RF-B40077A8-69",
+            "RF-B40077A8-67",
+            "RF-B40077A8-70",
+            "RF-B40077A8-68",
+            "RF-83330C9C-90"
+          ],
+          "latency_ms": 493.726,
+          "reflected_query": "Across wide cardinality ranges, how much can DREX reduce relative error versus HLL and KMV? accuracy relative error standard error ARE"
+        },
+        {
+          "id": "drex-06",
+          "query": "在指定 F1 分数的超级扩散者检测中，DREX 相比 HLL 能节省多少内存？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-76"
+          ],
+          "retrieved": [
+            "RF-B40077A8-76",
+            "RF-B40077A8-77",
+            "RF-B40077A8-64",
+            "RF-B40077A8-23",
+            "RF-B40077A8-71"
+          ],
+          "latency_ms": 593.992,
+          "reflected_query": "在指定 F1 分数的超级扩散者检测中，DREX 相比 HLL 能节省多少内存？ memory space bits bytes registers counters MVP"
+        },
+        {
+          "id": "drex-07",
+          "query": "What peak update throughput in Mops is reported for DREX and why is it fast at high cardinality?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-77"
+          ],
+          "retrieved": [
+            "RF-B40077A8-78",
+            "RF-B40077A8-77",
+            "RF-B40077A8-80",
+            "RF-B40077A8-12",
+            "RF-977C4044-17"
+          ],
+          "latency_ms": 551.082,
+          "reflected_query": "What peak update throughput in Mops is reported for DREX and why is it fast at high cardinality? update throughput query throughput Mops"
+        },
+        {
+          "id": "drex-08",
+          "query": "How are two DREX instances aligned and combined to compute their union?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-51",
+            "RF-B40077A8-53"
+          ],
+          "retrieved": [
+            "RF-B40077A8-51",
+            "RF-9B51FD1B-53",
+            "RF-B40077A8-47",
+            "RF-B40077A8-50",
+            "RF-9B51FD1B-60"
+          ],
+          "latency_ms": 360.93,
+          "reflected_query": "How are two DREX instances aligned and combined to compute their union? set union intersection inclusion exclusion"
+        },
+        {
+          "id": "drex-09",
+          "query": "DREX 如何利用容斥原理由两个实例估计集合交集？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-53"
+          ],
+          "retrieved": [
+            "RF-B40077A8-12",
+            "RF-B40077A8-64",
+            "RF-B40077A8-80",
+            "RF-B40077A8-13",
+            "RF-B40077A8-35"
+          ],
+          "latency_ms": 421.36,
+          "reflected_query": "DREX 如何利用容斥原理由两个实例估计集合交集？ set union intersection inclusion exclusion"
+        },
+        {
+          "id": "drex-10",
+          "query": "Which network cardinality sketch keeps accuracy nearly unchanged when counter width q varies from two to five?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "DREX",
+          "relevant": [
+            "RF-B40077A8-67"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-122",
+            "RF-B40077A8-56",
+            "RF-B40077A8-59",
+            "RF-B40077A8-6",
+            "RF-B40077A8-67"
+          ],
+          "latency_ms": 380.153,
+          "reflected_query": "Which network cardinality sketch keeps accuracy nearly unchanged when counter width q varies from two to five? accuracy relative error standard error ARE"
+        },
+        {
+          "id": "ull-01",
+          "query": "How much less space does UltraLogLog require than HLL for the same distinct-count information?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-1",
+            "RF-2DCCFEB5-22"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-2",
+            "RF-2DCCFEB5-1",
+            "RF-2DCCFEB5-4",
+            "RF-2DCCFEB5-15",
+            "RF-2DCCFEB5-3"
+          ],
+          "latency_ms": 395.199,
+          "reflected_query": "How much less space does UltraLogLog require than HLL for the same distinct-count information? cardinality distinct count estimation memory space bits bytes registers counters MVP"
+        },
+        {
+          "id": "ull-02",
+          "query": "ULL 具备哪些适合分布式系统的代数性质和插入复杂度？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-1"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-110",
+            "RF-2DCCFEB5-49",
+            "RF-2DCCFEB5-111",
+            "RF-2DCCFEB5-25",
+            "RF-2DCCFEB5-23"
+          ],
+          "latency_ms": 376.251,
+          "reflected_query": "ULL 具备哪些适合分布式系统的代数性质和插入复杂度？ merge mergeability union distributed partial results"
+        },
+        {
+          "id": "ull-03",
+          "query": "What space reduction does the simpler fast UltraLogLog estimator retain at HLL-like estimation speed?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-1"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-2",
+            "RF-2DCCFEB5-110",
+            "RF-2DCCFEB5-24",
+            "RF-2DCCFEB5-3",
+            "RF-2DCCFEB5-1"
+          ],
+          "latency_ms": 427.363,
+          "reflected_query": "What space reduction does the simpler fast UltraLogLog estimator retain at HLL-like estimation speed? memory space bits bytes registers counters MVP"
+        },
+        {
+          "id": "ull-04",
+          "query": "UltraLogLog 的 MVP 数值是多少，它比 HyperLogLog 低多少？",
+          "language": "zh",
+          "difficulty": "easy",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-22"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-73",
+            "RF-2DCCFEB5-46",
+            "RF-2DCCFEB5-1",
+            "RF-2DCCFEB5-3",
+            "RF-2DCCFEB5-47"
+          ],
+          "latency_ms": 368.322,
+          "reflected_query": "UltraLogLog 的 MVP 数值是多少，它比 HyperLogLog 低多少？"
+        },
+        {
+          "id": "ull-05",
+          "query": "How does maximum-likelihood estimation in ULL relate to the Cramér-Rao variance bound?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-38"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-50",
+            "RF-2DCCFEB5-108",
+            "RF-2DCCFEB5-107",
+            "RF-2DCCFEB5-23",
+            "RF-2DCCFEB5-39"
+          ],
+          "latency_ms": 372.874,
+          "reflected_query": "How does maximum-likelihood estimation in ULL relate to the Cramér-Rao variance bound?"
+        },
+        {
+          "id": "ull-06",
+          "query": "为什么 ULL 的寄存器表示经过无损压缩后通常比 HLL 更紧凑？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-22"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-49",
+            "RF-2DCCFEB5-100",
+            "RF-2DCCFEB5-46",
+            "RF-2DCCFEB5-101",
+            "RF-2DCCFEB5-23"
+          ],
+          "latency_ms": 526.679,
+          "reflected_query": "为什么 ULL 的寄存器表示经过无损压缩后通常比 HLL 更紧凑？ Shannon entropy lossless compression"
+        },
+        {
+          "id": "ull-07",
+          "query": "What happens to HLL memory-variance product when martingale or HIP estimation is allowed without merging?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-20"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-46",
+            "RF-2DCCFEB5-19",
+            "RF-2DCCFEB5-37",
+            "RF-2DCCFEB5-12",
+            "RF-2DCCFEB5-110"
+          ],
+          "latency_ms": 557.074,
+          "reflected_query": "What happens to HLL memory-variance product when martingale or HIP estimation is allowed without merging? memory space bits bytes registers counters MVP"
+        },
+        {
+          "id": "ull-08",
+          "query": "不可合并的 distinct-count sketch 理论 MVP 下限大约是多少？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-20"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-16",
+            "RF-2DCCFEB5-73",
+            "RF-2DCCFEB5-95",
+            "RF-2DCCFEB5-24",
+            "RF-9B51FD1B-17"
+          ],
+          "latency_ms": 413.332,
+          "reflected_query": "不可合并的 distinct-count sketch 理论 MVP 下限大约是多少？ cardinality distinct count estimation merge mergeability union distributed partial results"
+        },
+        {
+          "id": "ull-09",
+          "query": "Why is mergeability important for ULL when partial counts are distributed over space or time?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-81"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-81",
+            "RF-2DCCFEB5-110",
+            "RF-2DCCFEB5-19",
+            "RF-2DCCFEB5-46",
+            "RF-2DCCFEB5-102"
+          ],
+          "latency_ms": 589.866,
+          "reflected_query": "Why is mergeability important for ULL when partial counts are distributed over space or time? memory space bits bytes registers counters MVP merge mergeability union distributed partial results"
+        },
+        {
+          "id": "ull-10",
+          "query": "How can UltraLogLog sketches with different precision be merged or downsized?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "ULL",
+          "relevant": [
+            "RF-2DCCFEB5-81"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-91",
+            "RF-2DCCFEB5-81",
+            "RF-2DCCFEB5-85",
+            "RF-2DCCFEB5-73",
+            "RF-2DCCFEB5-3"
+          ],
+          "latency_ms": 551.742,
+          "reflected_query": "How can UltraLogLog sketches with different precision be merged or downsized? merge mergeability union distributed partial results"
+        },
+        {
+          "id": "seive-01",
+          "query": "What stream-processing task is SeiveSketch designed to solve?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-1"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-57",
+            "RF-9B51FD1B-3",
+            "RF-9B51FD1B-122",
+            "RF-9B51FD1B-123",
+            "RF-9B51FD1B-2"
+          ],
+          "latency_ms": 464.599,
+          "reflected_query": "What stream-processing task is SeiveSketch designed to solve?"
+        },
+        {
+          "id": "seive-02",
+          "query": "SeiveSketch 为什么使用 4-bit 计数器处理大量冷门项？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-3"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-32",
+            "RF-9B51FD1B-2",
+            "RF-9B51FD1B-95",
+            "RF-9B51FD1B-103",
+            "RF-9B51FD1B-100"
+          ],
+          "latency_ms": 533.14,
+          "reflected_query": "SeiveSketch 为什么使用 4-bit 计数器处理大量冷门项？"
+        },
+        {
+          "id": "seive-03",
+          "query": "By what maximum factor does SeiveSketch reduce estimation error compared with the state of the art?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-3"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-3",
+            "RF-9B51FD1B-94",
+            "RF-9B51FD1B-123",
+            "RF-9B51FD1B-124",
+            "RF-2DCCFEB5-9"
+          ],
+          "latency_ms": 496.105,
+          "reflected_query": "By what maximum factor does SeiveSketch reduce estimation error compared with the state of the art? accuracy relative error standard error ARE"
+        },
+        {
+          "id": "seive-04",
+          "query": "自适应缩放如何在不增加计数器位数的情况下适应不同数据集的冷项频率范围？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-24"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-32",
+            "RF-9B51FD1B-14",
+            "RF-9B51FD1B-9",
+            "RF-9B51FD1B-25",
+            "RF-9B51FD1B-28"
+          ],
+          "latency_ms": 451.04,
+          "reflected_query": "自适应缩放如何在不增加计数器位数的情况下适应不同数据集的冷项频率范围？ item frequency estimation data stream hot items cold items warm items adaptive scaling"
+        },
+        {
+          "id": "seive-05",
+          "query": "Which theorem provides the relative-error bound for every item in SeiveSketch?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-73"
+          ],
+          "retrieved": [
+            "RF-B40077A8-58",
+            "RF-9B51FD1B-3",
+            "RF-9B51FD1B-90",
+            "RF-83330C9C-72",
+            "RF-9B51FD1B-94"
+          ],
+          "latency_ms": 646.288,
+          "reflected_query": "Which theorem provides the relative-error bound for every item in SeiveSketch? accuracy relative error standard error ARE"
+        },
+        {
+          "id": "seive-06",
+          "query": "在 CAIDA 数据集上，SeiveSketch 相比 CM、CU、AS、CF 等方法的 ARE 改善如何？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-87"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-95",
+            "RF-9B51FD1B-94",
+            "RF-9B51FD1B-83",
+            "RF-9B51FD1B-87",
+            "RF-9B51FD1B-84"
+          ],
+          "latency_ms": 412.458,
+          "reflected_query": "在 CAIDA 数据集上，SeiveSketch 相比 CM、CU、AS、CF 等方法的 ARE 改善如何？"
+        },
+        {
+          "id": "seive-07",
+          "query": "Why can CU estimate hot items more accurately than SeiveSketch even when SeiveSketch wins overall?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-87"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-87",
+            "RF-9B51FD1B-28",
+            "RF-9B51FD1B-95",
+            "RF-9B51FD1B-94",
+            "RF-9B51FD1B-32"
+          ],
+          "latency_ms": 461.821,
+          "reflected_query": "Why can CU estimate hot items more accurately than SeiveSketch even when SeiveSketch wins overall? hot items cold items warm items adaptive scaling"
+        },
+        {
+          "id": "seive-08",
+          "query": "How are local SeiveSketch instances combined in a distributed counting deployment?",
+          "language": "en",
+          "difficulty": "medium",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-51"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-51",
+            "RF-9B51FD1B-52",
+            "RF-9B51FD1B-122",
+            "RF-9B51FD1B-123",
+            "RF-9B51FD1B-124"
+          ],
+          "latency_ms": 721.452,
+          "reflected_query": "How are local SeiveSketch instances combined in a distributed counting deployment? merge mergeability union distributed partial results"
+        },
+        {
+          "id": "seive-09",
+          "query": "为什么在单节点内存较小时，增加分布式实例并合并反而可能降低估计误差？",
+          "language": "zh",
+          "difficulty": "hard",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-123"
+          ],
+          "retrieved": [
+            "RF-2DCCFEB5-105",
+            "RF-F6B914C4-64",
+            "RF-2DCCFEB5-19",
+            "RF-B40077A8-8",
+            "RF-2DCCFEB5-12"
+          ],
+          "latency_ms": 468.529,
+          "reflected_query": "为什么在单节点内存较小时，增加分布式实例并合并反而可能降低估计误差？ accuracy relative error standard error ARE memory space bits bytes registers counters MVP merge mergeability union distributed partial results"
+        },
+        {
+          "id": "seive-10",
+          "query": "What parallel processing speedup range is reported for SeiveSketch?",
+          "language": "en",
+          "difficulty": "easy",
+          "source": "SeiveSketch",
+          "relevant": [
+            "RF-9B51FD1B-121"
+          ],
+          "retrieved": [
+            "RF-9B51FD1B-121",
+            "RF-9B51FD1B-57",
+            "RF-9B51FD1B-122",
+            "RF-9B51FD1B-95",
+            "RF-9B51FD1B-2"
+          ],
+          "latency_ms": 591.029,
+          "reflected_query": "What parallel processing speedup range is reported for SeiveSketch? parallelization throughput speedup"
+        },
+        {
+          "id": "distractor-01",
+          "query": "Which system exposes hidden collective-communication dependencies for root-cause analysis in unreliable LLM training?",
+          "language": "en",
+          "difficulty": "hard",
+          "source": "Mycroft",
+          "relevant": [
+            "RF-02FC78C3-3"
+          ],
+          "retrieved": [
+            "RF-02FC78C3-115",
+            "RF-02FC78C3-13",
+            "RF-02FC78C3-4",
+            "RF-02FC78C3-54",
+            "RF-02FC78C3-3"
+          ],
+          "latency_ms": 401.292,
+          "reflected_query": "Which system exposes hidden collective-communication dependencies for root-cause analysis in unreliable LLM training?"
+        },
+        {
+          "id": "distractor-02",
+          "query": "哪篇论文介绍了用于大规模语言模型训练的 Astral 数据中心基础设施？",
+          "language": "zh",
+          "difficulty": "medium",
+          "source": "Astral",
+          "relevant": [
+            "RF-58AA680D-1"
+          ],
+          "retrieved": [
+            "RF-58AA680D-79",
+            "RF-58AA680D-15",
+            "RF-58AA680D-1",
+            "RF-58AA680D-36",
+            "RF-58AA680D-2"
+          ],
+          "latency_ms": 363.571,
+          "reflected_query": "哪篇论文介绍了用于大规模语言模型训练的 Astral 数据中心基础设施？"
+        }
+      ],
+      "bad_cases": {
+        "retrieval_miss": [
+          "hll-01",
+          "hll-02",
+          "hll-03",
+          "hll-04",
+          "hll-06",
+          "hll-07",
+          "hll-08",
+          "drex-02",
+          "drex-04",
+          "drex-09",
+          "ull-02",
+          "ull-04",
+          "ull-05",
+          "ull-06",
+          "ull-07",
+          "ull-08",
+          "seive-01",
+          "seive-02",
+          "seive-04",
+          "seive-05",
+          "seive-09"
+        ]
+      }
+    }
+  },
+  "embedding_index": {
+    "status": "built",
+    "chunks": 1192,
+    "segments": 1202,
+    "dimensions": 384,
+    "model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    "cache": "E:\\agent\\nanobot-v0.1.4-era\\research-demo-768\\research\\vectors\\sentence-transformers-paraphrase-multilingual-minilm-l12-v2-seg768-ceaa881bdd48acd4.npz"
+  },
+  "dataset": "E:\\agent\\nanobot-v0.1.4-era\\benchmarks\\researchflow\\cardinality_sketch_40_768.jsonl"
+}

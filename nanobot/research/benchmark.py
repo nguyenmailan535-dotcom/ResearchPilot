@@ -7,7 +7,7 @@ from collections import defaultdict
 from typing import Any, Callable, Iterable
 
 from nanobot.research.metrics import percentile
-from nanobot.research.retrieval import RetrievalSuite, reflect_query
+from nanobot.research.retrieval import RetrievalSuite, reciprocal_rank_fusion, reflect_query
 from nanobot.research.store import ResearchStore
 
 SearchMethod = Callable[[str], list[dict[str, Any]]]
@@ -139,3 +139,78 @@ def benchmark_retrieval(
             "bad_cases": {"retrieval_miss": misses},
         }
     return output
+
+
+def tune_rrf_weights(
+    store: ResearchStore,
+    suite: RetrievalSuite,
+    cases: Iterable[dict[str, Any]],
+    *,
+    top_k: int = 5,
+    weight_ratios: tuple[float, ...] = (0.5, 0.75, 1.0, 1.5, 2.0, 3.0),
+    rank_constants: tuple[int, ...] = (20, 40, 60, 80),
+) -> dict[str, Any]:
+    """Tune vector/BM25 RRF ratio on a development set without repeated model inference."""
+    cases = validate_cases(store, cases)
+    pool = max(20, top_k * 4)
+    cached: list[tuple[dict[str, Any], list[dict[str, Any]], list[dict[str, Any]]]] = []
+    started = time.perf_counter()
+    for case in cases:
+        query = str(case["query"])
+        cached.append(
+            (
+                case,
+                suite.bm25(query, top_k=pool),
+                suite.vector(query, top_k=pool),
+            )
+        )
+
+    candidates: list[dict[str, Any]] = []
+    for vector_ratio in weight_ratios:
+        for rank_constant in rank_constants:
+            details: list[dict[str, Any]] = []
+            for case, bm25, vector in cached:
+                results = reciprocal_rank_fusion(
+                    [bm25, vector],
+                    top_k=top_k,
+                    rank_constant=rank_constant,
+                    weights=(1.0, vector_ratio),
+                )
+                details.append(
+                    {
+                        "id": str(case["id"]),
+                        "relevant": sorted(
+                            {
+                                str(value).upper()
+                                for value in case["relevant_citations"]
+                            }
+                        ),
+                        "retrieved": [str(item["citation"]).upper() for item in results],
+                    }
+                )
+            metrics = _aggregate(details, top_k)
+            candidates.append(
+                {
+                    "bm25_weight": 1.0,
+                    "vector_weight": vector_ratio,
+                    "rank_constant": rank_constant,
+                    "metrics": metrics,
+                }
+            )
+    candidates.sort(
+        key=lambda item: (
+            -item["metrics"]["recall_at_k"],
+            -item["metrics"]["mrr"],
+            -item["metrics"]["success_at_k"],
+            abs(item["vector_weight"] - 1.0),
+            item["rank_constant"],
+        )
+    )
+    return {
+        "dataset_cases": len(cases),
+        "top_k": top_k,
+        "selection_rule": "Recall@K, then MRR, then Success@K; closest-to-equal ratio on ties",
+        "retrieval_seconds": round(time.perf_counter() - started, 3),
+        "best": candidates[0] if candidates else None,
+        "candidates": candidates,
+    }

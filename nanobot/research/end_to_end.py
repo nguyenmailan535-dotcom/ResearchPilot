@@ -132,6 +132,91 @@ def score_answer(store: ResearchStore, case: dict[str, Any], answer: str) -> dic
     }
 
 
+def aggregate_evaluation_details(
+    details: list[dict[str, Any]],
+    *,
+    prompt_usd_per_million: float = 0.0,
+    completion_usd_per_million: float = 0.0,
+) -> dict[str, Any]:
+    """Aggregate saved case details so interrupted evaluations can be resumed safely."""
+    count = len(details)
+
+    def mean(field: str) -> float:
+        return round(sum(float(item[field]) for item in details) / max(1, count), 4)
+
+    latencies = [float(item["elapsed_seconds"]) for item in details]
+    prompt_tokens = sum(int(item["prompt_tokens"]) for item in details)
+    completion_tokens = sum(int(item["completion_tokens"]) for item in details)
+    answerable = [item for item in details if item["expected_answerable"]]
+    unanswerable = [item for item in details if not item["expected_answerable"]]
+    bad_case_counts: dict[str, int] = {}
+    for item in details:
+        for label in item["bad_case_labels"]:
+            bad_case_counts[label] = bad_case_counts.get(label, 0) + 1
+    judge_scores = [
+        float(item["llm_judge"]["overall"])
+        for item in details
+        if "llm_judge" in item and "overall" in item["llm_judge"]
+    ]
+    semantic_support = [
+        float(item["semantic_entailment"]["support_rate"])
+        for item in details
+        if "semantic_entailment" in item and "support_rate" in item["semantic_entailment"]
+    ]
+    pricing_configured = bool(prompt_usd_per_million or completion_usd_per_million)
+    metrics = {
+        "task_completion_rate": mean("completed"),
+        "answer_pass_rate": mean("answer_pass"),
+        "concept_coverage": mean("concept_coverage"),
+        "citation_validity": mean("citation_validity"),
+        "relevant_citation_recall": mean("relevant_citation_recall"),
+        "paragraph_citation_coverage": mean("paragraph_citation_coverage"),
+        "claim_support_rate": round(
+            sum(float(item["entailment"]["support_rate"]) for item in details)
+            / max(1, count),
+            4,
+        ),
+        "average_latency_seconds": mean("elapsed_seconds"),
+        "p50_latency_seconds": percentile(latencies, 50),
+        "p95_latency_seconds": percentile(latencies, 95),
+        "average_prompt_tokens": mean("prompt_tokens"),
+        "average_completion_tokens": mean("completion_tokens"),
+        "total_prompt_tokens": prompt_tokens,
+        "total_completion_tokens": completion_tokens,
+        "estimated_cost_usd": round(
+            sum(float(item["estimated_cost_usd"]) for item in details), 8
+        ) if pricing_configured else None,
+        "average_tool_events": round(
+            sum(len(item["tool_events"]) for item in details) / max(1, count), 4
+        ),
+        "unanswerable_recall": round(
+            sum(bool(item["abstained"]) for item in unanswerable) / len(unanswerable), 4
+        ) if unanswerable else None,
+        "false_answer_rate": round(
+            sum(not bool(item["abstained"]) for item in unanswerable) / len(unanswerable), 4
+        ) if unanswerable else None,
+        "answerable_accuracy": round(
+            sum(bool(item["answer_pass"]) for item in answerable) / len(answerable), 4
+        ) if answerable else None,
+        "llm_judge_overall": round(sum(judge_scores) / len(judge_scores), 4)
+        if judge_scores else None,
+        "semantic_claim_support_rate": round(
+            sum(semantic_support) / len(semantic_support), 4
+        ) if semantic_support else None,
+    }
+    return {
+        "cases": count,
+        "metrics": metrics,
+        "bad_case_summary": dict(sorted(bad_case_counts.items())),
+        "pricing": {
+            "configured": pricing_configured,
+            "prompt_usd_per_million": prompt_usd_per_million,
+            "completion_usd_per_million": completion_usd_per_million,
+        },
+        "details": details,
+    }
+
+
 async def evaluate_agent_answers(
     agent_loop: Any,
     store: ResearchStore,
@@ -227,78 +312,8 @@ async def evaluate_agent_answers(
         detail["bad_case_labels"] = classify_bad_case(detail)
         details.append(detail)
 
-    count = len(details)
-
-    def mean(field: str) -> float:
-        return round(sum(float(item[field]) for item in details) / max(1, count), 4)
-
-    latencies = [float(item["elapsed_seconds"]) for item in details]
-    prompt_tokens = sum(int(item["prompt_tokens"]) for item in details)
-    completion_tokens = sum(int(item["completion_tokens"]) for item in details)
-    answerable = [item for item in details if item["expected_answerable"]]
-    unanswerable = [item for item in details if not item["expected_answerable"]]
-    bad_case_counts: dict[str, int] = {}
-    for item in details:
-        for label in item["bad_case_labels"]:
-            bad_case_counts[label] = bad_case_counts.get(label, 0) + 1
-    judge_scores = [
-        float(item["llm_judge"]["overall"])
-        for item in details
-        if "llm_judge" in item and "overall" in item["llm_judge"]
-    ]
-    semantic_support = [
-        float(item["semantic_entailment"]["support_rate"])
-        for item in details
-        if "semantic_entailment" in item and "support_rate" in item["semantic_entailment"]
-    ]
-    metrics = {
-            "task_completion_rate": mean("completed"),
-            "answer_pass_rate": mean("answer_pass"),
-            "concept_coverage": mean("concept_coverage"),
-            "citation_validity": mean("citation_validity"),
-            "relevant_citation_recall": mean("relevant_citation_recall"),
-            "paragraph_citation_coverage": mean("paragraph_citation_coverage"),
-            "claim_support_rate": round(
-                sum(float(item["entailment"]["support_rate"]) for item in details)
-                / max(1, count),
-                4,
-            ),
-            "average_latency_seconds": mean("elapsed_seconds"),
-            "p50_latency_seconds": percentile(latencies, 50),
-            "p95_latency_seconds": percentile(latencies, 95),
-            "average_prompt_tokens": mean("prompt_tokens"),
-            "average_completion_tokens": mean("completion_tokens"),
-            "total_prompt_tokens": prompt_tokens,
-            "total_completion_tokens": completion_tokens,
-            "estimated_cost_usd": round(
-                sum(float(item["estimated_cost_usd"]) for item in details), 8
-            ) if pricing_configured else None,
-            "average_tool_events": round(
-                sum(len(item["tool_events"]) for item in details) / max(1, count), 4
-            ),
-            "unanswerable_recall": round(
-                sum(bool(item["abstained"]) for item in unanswerable) / len(unanswerable), 4
-            ) if unanswerable else None,
-            "false_answer_rate": round(
-                sum(not bool(item["abstained"]) for item in unanswerable) / len(unanswerable), 4
-            ) if unanswerable else None,
-            "answerable_accuracy": round(
-                sum(bool(item["answer_pass"]) for item in answerable) / len(answerable), 4
-            ) if answerable else None,
-            "llm_judge_overall": round(sum(judge_scores) / len(judge_scores), 4)
-            if judge_scores else None,
-            "semantic_claim_support_rate": round(
-                sum(semantic_support) / len(semantic_support), 4
-            ) if semantic_support else None,
-        }
-    return {
-        "cases": count,
-        "metrics": metrics,
-        "bad_case_summary": dict(sorted(bad_case_counts.items())),
-        "pricing": {
-            "configured": pricing_configured,
-            "prompt_usd_per_million": prompt_usd_per_million,
-            "completion_usd_per_million": completion_usd_per_million,
-        },
-        "details": details,
-    }
+    return aggregate_evaluation_details(
+        details,
+        prompt_usd_per_million=prompt_usd_per_million,
+        completion_usd_per_million=completion_usd_per_million,
+    )

@@ -510,9 +510,12 @@ def serve(
 ):
     """Start the OpenAI-compatible API server (/v1/chat/completions)."""
     try:
-        from aiohttp import web  # noqa: F401
+        import uvicorn
     except ImportError:
-        console.print("[red]aiohttp is required. Install with: pip install 'nanobot-ai[api]'[/red]")
+        console.print(
+            "[red]FastAPI/Uvicorn is required. Install with: "
+            "pip install 'nanobot-ai[api]'[/red]"
+        )
         raise typer.Exit(1)
 
     from loguru import logger
@@ -568,16 +571,7 @@ def serve(
 
     api_app = create_app(agent_loop, model_name=model_name, request_timeout=timeout)
 
-    async def on_startup(_app):
-        await agent_loop._connect_mcp()
-
-    async def on_cleanup(_app):
-        await agent_loop.close_mcp()
-
-    api_app.on_startup.append(on_startup)
-    api_app.on_cleanup.append(on_cleanup)
-
-    web.run_app(api_app, host=host, port=port, print=lambda msg: logger.info(msg))
+    uvicorn.run(api_app, host=host, port=port, log_level="info" if verbose else "warning")
 
 
 # ============================================================================
@@ -1036,9 +1030,9 @@ def research_ingest(
     path: str = typer.Argument(..., help="PDF, Markdown, text, source file, or directory"),
     workspace: str | None = typer.Option(None, "--workspace", "-w"),
     max_files: int = typer.Option(100, "--max-files", min=1, max=500),
-    chunk_size: int = typer.Option(1200, "--chunk-size", min=200, max=4000),
-    chunk_overlap: int = typer.Option(160, "--chunk-overlap", min=0, max=1000),
-    chunk_strategy: str = typer.Option("structure", "--chunk-strategy"),
+    chunk_size: int = typer.Option(768, "--chunk-size", min=200, max=4000),
+    chunk_overlap: int = typer.Option(120, "--chunk-overlap", min=0, max=1000),
+    chunk_strategy: str = typer.Option("fixed", "--chunk-strategy"),
 ):
     """Index local evidence for grounded research."""
     store = _research_store(workspace)
@@ -1080,12 +1074,29 @@ def research_search(
     rerank: bool = typer.Option(False, "--rerank"),
 ):
     """Search evidence with selectable BM25, dense, hybrid, or reflected hybrid retrieval."""
+    import os
+
     from nanobot.research.retrieval import DenseRetriever, FastEmbedReranker, RetrievalSuite
 
     store = _research_store(workspace)
+    dense = DenseRetriever(store)
+    backend = None
+    backend_name = os.getenv(
+        "RESEARCH_RETRIEVAL_BACKEND",
+        "milvus" if os.getenv("RESEARCH_MILVUS_URI") else "local",
+    ).strip().lower()
+    if backend_name == "milvus":
+        from nanobot.research.milvus import MilvusResearchBackend
+
+        backend = MilvusResearchBackend(store, embedder=dense.embedder)
+    elif backend_name != "local":
+        raise typer.BadParameter(
+            "RESEARCH_RETRIEVAL_BACKEND must be either 'local' or 'milvus'"
+        )
     suite = RetrievalSuite(
         store,
-        DenseRetriever(store),
+        dense,
+        backend=backend,
         reranker=FastEmbedReranker() if rerank else None,
     )
     outcome = suite.search(
@@ -1114,6 +1125,31 @@ def research_search(
         f"latency_ms={outcome.latency_ms} degraded={outcome.degraded} "
         f"reranked={outcome.reranked}[/dim]"
     )
+
+
+@research_app.command("sync-index")
+def research_sync_index(
+    workspace: str | None = typer.Option(None, "--workspace", "-w"),
+    uri: str | None = typer.Option(None, "--uri", help="Milvus endpoint override"),
+    collection: str | None = typer.Option(None, "--collection"),
+    force: bool = typer.Option(False, "--force", help="Re-embed every chunk"),
+):
+    """Synchronize SQLite evidence chunks into the Milvus BM25/HNSW projection."""
+    from nanobot.research.milvus import MilvusResearchBackend
+
+    store = _research_store(workspace)
+    backend = MilvusResearchBackend(store, uri=uri, collection=collection)
+    console.print("[dim]Synchronizing evidence chunks with Milvus/BGE-M3...[/dim]")
+    try:
+        result = backend.sync(force=force)
+    except Exception as exc:
+        console.print(f"[red]Milvus synchronization failed:[/red] {exc}")
+        console.print(
+            "[dim]Start Milvus first and install the research dependencies: "
+            "pip install -e '.[research]'.[/dim]"
+        )
+        raise typer.Exit(1) from exc
+    console.print_json(data=result)
 
 
 @research_app.command("sources")
@@ -1178,9 +1214,9 @@ def research_benchmark(
     workspace: str | None = typer.Option(None, "--workspace", "-w"),
     top_k: int = typer.Option(5, "--top-k", min=3, max=20),
     model: str = typer.Option(
-        "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+        "BAAI/bge-m3",
         "--embedding-model",
-        help="FastEmbed dense embedding model",
+        help="Dense embedding model (BGE-M3 by default)",
     ),
     output: str | None = typer.Option(None, "--output", "-o", help="Result JSON path"),
     rebuild_vectors: bool = typer.Option(False, "--rebuild-vectors"),
@@ -1188,6 +1224,7 @@ def research_benchmark(
 ):
     """Compare BM25, dense, hybrid RRF, and reflected hybrid retrieval."""
     import json
+    import os
     from datetime import datetime
 
     from nanobot.research.benchmark import benchmark_retrieval
@@ -1197,15 +1234,38 @@ def research_benchmark(
     store = _research_store(workspace)
     cases = load_cases(Path(dataset).expanduser())
     dense = DenseRetriever(store, model_name=model)
-    console.print(f"[dim]Building/loading dense index with {model}...[/dim]")
-    index = dense.build_index(force=rebuild_vectors)
+    backend = None
+    backend_name = os.getenv(
+        "RESEARCH_RETRIEVAL_BACKEND",
+        "milvus" if os.getenv("RESEARCH_MILVUS_URI") else "local",
+    ).strip().lower()
+    if backend_name == "milvus":
+        from nanobot.research.milvus import MilvusResearchBackend
+
+        backend = MilvusResearchBackend(store, model_name=model, embedder=dense.embedder)
+        console.print(f"[dim]Synchronizing Milvus index with {model}...[/dim]")
+        index = backend.sync(force=rebuild_vectors)
+    elif backend_name == "local":
+        console.print(f"[dim]Building/loading local dense index with {model}...[/dim]")
+        index = dense.build_index(force=rebuild_vectors)
+    else:
+        raise typer.BadParameter(
+            "RESEARCH_RETRIEVAL_BACKEND must be either 'local' or 'milvus'"
+        )
+    suite = RetrievalSuite(
+        store,
+        dense,
+        backend=backend,
+        reranker=FastEmbedReranker() if rerank else None,
+    )
     result = benchmark_retrieval(
         store,
-        RetrievalSuite(store, dense, reranker=FastEmbedReranker() if rerank else None),
+        suite,
         cases,
         ks=(1, 3, top_k),
     )
     result["embedding_index"] = index
+    result["retrieval_backend"] = backend_name
     result["dataset"] = str(Path(dataset).expanduser().resolve())
 
     table = Table(title=f"ResearchFlow Retrieval Benchmark ({len(cases)} cases)")
@@ -1242,7 +1302,7 @@ def research_chunk_ablation(
     dataset: str = typer.Argument(..., help="Labeled JSONL dataset using current RF citations"),
     workspace: str | None = typer.Option(None, "--workspace", "-w"),
     model: str = typer.Option(
-        "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+        "BAAI/bge-m3",
         "--embedding-model",
     ),
     top_k: int = typer.Option(5, "--top-k", min=1, max=20),
@@ -1269,6 +1329,51 @@ def research_chunk_ablation(
     console.print(f"Results: [cyan]{output_path.resolve()}[/cyan]")
 
 
+@research_app.command("tune-rrf")
+def research_tune_rrf(
+    dataset: str = typer.Argument(..., help="Development JSONL with relevance labels"),
+    workspace: str | None = typer.Option(None, "--workspace", "-w"),
+    top_k: int = typer.Option(5, "--top-k", min=1, max=20),
+    output: str | None = typer.Option(None, "--output", "-o"),
+):
+    """Tune the vector/BM25 RRF ratio on a development set."""
+    import json
+    import os
+
+    from nanobot.research.benchmark import tune_rrf_weights
+    from nanobot.research.evaluate import load_cases
+    from nanobot.research.retrieval import DenseRetriever, RetrievalSuite
+
+    store = _research_store(workspace)
+    cases = load_cases(Path(dataset).expanduser())
+    dense = DenseRetriever(store)
+    backend = None
+    backend_name = os.getenv(
+        "RESEARCH_RETRIEVAL_BACKEND",
+        "milvus" if os.getenv("RESEARCH_MILVUS_URI") else "local",
+    ).strip().lower()
+    if backend_name == "milvus":
+        from nanobot.research.milvus import MilvusResearchBackend
+
+        backend = MilvusResearchBackend(store, embedder=dense.embedder)
+    elif backend_name != "local":
+        raise typer.BadParameter(
+            "RESEARCH_RETRIEVAL_BACKEND must be either 'local' or 'milvus'"
+        )
+    result = tune_rrf_weights(
+        store,
+        RetrievalSuite(store, dense, backend=backend),
+        cases,
+        top_k=top_k,
+    )
+    result["retrieval_backend"] = backend_name
+    console.print_json(data=result["best"])
+    if output:
+        output_path = Path(output).expanduser()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
 @research_app.command("calibrate-threshold")
 def research_calibrate_threshold(
     dataset: str = typer.Argument(..., help="Dev JSONL with answerable and unanswerable cases"),
@@ -1279,14 +1384,29 @@ def research_calibrate_threshold(
 ):
     """Calibrate the no-answer threshold on a development set."""
     import json
+    import os
 
     from nanobot.research.evaluate import calibrate_no_answer_threshold, load_cases
     from nanobot.research.retrieval import DenseRetriever, RetrievalSuite
 
     store = _research_store(workspace)
     cases = load_cases(Path(dataset).expanduser())
+    dense = DenseRetriever(store)
+    backend = None
+    backend_name = os.getenv(
+        "RESEARCH_RETRIEVAL_BACKEND",
+        "milvus" if os.getenv("RESEARCH_MILVUS_URI") else "local",
+    ).strip().lower()
+    if backend_name == "milvus":
+        from nanobot.research.milvus import MilvusResearchBackend
+
+        backend = MilvusResearchBackend(store, embedder=dense.embedder)
+    elif backend_name != "local":
+        raise typer.BadParameter(
+            "RESEARCH_RETRIEVAL_BACKEND must be either 'local' or 'milvus'"
+        )
     result = calibrate_no_answer_threshold(
-        RetrievalSuite(store, DenseRetriever(store)),
+        RetrievalSuite(store, dense, backend=backend),
         cases,
         strategy=strategy,
         top_k=top_k,
@@ -1304,6 +1424,11 @@ def research_e2e_evaluate(
     workspace: str | None = typer.Option(None, "--workspace", "-w"),
     config: str | None = typer.Option(None, "--config", "-c"),
     output: str | None = typer.Option(None, "--output", "-o"),
+    resume_from: str | None = typer.Option(
+        None,
+        "--resume-from",
+        help="Saved evaluation; rerun only cases whose completed flag is false",
+    ),
     limit: int | None = typer.Option(None, "--limit", min=1),
     judge_model: str | None = typer.Option(None, "--judge-model"),
     prompt_usd_per_million: float = typer.Option(0.0, "--prompt-usd-per-million", min=0),
@@ -1317,7 +1442,11 @@ def research_e2e_evaluate(
 
     from nanobot.agent.loop import AgentLoop
     from nanobot.bus.queue import MessageBus
-    from nanobot.research.end_to_end import evaluate_agent_answers, load_end_to_end_cases
+    from nanobot.research.end_to_end import (
+        aggregate_evaluation_details,
+        evaluate_agent_answers,
+        load_end_to_end_cases,
+    )
     from nanobot.research.store import ResearchStore
     from nanobot.session.manager import SessionManager
 
@@ -1342,6 +1471,22 @@ def research_e2e_evaluate(
     )
     cases = load_end_to_end_cases(Path(dataset).expanduser())
     store = ResearchStore(runtime_config.workspace_path)
+    previous_details: dict[str, dict] = {}
+    cases_to_run = cases
+    if resume_from:
+        saved = json.loads(Path(resume_from).expanduser().read_text(encoding="utf-8"))
+        previous_details = {
+            str(detail["id"]): detail for detail in saved.get("details", [])
+        }
+        cases_to_run = [
+            case
+            for case in cases
+            if not bool(previous_details.get(str(case["id"]), {}).get("completed"))
+        ]
+        console.print(
+            f"[dim]Resuming {len(cases_to_run)} incomplete cases; "
+            f"reusing {len(cases) - len(cases_to_run)} completed cases.[/dim]"
+        )
 
     async def run_evaluation():
         try:
@@ -1358,10 +1503,12 @@ def research_e2e_evaluate(
                     return await judge_claim_entailment(provider, judge_model, store, answer)
 
                 claim_judge = run_claim_judge
+            if not cases_to_run:
+                return {"details": []}
             return await evaluate_agent_answers(
                 agent_loop,
                 store,
-                cases,
+                cases_to_run,
                 limit=limit,
                 judge=judge,
                 claim_judge=claim_judge,
@@ -1372,6 +1519,17 @@ def research_e2e_evaluate(
             await agent_loop.close_mcp()
 
     result = asyncio.run(run_evaluation())
+    if resume_from:
+        updated = {str(detail["id"]): detail for detail in result["details"]}
+        merged = [
+            updated.get(str(case["id"])) or previous_details[str(case["id"])]
+            for case in cases
+        ]
+        result = aggregate_evaluation_details(
+            merged,
+            prompt_usd_per_million=prompt_usd_per_million,
+            completion_usd_per_million=completion_usd_per_million,
+        )
     result["dataset"] = str(Path(dataset).expanduser().resolve())
     result["model"] = runtime_config.agents.defaults.model
     metrics = result["metrics"]
@@ -1476,6 +1634,75 @@ def research_judge_evaluate(
     else:
         timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         output_path = store.root / "evaluations" / f"judge-{timestamp}.json"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    console.print(f"Results: [cyan]{output_path.resolve()}[/cyan]")
+
+
+@research_app.command("ragas-evaluate")
+def research_ragas_evaluate(
+    evaluation: str = typer.Argument(..., help="Saved e2e evaluation JSON with answers"),
+    workspace: str | None = typer.Option(None, "--workspace", "-w"),
+    config: str | None = typer.Option(None, "--config", "-c"),
+    model: str = typer.Option("deepseek-v4-pro", "--model"),
+    output: str | None = typer.Option(None, "--output", "-o"),
+    resume_from: str | None = typer.Option(
+        None,
+        "--resume-from",
+        help="Saved RAGAS result; rerun only incomplete cases",
+    ),
+    concurrency: int = typer.Option(2, "--concurrency", min=1, max=4),
+):
+    """Score saved answers with RAGAS Faithfulness and Answer Relevancy."""
+    import json
+    from datetime import datetime
+
+    from nanobot.research.ragas_eval import aggregate_ragas_details, evaluate_ragas_results
+    from nanobot.research.store import ResearchStore
+
+    runtime_config = _load_runtime_config(config, workspace)
+    store = ResearchStore(runtime_config.workspace_path)
+    saved = json.loads(Path(evaluation).expanduser().read_text(encoding="utf-8"))
+    details = list(saved.get("details", []))
+    previous_details: dict[str, dict] = {}
+    if resume_from:
+        previous = json.loads(Path(resume_from).expanduser().read_text(encoding="utf-8"))
+        previous_details = {
+            str(detail.get("id", "")): detail for detail in previous.get("details", [])
+        }
+        details = [
+            detail
+            for detail in details
+            if not bool(previous_details.get(str(detail.get("id", "")), {}).get("completed"))
+        ]
+        console.print(
+            f"[dim]Resuming {len(details)} incomplete RAGAS cases; "
+            f"reusing {len(saved.get('details', [])) - len(details)} completed cases.[/dim]"
+        )
+    result = asyncio.run(
+        evaluate_ragas_results(
+            store,
+            details,
+            model=model,
+            api_key=runtime_config.get_api_key(model),
+            base_url=runtime_config.get_api_base(model),
+            concurrency=concurrency,
+        )
+    )
+    if resume_from:
+        updated = {str(detail.get("id", "")): detail for detail in result["details"]}
+        merged = [
+            updated.get(str(detail.get("id", "")))
+            or previous_details[str(detail.get("id", ""))]
+            for detail in saved.get("details", [])
+        ]
+        result = aggregate_ragas_details(merged, model=model)
+    console.print_json(data={key: value for key, value in result.items() if key != "details"})
+    if output:
+        output_path = Path(output).expanduser()
+    else:
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        output_path = store.root / "evaluations" / f"ragas-{timestamp}.json"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     console.print(f"Results: [cyan]{output_path.resolve()}[/cyan]")

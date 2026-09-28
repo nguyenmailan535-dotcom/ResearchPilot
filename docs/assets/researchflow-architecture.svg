@@ -40,7 +40,7 @@
   <text x="332" y="145" class="section">SERVICE LAYER</text>
   <g filter="url(#shadow)"><rect x="332" y="166" width="280" height="228" rx="20" class="card"/></g>
   <text x="356" y="202" class="node-title">HTTP / SSE API</text>
-  <text x="356" y="226" class="node-text">aiohttp · port 18791</text>
+  <text x="356" y="226" class="node-text">FastAPI · port 18791</text>
   <g>
     <rect x="356" y="248" width="106" height="32" rx="16" fill="#e4f2e9"/><text x="375" y="269" class="pill-text">Document API</text>
     <rect x="476" y="248" width="112" height="32" rx="16" fill="#e4f2e9"/><text x="497" y="269" class="pill-text">Task API</text>

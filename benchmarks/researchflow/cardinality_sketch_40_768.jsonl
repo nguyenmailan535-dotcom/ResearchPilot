@@ -1,0 +1,40 @@
+{"id":"hll-01","query":"What is the asymptotic standard error of HyperLogLog with m registers?","relevant_citations":["RF-F6B914C4-1"],"language":"en","difficulty":"easy","source":"HLL"}
+{"id":"hll-02","query":"HLL 使用约 1.5KB 内存时可以达到怎样的基数估计精度？","relevant_citations":["RF-F6B914C4-1"],"language":"zh","difficulty":"medium","source":"HLL"}
+{"id":"hll-03","query":"How many bits are sufficient for each HyperLogLog register with 32-bit hashes?","relevant_citations":["RF-F6B914C4-64"],"language":"en","difficulty":"easy","source":"HLL"}
+{"id":"hll-04","query":"为什么 HLL 的估计结果可以近似看作高斯分布，其标准差如何表示？","relevant_citations":["RF-F6B914C4-64"],"language":"zh","difficulty":"hard","source":"HLL"}
+{"id":"hll-05","query":"Describe how HyperLogLog chooses a register and updates it using the leftmost one bit.","relevant_citations":["RF-F6B914C4-19"],"language":"en","difficulty":"medium","source":"HLL"}
+{"id":"hll-06","query":"How do the relative accuracy constants of LOGLOG and HYPERLOGLOG compare?","relevant_citations":["RF-F6B914C4-13"],"language":"en","difficulty":"medium","source":"HLL"}
+{"id":"hll-07","query":"哪种经典去重计数算法能够最优并行化，并以 1.04 除以根号 m 的误差工作？","relevant_citations":["RF-F6B914C4-1"],"language":"zh","difficulty":"hard","source":"HLL"}
+{"id":"hll-08","query":"Why can querying HLL be slow when it must aggregate every register with a harmonic mean?","relevant_citations":["RF-B40077A8-19"],"language":"en","difficulty":"medium","source":"DREX"}
+{"id":"drex-01","query":"Why do database-oriented distinct counters struggle with dynamic network traffic under tight memory?","relevant_citations":["RF-B40077A8-8"],"language":"en","difficulty":"hard","source":"DREX"}
+{"id":"drex-02","query":"DREX 如何通过自适应采样在固定小内存下扩展可计数范围？","relevant_citations":["RF-B40077A8-8"],"language":"zh","difficulty":"hard","source":"DREX"}
+{"id":"drex-03","query":"What standard-error expression is derived for DREX when t equals pN divided by m?","relevant_citations":["RF-B40077A8-59"],"language":"en","difficulty":"hard","source":"DREX"}
+{"id":"drex-04","query":"实验为什么表明 DREX 的每个计数单元使用 2 bit 就足够？","relevant_citations":["RF-B40077A8-67"],"language":"zh","difficulty":"medium","source":"DREX"}
+{"id":"drex-05","query":"Across wide cardinality ranges, how much can DREX reduce relative error versus HLL and KMV?","relevant_citations":["RF-B40077A8-69"],"language":"en","difficulty":"hard","source":"DREX"}
+{"id":"drex-06","query":"在指定 F1 分数的超级扩散者检测中，DREX 相比 HLL 能节省多少内存？","relevant_citations":["RF-B40077A8-76"],"language":"zh","difficulty":"hard","source":"DREX"}
+{"id":"drex-07","query":"What peak update throughput in Mops is reported for DREX and why is it fast at high cardinality?","relevant_citations":["RF-B40077A8-77"],"language":"en","difficulty":"medium","source":"DREX"}
+{"id":"drex-08","query":"How are two DREX instances aligned and combined to compute their union?","relevant_citations":["RF-B40077A8-51","RF-B40077A8-53"],"language":"en","difficulty":"hard","source":"DREX"}
+{"id":"drex-09","query":"DREX 如何利用容斥原理由两个实例估计集合交集？","relevant_citations":["RF-B40077A8-53"],"language":"zh","difficulty":"medium","source":"DREX"}
+{"id":"drex-10","query":"Which network cardinality sketch keeps accuracy nearly unchanged when counter width q varies from two to five?","relevant_citations":["RF-B40077A8-67"],"language":"en","difficulty":"hard","source":"DREX"}
+{"id":"ull-01","query":"How much less space does UltraLogLog require than HLL for the same distinct-count information?","relevant_citations":["RF-2DCCFEB5-1","RF-2DCCFEB5-22"],"language":"en","difficulty":"easy","source":"ULL"}
+{"id":"ull-02","query":"ULL 具备哪些适合分布式系统的代数性质和插入复杂度？","relevant_citations":["RF-2DCCFEB5-1"],"language":"zh","difficulty":"medium","source":"ULL"}
+{"id":"ull-03","query":"What space reduction does the simpler fast UltraLogLog estimator retain at HLL-like estimation speed?","relevant_citations":["RF-2DCCFEB5-1"],"language":"en","difficulty":"medium","source":"ULL"}
+{"id":"ull-04","query":"UltraLogLog 的 MVP 数值是多少，它比 HyperLogLog 低多少？","relevant_citations":["RF-2DCCFEB5-22"],"language":"zh","difficulty":"easy","source":"ULL"}
+{"id":"ull-05","query":"How does maximum-likelihood estimation in ULL relate to the Cramér-Rao variance bound?","relevant_citations":["RF-2DCCFEB5-38"],"language":"en","difficulty":"hard","source":"ULL"}
+{"id":"ull-06","query":"为什么 ULL 的寄存器表示经过无损压缩后通常比 HLL 更紧凑？","relevant_citations":["RF-2DCCFEB5-22"],"language":"zh","difficulty":"hard","source":"ULL"}
+{"id":"ull-07","query":"What happens to HLL memory-variance product when martingale or HIP estimation is allowed without merging?","relevant_citations":["RF-2DCCFEB5-20"],"language":"en","difficulty":"hard","source":"ULL"}
+{"id":"ull-08","query":"不可合并的 distinct-count sketch 理论 MVP 下限大约是多少？","relevant_citations":["RF-2DCCFEB5-20"],"language":"zh","difficulty":"hard","source":"ULL"}
+{"id":"ull-09","query":"Why is mergeability important for ULL when partial counts are distributed over space or time?","relevant_citations":["RF-2DCCFEB5-81"],"language":"en","difficulty":"medium","source":"ULL"}
+{"id":"ull-10","query":"How can UltraLogLog sketches with different precision be merged or downsized?","relevant_citations":["RF-2DCCFEB5-81"],"language":"en","difficulty":"hard","source":"ULL"}
+{"id":"seive-01","query":"What stream-processing task is SeiveSketch designed to solve?","relevant_citations":["RF-9B51FD1B-1"],"language":"en","difficulty":"easy","source":"SeiveSketch"}
+{"id":"seive-02","query":"SeiveSketch 为什么使用 4-bit 计数器处理大量冷门项？","relevant_citations":["RF-9B51FD1B-3"],"language":"zh","difficulty":"medium","source":"SeiveSketch"}
+{"id":"seive-03","query":"By what maximum factor does SeiveSketch reduce estimation error compared with the state of the art?","relevant_citations":["RF-9B51FD1B-3"],"language":"en","difficulty":"easy","source":"SeiveSketch"}
+{"id":"seive-04","query":"自适应缩放如何在不增加计数器位数的情况下适应不同数据集的冷项频率范围？","relevant_citations":["RF-9B51FD1B-24"],"language":"zh","difficulty":"hard","source":"SeiveSketch"}
+{"id":"seive-05","query":"Which theorem provides the relative-error bound for every item in SeiveSketch?","relevant_citations":["RF-9B51FD1B-73"],"language":"en","difficulty":"medium","source":"SeiveSketch"}
+{"id":"seive-06","query":"在 CAIDA 数据集上，SeiveSketch 相比 CM、CU、AS、CF 等方法的 ARE 改善如何？","relevant_citations":["RF-9B51FD1B-87"],"language":"zh","difficulty":"hard","source":"SeiveSketch"}
+{"id":"seive-07","query":"Why can CU estimate hot items more accurately than SeiveSketch even when SeiveSketch wins overall?","relevant_citations":["RF-9B51FD1B-87"],"language":"en","difficulty":"hard","source":"SeiveSketch"}
+{"id":"seive-08","query":"How are local SeiveSketch instances combined in a distributed counting deployment?","relevant_citations":["RF-9B51FD1B-51"],"language":"en","difficulty":"medium","source":"SeiveSketch"}
+{"id":"seive-09","query":"为什么在单节点内存较小时，增加分布式实例并合并反而可能降低估计误差？","relevant_citations":["RF-9B51FD1B-123"],"language":"zh","difficulty":"hard","source":"SeiveSketch"}
+{"id":"seive-10","query":"What parallel processing speedup range is reported for SeiveSketch?","relevant_citations":["RF-9B51FD1B-121"],"language":"en","difficulty":"easy","source":"SeiveSketch"}
+{"id":"distractor-01","query":"Which system exposes hidden collective-communication dependencies for root-cause analysis in unreliable LLM training?","relevant_citations":["RF-02FC78C3-3"],"language":"en","difficulty":"hard","source":"Mycroft"}
+{"id":"distractor-02","query":"哪篇论文介绍了用于大规模语言模型训练的 Astral 数据中心基础设施？","relevant_citations":["RF-58AA680D-1"],"language":"zh","difficulty":"medium","source":"Astral"}

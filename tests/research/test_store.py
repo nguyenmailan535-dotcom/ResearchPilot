@@ -35,6 +35,10 @@ def test_ingest_is_idempotent_and_search_returns_stable_citations(tmp_path: Path
     second = store.ingest_file(source, max_chars=220, overlap=30)
 
     assert first["status"] == "indexed"
+    assert first["chunk_config"]["parser"] == {
+        "name": "plain-text",
+        "revision": "text-v1",
+    }
     assert second["status"] == "unchanged"
     assert second["chunks"] == first["chunks"]
 
@@ -63,6 +67,28 @@ def test_reindex_changed_file_replaces_old_chunks(tmp_path: Path) -> None:
     assert updated["source_id"] == first["source_id"]
     assert store.search("alpha") == []
     assert store.search("beta")
+
+
+def test_pdf_elements_are_packed_into_real_windows(tmp_path: Path, monkeypatch) -> None:
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    source = workspace / "paper.pdf"
+    source.write_bytes(b"synthetic pdf")
+    store = ResearchStore(workspace)
+    elements = [
+        (1, f"paragraph {index} " + "evidence " * 8, "NarrativeText", "Method")
+        for index in range(12)
+    ]
+    monkeypatch.setattr(ResearchStore, "_read_pdf", staticmethod(lambda _path: elements))
+
+    result = store.ingest_file(source, max_chars=300, overlap=40)
+    chunks = store.list_chunks()
+
+    assert 3 < result["chunks"] < len(elements)
+    assert all(len(chunk["content"]) <= 300 for chunk in chunks)
+    assert all(chunk["page"] == 1 for chunk in chunks)
+    assert any(chunk["element_type"] == "Composite" for chunk in chunks)
+    assert result["chunk_config"]["parser"]["revision"] == "pdf-elements-packed-v2"
 
 
 def test_report_verification_and_save(tmp_path: Path) -> None:

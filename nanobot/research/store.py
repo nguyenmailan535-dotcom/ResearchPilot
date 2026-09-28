@@ -12,6 +12,7 @@ import hashlib
 import json
 import logging
 import math
+import os
 import re
 import sqlite3
 from collections import Counter
@@ -65,18 +66,23 @@ def tokenize(text: str) -> list[str]:
     return tokens
 
 
+def _clean_text(text: str) -> str:
+    """Normalize text once so chunk boundaries and PDF element offsets stay comparable."""
+    utf8_safe = (text or "").encode("utf-8", errors="replace").decode("utf-8")
+    cleaned = re.sub(r"[ \t]+", " ", utf8_safe.replace("\r\n", "\n"))
+    return re.sub(r"\n{3,}", "\n\n", cleaned).strip()
+
+
 def split_text(
     text: str,
-    max_chars: int = 1200,
-    overlap: int = 160,
-    strategy: str = "structure",
+    max_chars: int = 768,
+    overlap: int = 120,
+    strategy: str = "fixed",
 ) -> list[str]:
     """Split text with deterministic bounds and optional heading-aware section preservation."""
     # Some non-compliant PDFs contain lone UTF-16 surrogate code points. Python strings can
     # temporarily hold them, but SQLite correctly rejects them when encoding to UTF-8.
-    utf8_safe = (text or "").encode("utf-8", errors="replace").decode("utf-8")
-    cleaned = re.sub(r"[ \t]+", " ", utf8_safe.replace("\r\n", "\n"))
-    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned).strip()
+    cleaned = _clean_text(text)
     if not cleaned:
         return []
     if max_chars < 200:
@@ -170,6 +176,8 @@ class ResearchStore:
                     source_id TEXT NOT NULL,
                     ordinal INTEGER NOT NULL,
                     page INTEGER,
+                    element_type TEXT,
+                    section TEXT,
                     content TEXT NOT NULL,
                     token_count INTEGER NOT NULL,
                     FOREIGN KEY(source_id) REFERENCES sources(id) ON DELETE CASCADE,
@@ -212,6 +220,11 @@ class ResearchStore:
             columns = {row["name"] for row in conn.execute("PRAGMA table_info(sources)")}
             if "chunk_config" not in columns:
                 conn.execute("ALTER TABLE sources ADD COLUMN chunk_config TEXT NOT NULL DEFAULT ''")
+            chunk_columns = {row["name"] for row in conn.execute("PRAGMA table_info(chunks)")}
+            if "element_type" not in chunk_columns:
+                conn.execute("ALTER TABLE chunks ADD COLUMN element_type TEXT")
+            if "section" not in chunk_columns:
+                conn.execute("ALTER TABLE chunks ADD COLUMN section TEXT")
 
     def log_event(self, event_type: str, payload: dict[str, Any]) -> None:
         with self._connect() as conn:
@@ -221,7 +234,40 @@ class ResearchStore:
             )
 
     @staticmethod
-    def _read_pdf(path: Path) -> list[tuple[int | None, str]]:
+    def _read_pdf(path: Path) -> list[tuple[int | None, str, str, str | None]]:
+        """Parse PDF elements with Unstructured, retaining page/type/section metadata.
+
+        pypdf remains a deterministic fallback for malformed documents and lightweight unit
+        tests.  Set RESEARCH_PDF_PARSER=pypdf to disable Unstructured explicitly.
+        """
+        parser = os.getenv("RESEARCH_PDF_PARSER", "unstructured").strip().lower()
+        if parser == "unstructured":
+            try:
+                from unstructured.partition.pdf import partition_pdf
+
+                elements = partition_pdf(
+                    filename=str(path),
+                    strategy=os.getenv("RESEARCH_UNSTRUCTURED_STRATEGY", "fast"),
+                    include_page_breaks=False,
+                )
+                output: list[tuple[int | None, str, str, str | None]] = []
+                current_section: str | None = None
+                for element in elements:
+                    content = str(element).strip()
+                    if not content:
+                        continue
+                    element_type = str(getattr(element, "category", None) or type(element).__name__)
+                    metadata = getattr(element, "metadata", None)
+                    page = getattr(metadata, "page_number", None) if metadata else None
+                    if element_type.lower() in {"title", "header"}:
+                        current_section = content[:500]
+                    output.append((page, content, element_type, current_section))
+                if output:
+                    return output
+            except Exception as exc:
+                logging.getLogger(__name__).warning(
+                    "Unstructured failed for %s; falling back to pypdf: %s", path.name, exc
+                )
         try:
             from pypdf import PdfReader
         except ImportError as exc:  # pragma: no cover - dependency is declared
@@ -236,14 +282,14 @@ class ResearchStore:
         try:
             reader = PdfReader(str(path), strict=False)
             return [
-                (index, (page.extract_text() or "").strip())
+                (index, (page.extract_text() or "").strip(), "Page", None)
                 for index, page in enumerate(reader.pages, start=1)
             ]
         finally:
             pypdf_logger.setLevel(previous_level)
 
     @staticmethod
-    def _read_text(path: Path) -> list[tuple[int | None, str]]:
+    def _read_text(path: Path) -> list[tuple[int | None, str, str, str | None]]:
         raw = path.read_bytes()
         for encoding in ("utf-8", "utf-8-sig", "gb18030"):
             try:
@@ -256,16 +302,84 @@ class ResearchStore:
         if path.suffix.lower() in {".html", ".htm"}:
             text = re.sub(r"<script[\s\S]*?</script>|<style[\s\S]*?</style>", " ", text, flags=re.I)
             text = re.sub(r"<[^>]+>", " ", text)
-        return [(None, text)]
+        return [(None, text, "Text", None)]
+
+    @staticmethod
+    def _chunk_elements(
+        elements: list[tuple[int | None, str, str, str | None]],
+        *,
+        max_chars: int,
+        overlap: int,
+        strategy: str,
+    ) -> list[tuple[int | None, str, str, str | None]]:
+        """Pack short parser elements into real retrieval windows without crossing pages.
+
+        Unstructured intentionally emits fine-grained titles, paragraphs, list items and table
+        fragments. Indexing every fragment directly creates thousands of one-line chunks and
+        makes a nominal ``768/120`` configuration misleading. This adapter preserves page and
+        section provenance while packing adjacent elements before applying the shared splitter.
+        """
+        grouped: list[tuple[int | None, list[tuple[str, str, str | None]]]] = []
+        for page, raw, element_type, section in elements:
+            content = _clean_text(raw)
+            if not content:
+                continue
+            if not grouped or grouped[-1][0] != page:
+                grouped.append((page, []))
+            grouped[-1][1].append((content, element_type, section))
+
+        output: list[tuple[int | None, str, str, str | None]] = []
+        for page, units in grouped:
+            pieces: list[str] = []
+            spans: list[tuple[int, int, str, str | None]] = []
+            cursor = 0
+            for content, element_type, section in units:
+                if pieces:
+                    cursor += 2
+                start = cursor
+                pieces.append(content)
+                cursor += len(content)
+                spans.append((start, cursor, element_type, section))
+            combined = "\n\n".join(pieces)
+            search_from = 0
+            previous_end = 0
+            for content in split_text(
+                combined,
+                max_chars=max_chars,
+                overlap=overlap,
+                strategy=strategy,
+            ):
+                start = combined.find(content, max(0, search_from))
+                if start < 0:
+                    start = combined.find(content)
+                if start < 0:  # Defensive fallback for future normalization changes.
+                    start = previous_end
+                end = start + len(content)
+                touched = [
+                    span for span in spans if min(end, span[1]) > max(start, span[0])
+                ]
+                anchor = max(
+                    touched or [(start, end, "Composite", None)],
+                    key=lambda span: min(end, span[1]) - max(start, span[0]),
+                )
+                element_type = anchor[2] if len(touched) == 1 else "Composite"
+                section = next(
+                    (span[3] for span in reversed(touched) if span[3]),
+                    anchor[3],
+                )
+                output.append((page, content, element_type, section))
+                previous_end = end
+                search_from = max(start + 1, end - overlap - 4)
+        return output
 
     def ingest_file(
         self,
         path: Path,
         *,
         title: str | None = None,
-        max_chars: int = 1200,
-        overlap: int = 160,
-        chunk_strategy: str = "structure",
+        max_chars: int = 768,
+        overlap: int = 120,
+        chunk_strategy: str = "fixed",
     ) -> dict[str, Any]:
         path = Path(path).expanduser().resolve()
         if not path.is_file():
@@ -277,8 +391,22 @@ class ResearchStore:
         raw = path.read_bytes()
         digest = _sha256(raw)
         source_id = hashlib.sha1(str(path).encode("utf-8")).hexdigest()[:16]
+        parser_config = (
+            {
+                "name": os.getenv("RESEARCH_PDF_PARSER", "unstructured").strip().lower(),
+                "strategy": os.getenv("RESEARCH_UNSTRUCTURED_STRATEGY", "fast").strip().lower(),
+                "revision": "pdf-elements-packed-v2",
+            }
+            if suffix == ".pdf"
+            else {"name": "plain-text", "revision": "text-v1"}
+        )
         chunk_config = json.dumps(
-            {"max_chars": max_chars, "overlap": overlap, "strategy": chunk_strategy},
+            {
+                "max_chars": max_chars,
+                "overlap": overlap,
+                "strategy": chunk_strategy,
+                "parser": parser_config,
+            },
             sort_keys=True,
         )
         with self._connect() as conn:
@@ -299,20 +427,38 @@ class ResearchStore:
             }
 
         pages = self._read_pdf(path) if suffix == ".pdf" else self._read_text(path)
-        chunk_rows: list[tuple[str, str, int, int | None, str, int]] = []
-        ordinal = 1
-        for page, text in pages:
-            for content in split_text(
-                text,
+        prepared = (
+            self._chunk_elements(
+                pages,
                 max_chars=max_chars,
                 overlap=overlap,
                 strategy=chunk_strategy,
-            ):
-                citation = f"RF-{source_id[:8]}-{ordinal}"
-                chunk_rows.append(
-                    (citation, source_id, ordinal, page, content, len(tokenize(content)))
+            )
+            if suffix == ".pdf"
+            else [
+                (page, content, element_type, section)
+                for page, text, element_type, section in pages
+                for content in split_text(
+                    text,
+                    max_chars=max_chars,
+                    overlap=overlap,
+                    strategy=chunk_strategy,
                 )
-                ordinal += 1
+            ]
+        )
+        chunk_rows: list[
+            tuple[str, str, int, int | None, str, str | None, str, int]
+        ] = []
+        ordinal = 1
+        for page, content, element_type, section in prepared:
+            citation = f"RF-{source_id[:8]}-{ordinal}"
+            chunk_rows.append(
+                (
+                    citation, source_id, ordinal, page, element_type, section,
+                    content, len(tokenize(content)),
+                )
+            )
+            ordinal += 1
         if not chunk_rows:
             raise ValueError(f"No extractable text found in {path.name}")
 
@@ -333,8 +479,8 @@ class ResearchStore:
                 ),
             )
             conn.executemany(
-                "INSERT INTO chunks(id, source_id, ordinal, page, content, token_count) "
-                "VALUES (?, ?, ?, ?, ?, ?)",
+                "INSERT INTO chunks(id, source_id, ordinal, page, element_type, section, "
+                "content, token_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 chunk_rows,
             )
         result = {
@@ -353,9 +499,9 @@ class ResearchStore:
         path: Path,
         *,
         max_files: int = 100,
-        max_chars: int = 1200,
-        overlap: int = 160,
-        chunk_strategy: str = "structure",
+        max_chars: int = 768,
+        overlap: int = 120,
+        chunk_strategy: str = "fixed",
     ) -> dict[str, Any]:
         path = Path(path).expanduser().resolve()
         if path.is_file():
@@ -419,7 +565,8 @@ class ResearchStore:
         with self._connect() as conn:
             rows = conn.execute(
                 f"""
-                SELECT c.id AS citation, c.source_id, c.ordinal, c.page, c.content,
+                SELECT c.id AS citation, c.source_id, c.ordinal, c.page, c.element_type,
+                       c.section, c.content,
                        s.title, s.path
                 FROM chunks c JOIN sources s ON s.id = c.source_id
                 {where}
@@ -449,7 +596,8 @@ class ResearchStore:
         with self._connect() as conn:
             rows = conn.execute(
                 f"""
-                SELECT c.id, c.source_id, c.ordinal, c.page, c.content,
+                SELECT c.id, c.source_id, c.ordinal, c.page, c.element_type, c.section,
+                       c.content,
                        s.title, s.path
                 FROM chunks c JOIN sources s ON s.id = c.source_id
                 {where}
@@ -494,6 +642,8 @@ class ResearchStore:
                     "title": row["title"],
                     "path": row["path"],
                     "page": row["page"],
+                    "element_type": row["element_type"],
+                    "section": row["section"],
                     "score": round(score, 4),
                     "content": content,
                 }
@@ -511,7 +661,8 @@ class ResearchStore:
         with self._connect() as conn:
             rows = conn.execute(
                 """
-                SELECT c.id AS citation, c.source_id, c.ordinal, c.page, c.content,
+                SELECT c.id AS citation, c.source_id, c.ordinal, c.page, c.element_type,
+                       c.section, c.content,
                        s.title, s.path
                 FROM chunks c JOIN sources s ON s.id = c.source_id
                 WHERE UPPER(c.id) IN ({})

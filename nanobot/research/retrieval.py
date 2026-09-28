@@ -6,6 +6,7 @@ import hashlib
 import math
 import os
 import re
+import threading
 import time
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -15,7 +16,7 @@ import numpy as np
 
 from nanobot.research.store import ResearchStore, split_text, tokenize
 
-DEFAULT_EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+DEFAULT_EMBEDDING_MODEL = "BAAI/bge-m3"
 DEFAULT_RERANKER_MODEL = "BAAI/bge-reranker-base"
 RETRIEVAL_STRATEGIES = ("auto", "bm25", "vector", "hybrid", "reflected_hybrid")
 DEFAULT_NO_ANSWER_THRESHOLDS = {
@@ -72,6 +73,63 @@ def reciprocal_rank_fusion(
     return output
 
 
+class BGEM3DenseEmbedder:
+    """FlagEmbedding adapter exposing the small interface used by ResearchFlow.
+
+    BGE-M3 can also emit lexical and ColBERT representations.  ResearchFlow deliberately uses
+    only its normalized dense representation here: Milvus' BM25 Function owns the sparse path,
+    so the two retrievers remain independently measurable in the existing ablation suite.
+    """
+
+    def __init__(self, model_name: str = DEFAULT_EMBEDDING_MODEL, model: Any | None = None) -> None:
+        self.model_name = model_name
+        self._model = model
+        self._model_lock = threading.Lock()
+
+    @property
+    def model(self) -> Any:
+        if self._model is None:
+            with self._model_lock:
+                if self._model is None:
+                    try:
+                        from FlagEmbedding import BGEM3FlagModel
+                    except ImportError as exc:
+                        raise RuntimeError(
+                            "BGE-M3 requires the research dependencies: "
+                            "pip install -e '.[research]'"
+                        ) from exc
+                    device = os.getenv("RESEARCH_BGE_DEVICE", "cpu")
+                    use_fp16 = os.getenv("RESEARCH_BGE_USE_FP16", "0").lower() in {
+                        "1", "true", "yes",
+                    }
+                    self._model = BGEM3FlagModel(
+                        self.model_name,
+                        use_fp16=use_fp16,
+                        devices=device,
+                    )
+        return self._model
+
+    def _encode(self, texts: list[str]) -> np.ndarray:
+        if not texts:
+            return np.empty((0, 1024), dtype=np.float32)
+        output = self.model.encode(
+            texts,
+            batch_size=max(1, int(os.getenv("RESEARCH_EMBEDDING_BATCH_SIZE", "8"))),
+            max_length=max(128, int(os.getenv("RESEARCH_EMBEDDING_MAX_LENGTH", "1024"))),
+            return_dense=True,
+            return_sparse=False,
+            return_colbert_vecs=False,
+        )
+        return np.asarray(output["dense_vecs"], dtype=np.float32)
+
+    def passage_embed(self, passages: Iterable[str]) -> Iterable[np.ndarray]:
+        return iter(self._encode(list(passages)))
+
+    def query_embed(self, query: str | Iterable[str]) -> Iterable[np.ndarray]:
+        values = [query] if isinstance(query, str) else list(query)
+        return iter(self._encode(values))
+
+
 class DenseRetriever:
     """FastEmbed-backed cosine retriever with a corpus-addressed on-disk cache."""
 
@@ -81,8 +139,8 @@ class DenseRetriever:
         *,
         model_name: str = DEFAULT_EMBEDDING_MODEL,
         embedder: Any | None = None,
-        segment_chars: int = 480,
-        segment_overlap: int = 80,
+        segment_chars: int = 768,
+        segment_overlap: int = 120,
     ) -> None:
         self.store = store
         self.model_name = model_name
@@ -92,10 +150,14 @@ class DenseRetriever:
         self._chunks: list[dict[str, Any]] = []
         self._embeddings: np.ndarray | None = None
         self._segment_chunk_indices: np.ndarray | None = None
+        self._build_lock = threading.Lock()
 
     @property
     def embedder(self) -> Any:
         if self._embedder is None:
+            if self.model_name.lower() in {"baai/bge-m3", "bge-m3"}:
+                self._embedder = BGEM3DenseEmbedder(self.model_name)
+                return self._embedder
             try:
                 from fastembed import TextEmbedding
             except ImportError as exc:
@@ -189,7 +251,11 @@ class DenseRetriever:
         source_ids: Iterable[str] | None = None,
     ) -> list[dict[str, Any]]:
         if self._embeddings is None:
-            self.build_index()
+            # Delegated researchers share one retriever and may reach the first dense query at
+            # the same time. Build/load the cache once, then keep query execution lock-free.
+            with self._build_lock:
+                if self._embeddings is None:
+                    self.build_index()
         assert self._embeddings is not None
         assert self._segment_chunk_indices is not None
         query_vector = np.asarray(list(self.embedder.query_embed(query)), dtype=np.float32)
@@ -281,26 +347,44 @@ class RetrievalSuite:
         store: ResearchStore,
         dense: DenseRetriever,
         *,
+        backend: Any | None = None,
         reranker: Any | None = None,
-        bm25_weight: float = 2.0,
-        vector_weight: float = 1.0,
-        rank_constant: int = 60,
+        bm25_weight: float | None = None,
+        vector_weight: float | None = None,
+        rank_constant: int | None = None,
     ) -> None:
         self.store = store
         self.dense = dense
+        self.backend = backend
         self.reranker = reranker
-        self.bm25_weight = bm25_weight
-        self.vector_weight = vector_weight
-        self.rank_constant = rank_constant
+        self.bm25_weight = (
+            float(os.getenv("RESEARCH_RRF_BM25_WEIGHT", "1.0"))
+            if bm25_weight is None
+            else bm25_weight
+        )
+        self.vector_weight = (
+            float(os.getenv("RESEARCH_RRF_VECTOR_WEIGHT", "1.0"))
+            if vector_weight is None
+            else vector_weight
+        )
+        self.rank_constant = (
+            int(os.getenv("RESEARCH_RRF_RANK_CONSTANT", "20"))
+            if rank_constant is None
+            else rank_constant
+        )
 
     def bm25(
         self, query: str, *, top_k: int, source_ids: Iterable[str] | None = None
     ) -> list[dict[str, Any]]:
+        if self.backend is not None:
+            return self.backend.bm25(query, top_k=top_k, source_ids=source_ids)
         return self.store.search(query, top_k=top_k, source_ids=source_ids)
 
     def vector(
         self, query: str, *, top_k: int, source_ids: Iterable[str] | None = None
     ) -> list[dict[str, Any]]:
+        if self.backend is not None:
+            return self.backend.vector(query, top_k=top_k, source_ids=source_ids)
         return self.dense.search(query, top_k=top_k, source_ids=source_ids)
 
     def hybrid(
@@ -442,12 +526,28 @@ class RetrievalSuite:
         try:
             results = getattr(self, used)(query, top_k=pool, source_ids=source_ids)
         except (RuntimeError, OSError, ValueError) as exc:
-            if not allow_fallback or used == "bm25":
+            if not allow_fallback:
                 raise
-            results = self.bm25(query, top_k=pool, source_ids=source_ids)
+            if used == "bm25":
+                if self.backend is None:
+                    raise
+                # If the external retrieval plane itself is unavailable, SQLite FTS remains a
+                # useful local sparse fallback.  This keeps the Agent operational while exposing
+                # the degradation in RetrievalOutcome rather than silently changing semantics.
+                results = self.store.search(query, top_k=pool, source_ids=source_ids)
+                fallback_reason = f"sparse backend unavailable: {exc}"
+            else:
+                try:
+                    results = self.bm25(query, top_k=pool, source_ids=source_ids)
+                    fallback_reason = f"dense retrieval unavailable: {exc}"
+                except (RuntimeError, OSError, ValueError) as backend_exc:
+                    results = self.store.search(query, top_k=pool, source_ids=source_ids)
+                    fallback_reason = (
+                        f"dense retrieval unavailable: {exc}; "
+                        f"sparse backend unavailable: {backend_exc}"
+                    )
             used = "bm25"
             degraded = True
-            fallback_reason = f"dense retrieval unavailable: {exc}"
 
         confidence, signals = self._confidence(used, results, query)
         if requested == "auto" and confidence < threshold and used != "bm25":

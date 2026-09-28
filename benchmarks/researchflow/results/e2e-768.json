@@ -1,0 +1,2752 @@
+{
+  "cases": 16,
+  "metrics": {
+    "task_completion_rate": 1.0,
+    "answer_pass_rate": 0.875,
+    "concept_coverage": 0.9375,
+    "citation_validity": 1.0,
+    "relevant_citation_recall": 0.7917,
+    "paragraph_citation_coverage": 0.8263,
+    "claim_support_rate": 0.7923,
+    "average_latency_seconds": 17.0619,
+    "p50_latency_seconds": 13.746,
+    "p95_latency_seconds": 39.2945,
+    "average_prompt_tokens": 19917.125,
+    "average_completion_tokens": 968.0,
+    "total_prompt_tokens": 318674,
+    "total_completion_tokens": 15488,
+    "estimated_cost_usd": null,
+    "average_tool_events": 4.625,
+    "unanswerable_recall": null,
+    "false_answer_rate": null,
+    "answerable_accuracy": 0.875,
+    "llm_judge_overall": null,
+    "semantic_claim_support_rate": null
+  },
+  "bad_case_summary": {
+    "retrieval_or_ranking_miss": 2,
+    "uncited_claim": 11,
+    "unsupported_claim": 8
+  },
+  "pricing": {
+    "configured": false,
+    "prompt_usd_per_million": 0.0,
+    "completion_usd_per_million": 0.0
+  },
+  "details": [
+    {
+      "id": "e2e-01",
+      "query": "如果只能使用约 1.5KB 内存估计十亿级基数，HyperLogLog 能提供什么精度，其误差如何随寄存器数量变化？",
+      "language": "zh",
+      "difficulty": "medium",
+      "answer": "基于已索引语料（HLL 原论文与 DREX 论文），回答如下。\n\n**直接结论：约 1.5KB 内存可实现约 2% 的典型相对精度。**\n\nHyperLogLog 使用 m 个寄存器（通常为“短字节”），单遍扫描数据即可估计基数，其相对精度（标准误差）通常约为 **1.04/√m** [RF-f6b914c4-2]。具体到 1.5KB 的配置：当 m = 2048、使用 32 位哈希、每个寄存器为 5 bit 时，可用 1.5kB 存储对超过 N = 10⁹（十亿级）的基数给出约 **2% 的典型精度** [RF-f6b914c4-16]。论文正文同样表述为：对远超 10⁹ 的基数可以 1.5KB 内存达到约 2% 的典型精度 [RF-f6b914c4-2]。按 1.04/√2048 计算，误差量级约为 2.3%，与文中的“约 2%”一致 [RF-f6b914c4-16]。\n\n**误差如何随寄存器数量变化：与 √m 成反比。**\n\nHLL 的标准误差渐近为 1.04/√m，即随寄存器数 m 增大而按平方根速率下降 [RF-b40077a8-20]。原论文指出误差渐近接近 β∞/√m，其中 β∞ = √(3 log 2 − 1) ≈ 1.03896，每个寄存器只需约 log₂ log₂ N + O(1) bit 即可估计不超过 N 的基数 [RF-f6b914c4-16]；估算程序也明确返回“typical relative error ±1.04/√m” [RF-f6b914c4-58]。因此寄存器数每增加 4 倍，误差约减半：m = 16 时约 26%，m = 2048 时约 2.3%，m = 65536 时约 0.41% [RF-f6b914c4-16][RF-f6b914c4-58]。文中给出的“实用”寄存器数为 m = 2⁴ 到 2¹⁶（即 16 到 65536）[RF-f6b914c4-58]。\n\n**补充与口径提示：**\n\n- 另一来源（DREX 论文）在比较表中将 HLL 的误差写为 **2.33/√m**（假定 5-bit 寄存器），并指出内存很小时 HLL 误差不可忽略——例如 128 bit 内存时误差接近 50% [RF-b40077a8-25]。这与 HLL 原论文的 1.04/√m 在常数上不同，可能源于分析口径或寄存器位宽的差异；但两者都表明误差随 √m 反比下降 [RF-f6b914c4-20][RF-b40077a8-20]。\n- HLL 的标准误差渐近为 1.04/√m，且在内存受限时误差偏高、查询吞吐较低（估计需对所有寄存器求调和平均）[RF-b40077a8-20]。\n\n**要点汇总：** 1.5KB（m = 2048，5-bit 寄存器）→ 约 2% 精度，支持 10⁹ 以上基数；误差 ≈ 1.04/√m，随寄存器数量增加按平方根规律下降 [RF-f6b914c4-2][RF-f6b914c4-16][RF-f6b914c4-58][RF-b40077a8-20]。",
+      "error": null,
+      "elapsed_seconds": 16.58,
+      "prompt_tokens": 13389,
+      "completion_tokens": 1438,
+      "tool_events": [
+        "read_file(\"E:\\agent\\nanobot-v0.1.4-era\\nanobot\\skil…\"), research_sources",
+        "research_decision(\"search\"), research_search(\"HyperLogLog standard error 1.04/sqrt(m) …\"), research_search(\"HyperLogLog 1.5KB memory billion cardina…\")",
+        "research_read"
+      ],
+      "streamed_chars": 1275,
+      "response_ok": true,
+      "expected_answerable": true,
+      "abstained": false,
+      "completed": true,
+      "answer_pass": false,
+      "concept_coverage": 1.0,
+      "concepts": [
+        {
+          "aliases": [
+            "1.5 KB",
+            "1.5KB"
+          ],
+          "matched": "1.5KB"
+        },
+        {
+          "aliases": [
+            "2%"
+          ],
+          "matched": "2%"
+        },
+        {
+          "aliases": [
+            "1.04/√m",
+            "1.04 / √m",
+            "1.04/sqrt(m)"
+          ],
+          "matched": "1.04/√m"
+        }
+      ],
+      "citations": [
+        "RF-F6B914C4-2",
+        "RF-F6B914C4-16",
+        "RF-B40077A8-20",
+        "RF-F6B914C4-58",
+        "RF-B40077A8-25",
+        "RF-F6B914C4-20"
+      ],
+      "valid_citations": [
+        "RF-F6B914C4-2",
+        "RF-F6B914C4-16",
+        "RF-B40077A8-20",
+        "RF-F6B914C4-58",
+        "RF-B40077A8-25",
+        "RF-F6B914C4-20"
+      ],
+      "missing_citations": [],
+      "citation_validity": 1.0,
+      "relevant_citation_recall": 0.0,
+      "relevant_label_precision": 0.0,
+      "relevant_hits": [],
+      "paragraph_citation_coverage": 1.0,
+      "entailment": {
+        "claims": 5,
+        "entailed": 0,
+        "partially_supported": 2,
+        "unsupported": 3,
+        "support_rate": 0.4,
+        "details": [
+          {
+            "claim": "HyperLogLog 使用 m 个寄存器（通常为“短字节”），单遍扫描数据即可估计基数，其相对精度（标准误差）通常约为 **1.04/√m** 。具体到 1.5KB 的配置：当 m = 2048、使用 32 位哈希、每个寄存器为 5 bit 时，可用 1.5kB 存储对超过 N = 10⁹（十亿级）的基数给出约 **2% 的典型精度** 。论文正文同样表述为：对远超 10⁹ 的基数可以 1.5KB 内存达到约 2% 的典型精度 。按 1.04/√2048 计算，误差量级约为 2.3%，与文中的“约 2%”一致 。",
+            "citations": [
+              "RF-F6B914C4-2",
+              "RF-F6B914C4-16"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.0617,
+            "missing_numbers": [
+              "10",
+              "2.3%"
+            ],
+            "missing_citations": [],
+            "evidence_excerpt": "memory\nofm units (typically, “short bytes”), HYPER LOGLOG performs a single pass over the data and produces an estimate\nof the cardinality such that the relative accuracy (the standard error) is typically about 1.04/√m. This improves on\nthe best previously known cardinality estimator, LOGLOG, whose accuracy can be matched by consuming only 64%\nof the original memory. For instance, the new algorithm makes it possible to estimate cardinalities well beyond 109\nwith a typical accuracy of 2% while using a memory of only 1.5 kilobytes. The algorithm parallelizes optimally and\nadapts to the sliding w"
+          },
+          {
+            "claim": "HLL 的标准误差渐近为 1.04/√m，即随寄存器数 m 增大而按平方根速率下降 。原论文指出误差渐近接近 β∞/√m，其中 β∞ = √(3 log 2 − 1) ≈ 1.03896，每个寄存器只需约 log₂ log₂ N + O(1) bit 即可估计不超过 N 的基数 ；估算程序也明确返回“typical relative error ±1.04/√m” 。因此寄存器数每增加 4 倍，误差约减半：m = 16 时约 26%，m = 2048 时约 2.3%，m = 65536 时约 0.41% 。文中给出的“实用”寄存器数为 m = 2⁴ 到 2¹⁶（即 16 到 65536）。",
+            "citations": [
+              "RF-B40077A8-20",
+              "RF-F6B914C4-16",
+              "RF-F6B914C4-58"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.1139,
+            "missing_numbers": [
+              "0.41%",
+              "16",
+              "2.3%",
+              "26%",
+              "65536"
+            ],
+            "missing_citations": [],
+            "evidence_excerpt": "s, HLL offers a significantly larger counting\nrange that reaches O(22q\n). Its standard error is asymptotically\n1.04√m . Given limited memory space, HLL suffers from a high\nerror rate. In addition, HLL shows low query throughput, as\nits estimation involves calculating the harmonic mean of all\nregisters. Many studies focus on optimizing the accuracy and\n2\nically close to β∞/√m,\nwhereβ∞ =√3 log 2− 1 .= 1.03896. The algorithm needs to maintain a collection of registers, each\nof which is at most log2 log2N +O(1) bits, when cardinalities≤N need to be estimated. In particular,\nHYPER LOGLOG achieves a"
+          },
+          {
+            "claim": "另一来源（DREX 论文）在比较表中将 HLL 的误差写为 **2.33/√m**（假定 5-bit 寄存器），并指出内存很小时 HLL 误差不可忽略——例如 128 bit 内存时误差接近 50% 。这与 HLL 原论文的 1.04/√m 在常数上不同，可能源于分析口径或寄存器位宽的差异；但两者都表明误差随 √m 反比下降 。",
+            "citations": [
+              "RF-B40077A8-25",
+              "RF-F6B914C4-20",
+              "RF-B40077A8-20"
+            ],
+            "label": "PARTIALLY_SUPPORTED",
+            "lexical_overlap": 0.0986,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "precisely, the number of counting units used. As discussed\nearlier, the error of HLL and KMV are 2.33√m (assuming 5-bit\nregisters in HLL) and 5.66√m , respectively. When memory is small,\nTABLE II:Comparisons of existing approaches. The notations H\nandApresent hash computation and memory access, respectively.\nApproaches Range Error Time overhead\nUpdate Query\nLC mlnm O(1/\n√\nN) 1H+1A O(1)\nHLL O(22q\n) 2.33/√m 2H+1A O(m)\nKMV O(232) 5.66/√m 1H + 1 Heap O(1)\nDREX O(22q\n) O(1/√pN) (1+p)H+pA O(1)\ntheir errors are non-negligible large. For example, the error of\nHLL is almost 50% with a memory of 128 bit"
+          },
+          {
+            "claim": "HLL 的标准误差渐近为 1.04/√m，且在内存受限时误差偏高、查询吞吐较低（估计需对所有寄存器求调和平均）。",
+            "citations": [
+              "RF-B40077A8-20"
+            ],
+            "label": "PARTIALLY_SUPPORTED",
+            "lexical_overlap": 0.0556,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "s, HLL offers a significantly larger counting\nrange that reaches O(22q\n). Its standard error is asymptotically\n1.04√m . Given limited memory space, HLL suffers from a high\nerror rate. In addition, HLL shows low query throughput, as\nits estimation involves calculating the harmonic mean of all\nregisters. Many studies focus on optimizing the accuracy and\n2"
+          },
+          {
+            "claim": "要点汇总：** 1.5KB（m = 2048，5-bit 寄存器）→ 约 2% 精度，支持 10⁹ 以上基数；误差 ≈ 1.04/√m，随寄存器数量增加按平方根规律下降 。",
+            "citations": [
+              "RF-F6B914C4-2",
+              "RF-F6B914C4-16",
+              "RF-F6B914C4-58",
+              "RF-B40077A8-20"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.1379,
+            "missing_numbers": [
+              "10"
+            ],
+            "missing_citations": [],
+            "evidence_excerpt": "memory\nofm units (typically, “short bytes”), HYPER LOGLOG performs a single pass over the data and produces an estimate\nof the cardinality such that the relative accuracy (the standard error) is typically about 1.04/√m. This improves on\nthe best previously known cardinality estimator, LOGLOG, whose accuracy can be matched by consuming only 64%\nof the original memory. For instance, the new algorithm makes it possible to estimate cardinalities well beyond 109\nwith a typical accuracy of 2% while using a memory of only 1.5 kilobytes. The algorithm parallelizes optimally and\nadapts to the sliding w"
+          }
+        ]
+      },
+      "estimated_cost_usd": null,
+      "bad_case_labels": [
+        "retrieval_or_ranking_miss",
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "e2e-02",
+      "query": "Why does DREX need only two bits per counter, and does its estimation accuracy depend on the counter width q?",
+      "language": "en",
+      "difficulty": "hard",
+      "answer": "## Direct answer\n\n**Why only 2 bits per counter.** DREX fixes each counter at 2 bits and uses a *rolling recording* scheme: instead of storing `l` (the length of leading zeros) directly, each 2-bit counter `s[i]` stores the **offset of `l` relative to the current round `r`**, and that offset is re-based every time `r` increases [RF-b40077a8-40][RF-b40077a8-41]. A 2-bit counter has exactly four states — `00` means no items in the counter, and the remaining three states `01`, `10`, `11` encode offsets 0, 1 and 2 — so DREX stores `s[i] = Min(l − r + 1, 3)` [RF-b40077a8-41]. Because the counting range of `s[i]` *rolls forward* as `r` increases, a counter can count large values using only 2 bits, which is what lets DREX avoid the space cost of widening every bit into a full multi-bit counter [RF-b40077a8-35][RF-b40077a8-40].\n\n**What actually sets the counting range.** The counting range depends only on the counter that tracks the variable `r`, not on the per-counter width: a q-bit counter recording `r` yields `O(2^{2q})` counting capacity, the same as HLL when using a q-bit counter to record the round `r` [RF-b40077a8-44][RF-b40077a8-59].\n\n**Does accuracy depend on q?** No. Theoretically, the standard error of the ratio `N̂/N` is `sqrt((e^t − t − 1) / (t·pN))`, where `t = pN/m` and `p = 1/2^r` — it depends on `t` and `N`, not on `q` [RF-b40077a8-59]. Experiment 2 confirms this: fixing the number of counting units and varying `q` from 2 to 5, the average relative error of DREX stays consistent across all `q` values, and the errors across different cardinalities at 128 counting units also show a high degree of consistency [RF-b40077a8-66]. The paper therefore concludes that **the accuracy of DREX is irrelevant to `q`, and 2 bits is enough** [RF-b40077a8-67].\n\n**Quantitative anchor.** Given `m` bits there are about `m/2` counting units; fixing the load factor `t = 2.5`, DREX's standard error is approximately `1.66/√m`, which is 28.8% and 70.7% smaller than HLL and KMV with the same number of bits [RF-b40077a8-61].\n\nSo: 2 bits suffice per counter because rolling recording makes each state a *relative* offset that re-bases as `r` advances [RF-b40077a8-41], while the round counter `r` (not the per-counter width) governs the counting range [RF-b40077a8-44]; and estimation accuracy does **not** depend on `q` — only on the load factor `t` and cardinality `N` [RF-b40077a8-59][RF-b40077a8-67].",
+      "error": null,
+      "elapsed_seconds": 20.58,
+      "prompt_tokens": 20554,
+      "completion_tokens": 742,
+      "tool_events": [
+        "read_file(\"E:\\agent\\nanobot-v0.1.4-era\\nanobot\\skil…\"), research_sources",
+        "research_decision(\"search\"), research_search(\"DREX two bits per counter why only two b…\"), research_search(\"DREX estimation accuracy independent of …\")",
+        "research_read, research_read",
+        "research_search(\"DREX standard error theoretical analysis…\"), research_search(\"DREX rolling recording counting range ex…\")",
+        "research_decision(\"record\")"
+      ],
+      "streamed_chars": 2906,
+      "response_ok": true,
+      "expected_answerable": true,
+      "abstained": false,
+      "completed": true,
+      "answer_pass": true,
+      "concept_coverage": 0.5,
+      "concepts": [
+        {
+          "aliases": [
+            "2 bit",
+            "two bit"
+          ],
+          "matched": "2 bit"
+        },
+        {
+          "aliases": [
+            "independent of q",
+            "does not depend on q",
+            "与 q 无关"
+          ],
+          "matched": null
+        }
+      ],
+      "citations": [
+        "RF-B40077A8-40",
+        "RF-B40077A8-41",
+        "RF-B40077A8-35",
+        "RF-B40077A8-44",
+        "RF-B40077A8-59",
+        "RF-B40077A8-66",
+        "RF-B40077A8-67",
+        "RF-B40077A8-61"
+      ],
+      "valid_citations": [
+        "RF-B40077A8-40",
+        "RF-B40077A8-41",
+        "RF-B40077A8-35",
+        "RF-B40077A8-44",
+        "RF-B40077A8-59",
+        "RF-B40077A8-66",
+        "RF-B40077A8-67",
+        "RF-B40077A8-61"
+      ],
+      "missing_citations": [],
+      "citation_validity": 1.0,
+      "relevant_citation_recall": 1.0,
+      "relevant_label_precision": 0.25,
+      "relevant_hits": [
+        "RF-B40077A8-59",
+        "RF-B40077A8-67"
+      ],
+      "paragraph_citation_coverage": 1.0,
+      "entailment": {
+        "claims": 9,
+        "entailed": 8,
+        "partially_supported": 0,
+        "unsupported": 1,
+        "support_rate": 0.8889,
+        "details": [
+          {
+            "claim": "Why only 2 bits per counter.** DREX fixes each counter at 2 bits and uses a *rolling recording* scheme: instead of storing `l` (the length of leading zeros) directly, each 2-bit counter `s[i]` stores the **offset of `l` relative to the current round `r`**, and that offset is re-based every time `r` increases .",
+            "citations": [
+              "RF-B40077A8-40",
+              "RF-B40077A8-41"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.6333,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "…6543210Max. 𝑙 observed\n33333321𝑠[𝑖]\nWhen 𝑟 = 0\nsampling rate 1\nWhen 𝑟 = 1\nsampling rate 1/2\nWhen 𝑟 = 2\nsampling rate 1/4\nCurrent counting rangeNo counting needed\n…6543210Max. 𝑙 observed\n33333210𝑠[𝑖]\n…6543210Max. 𝑙 observed\n33332100𝑠[𝑖]\nFig. 4:Relationship betweenl,r, ands[i].\nany more as their corresponding length of leading zeros is\nsmaller than r. In such a way, DREX reduces the error caused\nby double counting as in the baseline approach.\nRolling recording:Expanding each bit to a multi-bit counter\ntimes the space overhead compared with the original 1-bit\ncounter in LC. To reduce the space o"
+          },
+          {
+            "claim": "A 2-bit counter has exactly four states — `00` means no items in the counter, and the remaining three states `01`, `10`, `11` encode offsets 0, 1 and 2 — so DREX stores `s[i] = Min(l − r + 1, 3)` .",
+            "citations": [
+              "RF-B40077A8-41"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.6667,
+            "missing_numbers": [
+              "00",
+              "01",
+              "11"
+            ],
+            "missing_citations": [],
+            "evidence_excerpt": "h counter as 2 bits and adopts a rolling style to record the\nmaximum l in each counter. That is, instead of recording l\ndirectly, each 2-bit counter s[i] now stores the offset of l with\nrespect to r. Each time r is increased, DREX also updates the\noffset stored in s[i]. The counting range of s[i] rolls forward as\nr increases. As a 2-bit counter has only four counting states\nwhere state00indicates no items in the counter, we only have\nthe remaining three states01,10, and11to represent the offsets\n0, 1, and 2, respectively. Thus, DREX actually records l−r+1\nin s[i]. When the offset is larger tha"
+          },
+          {
+            "claim": "Because the counting range of `s[i]` *rolls forward* as `r` increases, a counter can count large values using only 2 bits, which is what lets DREX avoid the space cost of widening every bit into a full multi-bit counter .",
+            "citations": [
+              "RF-B40077A8-35",
+              "RF-B40077A8-40"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.5769,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "However, a repeated item of x is sampled and the second\nbit is set to 1 again. In this case, x is double-counted, which\nleads to an overestimation of the cardinality.\nB. Main Idea of DREX\nWe propose DREX, which implements dynamic range\nexpansion atop LC based on the baseline approach, but provides\nhigh accuracy guarantees. DREX builds on three primitive\ntechniques:lazy sampling,rolling recording, andcounter\nrecycling. Lazy sampling builds on the principle of adaptive\nsampling, but expands each bit in LC to a multi-bit counter\nto maintain more sampling states. Rolling recording rolls the\ncounti"
+          },
+          {
+            "claim": "What actually sets the counting range.** The counting range depends only on the counter that tracks the variable `r`, not on the per-counter width: a q-bit counter recording `r` yields `O(2^{2q})` counting capacity, the same as HLL when using a q-bit counter to record the round `r` .",
+            "citations": [
+              "RF-B40077A8-44",
+              "RF-B40077A8-59"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.5833,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "it in LC. If the counter has a value s[i] larger than 0,\nwe treat it as a set bit in LC. Since counters with s[i]>0 are\nupdated by the items with l≥r , thebitsin DREX is set with\nprobability 1\n2r . Finally, the estimate is obtained by 2rmln( m\nm−n ),\nwhere n is the number of non-zero counters in DREX. The\nupdate process also shows that the counting range of DREX\nAlgorithm 1Update\nInput:data itemx\n1:l= leadingzeros(h(x))\n2:ifl≥rthen\n3:ifs[g(x)] =0then\n4:n=n+1\n5:end if\n6:ifl≥s[g(x)] +r−1then\n7:s[g(x)] =Min(l−r+1,3)\n8:end if\n9:ifn≥vthen\n10:NextRound()\n11:end if\n12:end if\nonly depends on the count"
+          },
+          {
+            "claim": "Theoretically, the standard error of the ratio `N̂/N` is `sqrt((e^t − t − 1) / (t·pN))`, where `t = pN/m` and `p = 1/2^r` — it depends on `t` and `N`, not on `q` .",
+            "citations": [
+              "RF-B40077A8-59"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.6667,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "e theorem follows.\nTheorem 2.The standard error of the ratio ˆN\nN is\nq\net−t−1\nt pN ,\nwhere t= pN\nm and p= 1\n2r .\nProof. As ˆN equals ˆNr\np , we have ˆN\nN = ˆNr\npN , where ˆNr is the\nestimator for the number of distinct items left in DREX at\nround r. According to the standard error of Linear Counting, the\nstandard error of ˆNr\npN is\n√m(et−t−1)1/2\npN =\n√\net−t−1√pN\n√\npN/m =\nq\net−t−1\nt pN ,\nwheret= pN\nm . The theorem follows.\nFrom the above analysis, it is easy to see that DREX has a\nwide counting range with small memory. Its counting range\nis 22q\n, which is the same with that of HLL when using a "
+          },
+          {
+            "claim": "Experiment 2 confirms this: fixing the number of counting units and varying `q` from 2 to 5, the average relative error of DREX stays consistent across all `q` values, and the errors across different cardinalities at 128 counting units also show a high degree of consistency .",
+            "citations": [
+              "RF-B40077A8-66"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.6154,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "ell. We then study the error with\ndifferent m and compare empirical errors with the theoretical\nresults in Figure 6(b). The empirical errors and theoretical\nerrors of DREX match well. The above results demonstrate\nthe correctness of our theoretical analysis.\nExperiment 2 (Errors with different q-bit counters).We\nexamine the relationship between q and the accuracy of DREX.\nWe fix the counting units in DREX and vary q from 2 to 5.\nFigure 7(a) shows the average relative error on all synthetic\ndatasets used in Experiment 1. We observe that with the same\nnumber of counting units, the error of DREX "
+          },
+          {
+            "claim": "The paper therefore concludes that **the accuracy of DREX is irrelevant to `q`, and 2 bits is enough** .",
+            "citations": [
+              "RF-B40077A8-67"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.625,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "l q values. We further plot the error across different\ncardinalities with 128 counting units in Figure 7(b). The errors\nunder different q also show a high degree of consistency. The\nabove results justify our theoretical analysis that the accuracy\nof DREX is irrelevant toq, and 2 bits is enough for DREX.\nC. Accuracy\nExperiment 3 (Accuracy across a wide range of cardinal-\nities).We fix m and evaluate the relative errors of different\ndistinct counters across a wide range of cardinalities. We\ngenerate synthetic datasets as in Experiment 1 and plot the\naverage error in Figure 8. When m=64, DREX ach"
+          },
+          {
+            "claim": "Quantitative anchor.** Given `m` bits there are about `m/2` counting units; fixing the load factor `t = 2.5`, DREX's standard error is approximately `1.66/√m`, which is 28.8% and 70.7% smaller than HLL and KMV with the same number of bits .",
+            "citations": [
+              "RF-B40077A8-61"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.84,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "rrors\nFig. 6:Experiment 1 (Empirical vs. theoretical).\nload factor t be a constant small value regardless of m, thereby\nachieving a small error of O( 1√pN ) as shown in Table II. We\ncan also write the standard error of DREX as\n√\net−t−1\nt√m . Given\nm bits, there are around m\n2 counting units in DREX. If we\nfix t=2.5 , then the standard error of DREX is approximately\n1.66√m , which is 28.8% and 70.7%, respectively, smaller than that\nof HLL and KMV with the same number of bits. As to the\ntime overhead, the amortized time overhead of DREX is O(1),\nincluding only (1+ p) hash operations and p memory"
+          },
+          {
+            "claim": "So: 2 bits suffice per counter because rolling recording makes each state a *relative* offset that re-bases as `r` advances , while the round counter `r` (not the per-counter width) governs the counting range ; and estimation accuracy does **not** depend on `q` — only on the load factor `t` and cardinality `N` .",
+            "citations": [
+              "RF-B40077A8-41",
+              "RF-B40077A8-44",
+              "RF-B40077A8-59",
+              "RF-B40077A8-67"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.4194,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "h counter as 2 bits and adopts a rolling style to record the\nmaximum l in each counter. That is, instead of recording l\ndirectly, each 2-bit counter s[i] now stores the offset of l with\nrespect to r. Each time r is increased, DREX also updates the\noffset stored in s[i]. The counting range of s[i] rolls forward as\nr increases. As a 2-bit counter has only four counting states\nwhere state00indicates no items in the counter, we only have\nthe remaining three states01,10, and11to represent the offsets\n0, 1, and 2, respectively. Thus, DREX actually records l−r+1\nin s[i]. When the offset is larger tha"
+          }
+        ]
+      },
+      "estimated_cost_usd": null,
+      "bad_case_labels": [
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "e2e-03",
+      "query": "Compare UltraLogLog and HyperLogLog at equal estimation error in terms of memory efficiency.",
+      "language": "en",
+      "difficulty": "medium",
+      "answer": "## UltraLogLog vs. HyperLogLog at Equal Estimation Error — Memory Efficiency\n\n**Bottom line:** At equal estimation error, UltraLogLog (ULL) is consistently more memory-efficient than HyperLogLog (HLL), requiring about **28% less memory** with maximum-likelihood estimation, ~24% less with a fast HLL-comparable estimator, and ~17% less in non-distributed (martingale) settings.\n\n**Metric used.** Space efficiency is measured by the memory-variance product (MVP): for a given estimation variance (error), a lower MVP means less memory, so comparing MVPs at equal error directly compares memory footprint [RF-2dccfeb5-11].\n\n**Core comparison (ML estimator).** The ULL sketch uses configuration b=2, d=2, q=6 with a theoretical MVP of 4.6313, which is **28% below HLL's MVP of 6.4485** at q=6 registers; equivalently, ULL needs 28% less space to encode the same amount of distinct-count information extracted via maximum likelihood [RF-2dccfeb5-22][RF-2dccfeb5-45][RF-2dccfeb5-46]. The paper's conclusion confirms the theoretically predicted 28% space saving under the ML estimator was matched by experiments [RF-2dccfeb5-110].\n\n**Estimator-dependent savings.** A simpler/faster estimator still achieves a **24% space reduction at estimation speed comparable to HLL**, while in a non-distributed setting using martingale estimation ULL reduces space by **17%** [RF-2dccfeb5-2]. These 24% (FGRA) and 17% (martingale) figures were also confirmed experimentally [RF-2dccfeb5-110][RF-2dccfeb5-73].\n\n**Versus common 8-bit HLL implementations.** Compared with HLL implementations that use q=8 bits per register (MVP ≈ 8.5981), ULL's improvement reaches **46%** [RF-2dccfeb5-46].\n\n**Under lossless compression.** Assuming optimal lossless compression, the ULL configuration (d=2) yields MVP ≈ 2.3122 versus HLL (d=0) MVP ≈ 3.0437 — **24% less** — so ULL is potentially superior to any HLL variant using lossless compression [RF-2dccfeb5-49][RF-2dccfeb5-46]. ULL's Shannon entropy is also **24% smaller for the same estimation error**, making it more compact under standard compression algorithms (aided by its 8-bit registers) [RF-2dccfeb5-22][RF-2dccfeb5-2].\n\n**Summary of the trade-off at equal error:**\n\n| Setting (equal estimation error) | Memory saving of ULL vs. HLL |\n|---|---|\n| Maximum-likelihood estimator | 28% (MVP 4.6313 vs. 6.4485, q=6) [RF-2dccfeb5-22][RF-2dccfeb5-46] |\n| Fast estimator (HLL-comparable speed) | 24% [RF-2dccfeb5-2] |\n| Non-distributed martingale estimator | 17% [RF-2dccfeb5-2][RF-2dccfeb5-73] |\n| vs. HLL with q=8-bit registers | 46% [RF-2dccfeb5-46] |\n| Optimal lossless compression | 24% (MVP 2.3122 vs. 3.0437) [RF-2dccfeb5-49] |\n\n**Trade-off note.** The savings are largest with the ML estimator; choosing a faster estimator narrows the advantage (28% → 24% → 17%), i.e., there is a memory/speed trade-off rather than a single fixed figure [RF-2dccfeb5-2][RF-2dccfeb5-110].\n\n*Inference (not a source claim): since MVP scales linearly with memory at fixed variance, the ML figure implies HLL needs roughly 1.39× ULL's memory (6.4485 / 4.6313), consistent with the stated ~28% saving.*\n\nAll cited figures come from the single ULL source in the indexed corpus; no independent second source on this specific comparison was found, so the comparative numbers rest on that one paper.",
+      "error": null,
+      "elapsed_seconds": 13.774,
+      "prompt_tokens": 16908,
+      "completion_tokens": 1580,
+      "tool_events": [
+        "read_file(\"E:\\agent\\nanobot-v0.1.4-era\\nanobot\\skil…\"), research_sources",
+        "research_decision(\"search\"), research_search(\"UltraLogLog memory usage compared to Hyp…\"), research_search(\"UltraLogLog space efficiency improvement…\")",
+        "research_read, research_search(\"memory-variance product MVP definition U…\")"
+      ],
+      "streamed_chars": 3565,
+      "response_ok": true,
+      "expected_answerable": true,
+      "abstained": false,
+      "completed": true,
+      "answer_pass": true,
+      "concept_coverage": 1.0,
+      "concepts": [
+        {
+          "aliases": [
+            "28%"
+          ],
+          "matched": "28%"
+        },
+        {
+          "aliases": [
+            "4.63"
+          ],
+          "matched": "4.63"
+        },
+        {
+          "aliases": [
+            "memory",
+            "space",
+            "空间"
+          ],
+          "matched": "memory"
+        }
+      ],
+      "citations": [
+        "RF-2DCCFEB5-11",
+        "RF-2DCCFEB5-22",
+        "RF-2DCCFEB5-45",
+        "RF-2DCCFEB5-46",
+        "RF-2DCCFEB5-110",
+        "RF-2DCCFEB5-2",
+        "RF-2DCCFEB5-73",
+        "RF-2DCCFEB5-49"
+      ],
+      "valid_citations": [
+        "RF-2DCCFEB5-11",
+        "RF-2DCCFEB5-22",
+        "RF-2DCCFEB5-45",
+        "RF-2DCCFEB5-46",
+        "RF-2DCCFEB5-110",
+        "RF-2DCCFEB5-2",
+        "RF-2DCCFEB5-73",
+        "RF-2DCCFEB5-49"
+      ],
+      "missing_citations": [],
+      "citation_validity": 1.0,
+      "relevant_citation_recall": 0.5,
+      "relevant_label_precision": 0.125,
+      "relevant_hits": [
+        "RF-2DCCFEB5-22"
+      ],
+      "paragraph_citation_coverage": 0.7,
+      "entailment": {
+        "claims": 13,
+        "entailed": 13,
+        "partially_supported": 0,
+        "unsupported": 0,
+        "support_rate": 1.0,
+        "details": [
+          {
+            "claim": "Metric used.** Space efficiency is measured by the memory-variance product (MVP): for a given estimation variance (error), a lower MVP means less memory, so comparing MVPs at equal error directly compares memory footprint .",
+            "citations": [
+              "RF-2DCCFEB5-11"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.3478,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "Algorithm 1: Inserts an element with 64-bit hash value⟨ℎ63ℎ62...ℎ 0⟩2 into a\nHyperLogLog consisting of𝑚 = 2𝑝 (𝑝≥ 2) 6-bit registers𝑟0,𝑟 1,...,𝑟 𝑚−1 with\ninitial values𝑟𝑖 = 0.\n𝑖←\n⟨ℎ63ℎ62...ℎ 64−𝑝⟩2 ⊲ extract register index\n𝑎←⟨ 0... 0\n𝑝\nℎ63−𝑝ℎ62−𝑝.\n..ℎ 0⟩2 ⊲ mask register index bits\n𝑘← nlz(𝑎)−𝑝+ 1 ⊲ update value𝑘∈[ 1, 65−𝑝]\n⊲ function nlz returns the number of leading zeros\n𝑟𝑖← max(𝑟𝑖,𝑘) ⊲ update register\nwhich makes serialization very fast and convenient. Furthermore,\nadd and in-place merge operations do not require any additional\nmemory allocations.\nTo our knowledge HLL is so far the most spac"
+          },
+          {
+            "claim": "Core comparison (ML estimator).** The ULL sketch uses configuration b=2, d=2, q=6 with a theoretical MVP of 4.6313, which is **28% below HLL's MVP of 6.4485** at q=6 registers; equivalently, ULL needs 28% less space to encode the same amount of distinct-count information extracted via maximum likelihood .",
+            "citations": [
+              "RF-2DCCFEB5-22",
+              "RF-2DCCFEB5-45",
+              "RF-2DCCFEB5-46"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.5,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "1.2 Summary of Contributions\nWe first describe a data structure that generalizes the known data\nstructures HyperLogLog (HLL) [23], ExtendedHyperLogLog (EHLL)\n[33], and probabilistic counting with stochastic averaging (PCSA)\n[24]. We derive analytic expressions for the Fisher information and\nthe Shannon entropy as functions of the data structure parameters.\nAlthough these expressions reveal even more space-efficient con-\nfigurations that could be the subject of future research, the focus of\nthis work is on a setting that leads to a very practical data sketch\ncalled UltraLogLog (ULL) with a MVP "
+          },
+          {
+            "claim": "The paper's conclusion confirms the theoretically predicted 28% space saving under the ML estimator was matched by experiments .",
+            "citations": [
+              "RF-2DCCFEB5-110"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.6154,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "the space efficiency of ULL in this context, and can a fast\nand robust estimation algorithm be found for that as well?\n7 CONCLUSION\nWe derived the ULL sketch as a special case of a generalized data\nstructure unifying HLL, EHLL, and PCSA. The theoretically pre-\ndicted space savings of 28%, 24%, and 17% over HLL when using\nthe ML, FGRA, and martingale estimator, respectively, were per-\nfectly matched by our experiments. The byte-sized registers lead\nto faster recording speed as well as better compressibility. Since\nULL also has the same properties as HLL (constant-time insertions,\nidempotency, m"
+          },
+          {
+            "claim": "Estimator-dependent savings.** A simpler/faster estimator still achieves a **24% space reduction at estimation speed comparable to HLL**, while in a non-distributed setting using martingale estimation ULL reduces space by **17%** .",
+            "citations": [
+              "RF-2DCCFEB5-2"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.75,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "insert operation. At the same time, it requires 28%\nless space to encode the same amount of distinct count information,\nwhich can be extracted using the maximum likelihood method.\nAlternatively, a simpler and faster estimator is proposed, which\nstill achieves a space reduction of 24%, but at an estimation speed\ncomparable to that of HyperLogLog. In a non-distributed setting\nwhere martingale estimation can be used, UltraLogLog is able to\nreduce space by 17%. Moreover, its smaller entropy and its 8-bit\nregisters lead to better compaction when using standard compres-\nsion algorithms. All this is "
+          },
+          {
+            "claim": "These 24% (FGRA) and 17% (martingale) figures were also confirmed experimentally .",
+            "citations": [
+              "RF-2DCCFEB5-110",
+              "RF-2DCCFEB5-73"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.5556,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "the space efficiency of ULL in this context, and can a fast\nand robust estimation algorithm be found for that as well?\n7 CONCLUSION\nWe derived the ULL sketch as a special case of a generalized data\nstructure unifying HLL, EHLL, and PCSA. The theoretically pre-\ndicted space savings of 28%, 24%, and 17% over HLL when using\nthe ML, FGRA, and martingale estimator, respectively, were per-\nfectly matched by our experiments. The byte-sized registers lead\nto faster recording speed as well as better compressibility. Since\nULL also has the same properties as HLL (constant-time insertions,\nidempotency, m"
+          },
+          {
+            "claim": "Versus common 8-bit HLL implementations.** Compared with HLL implementations that use q=8 bits per register (MVP ≈ 8.5981), ULL's improvement reaches **46%** .",
+            "citations": [
+              "RF-2DCCFEB5-46"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.75,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "2.0\n2.5\n3.0\n3.5\n4.0\n4.5\nmemory-variance product\nHLL\nEHLL\nULL\nFigure 2: The theoretical asymptotic memory-variance prod-\nuct (MVP) (10) over the base 𝒃 for various values of 𝒅 under\nthe assumption of optimal lossless compression. The MVP\nof UltraLogLog ( ULL) is 24% smaller than that of HyperLog-\nLog (HLL).\nupdates as registers can be directly accessed and modified when\nstored in a byte array. This is why we picked𝑏 = 2,𝑑 = 2,𝑞 = 6 as\nconfiguration for our new data structure called UltraLogLog (ULL).\nIts theoretical MVP is 28% smaller than that of HLL with a register\nsize of𝑞 = 6 and a MVP of 6"
+          },
+          {
+            "claim": "Under lossless compression.** Assuming optimal lossless compression, the ULL configuration (d=2) yields MVP ≈ 2.3122 versus HLL (d=0) MVP ≈ 3.0437 — **24% less** — so ULL is potentially superior to any HLL variant using lossless compression .",
+            "citations": [
+              "RF-2DCCFEB5-49",
+              "RF-2DCCFEB5-46"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.7619,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "e\nsufficient in this case.\nFigure 2 shows theMVP under the assumption of optimal lossless\ncompression as given by (10). The ULL configuration with𝑑 = 2\nleads to MVP≈ 2.3122 which is 24% less than for HLL with𝑑 = 0\nand MVP≈ 3.0437. Therefore, ULL is potentially superior to any\nvariant of HLL that uses lossless compression techniques [2, 28], if\nsimilar techniques are also applied to ULL.\n3 DISTINCT COUNT ESTIMATION\nThe theoretical results show clearly that UltraLogLog (ULL) as a\nspecial case of the presented generalized data structure with𝑏 = 2,\n𝑑 = 2 and𝑞 = 6 encodes distinct count information"
+          },
+          {
+            "claim": "ULL's Shannon entropy is also **24% smaller for the same estimation error**, making it more compact under standard compression algorithms (aided by its 8-bit registers) .",
+            "citations": [
+              "RF-2DCCFEB5-22",
+              "RF-2DCCFEB5-2"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.8,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "1.2 Summary of Contributions\nWe first describe a data structure that generalizes the known data\nstructures HyperLogLog (HLL) [23], ExtendedHyperLogLog (EHLL)\n[33], and probabilistic counting with stochastic averaging (PCSA)\n[24]. We derive analytic expressions for the Fisher information and\nthe Shannon entropy as functions of the data structure parameters.\nAlthough these expressions reveal even more space-efficient con-\nfigurations that could be the subject of future research, the focus of\nthis work is on a setting that leads to a very practical data sketch\ncalled UltraLogLog (ULL) with a MVP "
+          },
+          {
+            "claim": "6.4485, q=6)  |",
+            "citations": [
+              "RF-2DCCFEB5-22",
+              "RF-2DCCFEB5-46"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 1.0,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "1.2 Summary of Contributions\nWe first describe a data structure that generalizes the known data\nstructures HyperLogLog (HLL) [23], ExtendedHyperLogLog (EHLL)\n[33], and probabilistic counting with stochastic averaging (PCSA)\n[24]. We derive analytic expressions for the Fisher information and\nthe Shannon entropy as functions of the data structure parameters.\nAlthough these expressions reveal even more space-efficient con-\nfigurations that could be the subject of future research, the focus of\nthis work is on a setting that leads to a very practical data sketch\ncalled UltraLogLog (ULL) with a MVP "
+          },
+          {
+            "claim": "| Fast estimator (HLL-comparable speed) | 24%  |",
+            "citations": [
+              "RF-2DCCFEB5-2"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.6667,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "insert operation. At the same time, it requires 28%\nless space to encode the same amount of distinct count information,\nwhich can be extracted using the maximum likelihood method.\nAlternatively, a simpler and faster estimator is proposed, which\nstill achieves a space reduction of 24%, but at an estimation speed\ncomparable to that of HyperLogLog. In a non-distributed setting\nwhere martingale estimation can be used, UltraLogLog is able to\nreduce space by 17%. Moreover, its smaller entropy and its 8-bit\nregisters lead to better compaction when using standard compres-\nsion algorithms. All this is "
+          },
+          {
+            "claim": "| Non-distributed martingale estimator | 17%  |",
+            "citations": [
+              "RF-2DCCFEB5-2",
+              "RF-2DCCFEB5-73"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 1.0,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "insert operation. At the same time, it requires 28%\nless space to encode the same amount of distinct count information,\nwhich can be extracted using the maximum likelihood method.\nAlternatively, a simpler and faster estimator is proposed, which\nstill achieves a space reduction of 24%, but at an estimation speed\ncomparable to that of HyperLogLog. In a non-distributed setting\nwhere martingale estimation can be used, UltraLogLog is able to\nreduce space by 17%. Moreover, its smaller entropy and its 8-bit\nregisters lead to better compaction when using standard compres-\nsion algorithms. All this is "
+          },
+          {
+            "claim": "HLL with q=8-bit registers | 46%  |",
+            "citations": [
+              "RF-2DCCFEB5-46"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.75,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "2.0\n2.5\n3.0\n3.5\n4.0\n4.5\nmemory-variance product\nHLL\nEHLL\nULL\nFigure 2: The theoretical asymptotic memory-variance prod-\nuct (MVP) (10) over the base 𝒃 for various values of 𝒅 under\nthe assumption of optimal lossless compression. The MVP\nof UltraLogLog ( ULL) is 24% smaller than that of HyperLog-\nLog (HLL).\nupdates as registers can be directly accessed and modified when\nstored in a byte array. This is why we picked𝑏 = 2,𝑑 = 2,𝑞 = 6 as\nconfiguration for our new data structure called UltraLogLog (ULL).\nIts theoretical MVP is 28% smaller than that of HLL with a register\nsize of𝑞 = 6 and a MVP of 6"
+          },
+          {
+            "claim": "Trade-off note.** The savings are largest with the ML estimator; choosing a faster estimator narrows the advantage (28% → 24% → 17%), i.e., there is a memory/speed trade-off rather than a single fixed figure .",
+            "citations": [
+              "RF-2DCCFEB5-2",
+              "RF-2DCCFEB5-110"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.3636,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "insert operation. At the same time, it requires 28%\nless space to encode the same amount of distinct count information,\nwhich can be extracted using the maximum likelihood method.\nAlternatively, a simpler and faster estimator is proposed, which\nstill achieves a space reduction of 24%, but at an estimation speed\ncomparable to that of HyperLogLog. In a non-distributed setting\nwhere martingale estimation can be used, UltraLogLog is able to\nreduce space by 17%. Moreover, its smaller entropy and its 8-bit\nregisters lead to better compaction when using standard compres-\nsion algorithms. All this is "
+          }
+        ]
+      },
+      "estimated_cost_usd": null,
+      "bad_case_labels": [
+        "uncited_claim"
+      ]
+    },
+    {
+      "id": "e2e-04",
+      "query": "ULL 如何合并不同精度的两个 sketch？合并结果是否依赖插入或合并顺序？",
+      "language": "zh",
+      "difficulty": "hard",
+      "answer": "## ULL 如何合并不同精度的两个 sketch？\n\nULL 可以合并不同精度的 sketch：合并前必须先把**精度较高**的那个缩减（downsize）到另一个较低的精度，然后再合并 [RF-2dccfeb5-81]。\n\n**降精度（downsizing）的核心机制**：从精度 p′ 降到 p < p′，是把 **2^(p′−p) 个连续寄存器**的信息合并（归并）到一起 [RF-2dccfeb5-81]。Algorithm 7 给出了完整做法——它把一个精度为 p′ 的 ULL（寄存器 r′₀…r′_{m′−1}，m′ = 2^{p′}）原地合并进另一个 p ≤ p′ 的 ULL（寄存器 r₀…r_{m−1}，m = 2^{p}）；对每个目标寄存器 i，取 `x ← unpack(r_i) or (unpack(r′_j) · 2^{p′−p})`，并对后续 l = 1 … 2^{p′−p}−1 的寄存器做相应处理 [RF-2dccfeb5-91]。同一算法也可只用于单纯降精度：把待降的 sketch 合并进一个**空**的低精度 ULL（所有寄存器 r_i = 0）即可 [RF-2dccfeb5-85]。\n\n当两个 sketch 精度相同时（p′ = p），2^{p′−p} = 1，内层循环可完全跳过；再加上寄存器是字节大小，此时 ULL 合并非常适合用 SIMD 处理 [RF-2dccfeb5-85]。\n\n## 合并结果是否依赖插入或合并顺序？\n\n**不依赖。** 最终结果只取决于被加入元素的**集合**，而不取决于插入顺序或合并顺序 [RF-2dccfeb5-81]。其原因是 ULL 的插入操作是**可交换的（commutative）**，合并操作既**可交换又可结合（commutative and associative）**，从而实现可复现性（Reproducibility） [RF-2dccfeb5-9]。论文摘要也把可交换、幂等、可合并列为其基本性质 [RF-2dccfeb5-8]。\n\n配套的**可约简性（Reducibility）**进一步保证：缩减到低精度后的状态，与直接用该低精度记录得到的状态**完全相同**，因此可以在不影响与旧数据可合并性的前提下调整精度 [RF-2dccfeb5-9]。\n\n**一句话总结**：不同精度合并 = 先按 2^(p′−p) 个连续寄存器把高精度 sketch 降到低精度，再用可交换、可结合的合并操作合并；由于插入与合并的可交换/可结合性，结果与插入或合并顺序无关 [RF-2dccfeb5-81][RF-2dccfeb5-9]。\n\n*（以上结论均来自已索引的 ULL.pdf，未创建报告文件；已将该发现记入项目 Evidence Ledger：ED-82ba0496c973。）*",
+      "error": null,
+      "elapsed_seconds": 12.574,
+      "prompt_tokens": 15200,
+      "completion_tokens": 685,
+      "tool_events": [
+        "read_file(\"E:\\agent\\nanobot-v0.1.4-era\\nanobot\\skil…\"), research_sources",
+        "research_decision(\"search\"), research_search(\"ULL merge two sketches of different prec…\"), research_search(\"UltraLogLog merge order independent inse…\")",
+        "research_read",
+        "research_decision(\"record\")"
+      ],
+      "streamed_chars": 1556,
+      "response_ok": true,
+      "expected_answerable": true,
+      "abstained": false,
+      "completed": true,
+      "answer_pass": true,
+      "concept_coverage": 1.0,
+      "concepts": [
+        {
+          "aliases": [
+            "降精度",
+            "lower precision",
+            "reduce"
+          ],
+          "matched": "降精度"
+        },
+        {
+          "aliases": [
+            "不依赖",
+            "independent"
+          ],
+          "matched": "不依赖"
+        },
+        {
+          "aliases": [
+            "顺序",
+            "order"
+          ],
+          "matched": "顺序"
+        }
+      ],
+      "citations": [
+        "RF-2DCCFEB5-81",
+        "RF-2DCCFEB5-91",
+        "RF-2DCCFEB5-85",
+        "RF-2DCCFEB5-9",
+        "RF-2DCCFEB5-8"
+      ],
+      "valid_citations": [
+        "RF-2DCCFEB5-81",
+        "RF-2DCCFEB5-91",
+        "RF-2DCCFEB5-85",
+        "RF-2DCCFEB5-9",
+        "RF-2DCCFEB5-8"
+      ],
+      "missing_citations": [],
+      "citation_validity": 1.0,
+      "relevant_citation_recall": 1.0,
+      "relevant_label_precision": 0.2,
+      "relevant_hits": [
+        "RF-2DCCFEB5-81"
+      ],
+      "paragraph_citation_coverage": 0.8571,
+      "entailment": {
+        "claims": 6,
+        "entailed": 0,
+        "partially_supported": 4,
+        "unsupported": 2,
+        "support_rate": 0.6667,
+        "details": [
+          {
+            "claim": "ULL 可以合并不同精度的 sketch：合并前必须先把**精度较高**的那个缩减（downsize）到另一个较低的精度，然后再合并 。",
+            "citations": [
+              "RF-2DCCFEB5-81"
+            ],
+            "label": "PARTIALLY_SUPPORTED",
+            "lexical_overlap": 0.0625,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "larly, for large distinct counts with registers greater\nthan or equal to4𝑤, equivalent to𝑐4𝑤+𝑐4𝑤+1+𝑐4𝑤+2+𝑐4𝑤+3 > 0, the\nlarge range correction is applied based on the estimator presented\nin Section 3.6.\n4.1 Merging and Downsizing\nULL sketches can be merged which is important if the data is dis-\ntributed over space and/or time and partial results must be com-\nbined. The final result will only depend on the set of added elements\nand not on the insertion or merge order. It is even possible to merge\nULL sketches with different precisions. For that, the sketch with\nhigher precision must be reduced "
+          },
+          {
+            "claim": "降精度（downsizing）的核心机制**：从精度 p′ 降到 p < p′，是把 **2^(p′−p) 个连续寄存器**的信息合并（归并）到一起 。Algorithm 7 给出了完整做法——它把一个精度为 p′ 的 ULL（寄存器 r′₀…r′_{m′−1}，m′ = 2^{p′}）原地合并进另一个 p ≤ p′ 的 ULL（寄存器 r₀…r_{m−1}，m = 2^{p}）；对每个目标寄存器 i，取 `x ← unpack(r_i) or (unpack(r′_j) · 2^{p′−p})`，并对后续 l = 1 … 2^{p′−p}−1 的寄存器做相应处理 。同一算法也可只用于单纯降精度：把待降的 sketch 合并进一个**空**的低精度 ULL（所有寄存器 r_i = 0）即可 。",
+            "citations": [
+              "RF-2DCCFEB5-81",
+              "RF-2DCCFEB5-91",
+              "RF-2DCCFEB5-85"
+            ],
+            "label": "PARTIALLY_SUPPORTED",
+            "lexical_overlap": 0.0633,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "larly, for large distinct counts with registers greater\nthan or equal to4𝑤, equivalent to𝑐4𝑤+𝑐4𝑤+1+𝑐4𝑤+2+𝑐4𝑤+3 > 0, the\nlarge range correction is applied based on the estimator presented\nin Section 3.6.\n4.1 Merging and Downsizing\nULL sketches can be merged which is important if the data is dis-\ntributed over space and/or time and partial results must be com-\nbined. The final result will only depend on the set of added elements\nand not on the insertion or merge order. It is even possible to merge\nULL sketches with different precisions. For that, the sketch with\nhigher precision must be reduced "
+          },
+          {
+            "claim": "当两个 sketch 精度相同时（p′ = p），2^{p′−p} = 1，内层循环可完全跳过；再加上寄存器是字节大小，此时 ULL 合并非常适合用 SIMD 处理 。",
+            "citations": [
+              "RF-2DCCFEB5-85"
+            ],
+            "label": "PARTIALLY_SUPPORTED",
+            "lexical_overlap": 0.0857,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "ed the calculation of the number of leading zeros (NLZ)\ncomputation in Algorithm 3 when recorded with lower precision𝑝.\nAlgorithm 7 shows in detail how anULL sketch with precision𝑝′\ncan be merged in-place into another one with precision𝑝≤𝑝′. The\nalgorithm simplifies a lot when the precisions are equal, because\n𝑝′ =𝑝 implies 2𝑝′−𝑝 = 1 and consequently the inner loop can be\nskipped entirely. In this case, and also due to the byte-sized registers,\nthe ULL merge operation is very well suited for single-instruction\nmultiple-data (SIMD) processing.\nAlgorithm 7 can also be applied to just downsize a "
+          },
+          {
+            "claim": "不依赖。** 最终结果只取决于被加入元素的**集合**，而不取决于插入顺序或合并顺序 。其原因是 ULL 的插入操作是**可交换的（commutative）**，合并操作既**可交换又可结合（commutative and associative）**，从而实现可复现性（Reproducibility） 。论文摘要也把可交换、幂等、可合并列为其基本性质 。",
+            "citations": [
+              "RF-2DCCFEB5-81",
+              "RF-2DCCFEB5-9",
+              "RF-2DCCFEB5-8"
+            ],
+            "label": "PARTIALLY_SUPPORTED",
+            "lexical_overlap": 0.0588,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "larly, for large distinct counts with registers greater\nthan or equal to4𝑤, equivalent to𝑐4𝑤+𝑐4𝑤+1+𝑐4𝑤+2+𝑐4𝑤+3 > 0, the\nlarge range correction is applied based on the estimator presented\nin Section 3.6.\n4.1 Merging and Downsizing\nULL sketches can be merged which is important if the data is dis-\ntributed over space and/or time and partial results must be com-\nbined. The final result will only depend on the set of added elements\nand not on the insertion or merge order. It is even possible to merge\nULL sketches with different precisions. For that, the sketch with\nhigher precision must be reduced "
+          },
+          {
+            "claim": "配套的**可约简性（Reducibility）**进一步保证：缩减到低精度后的状态，与直接用该低精度记录得到的状态**完全相同**，因此可以在不影响与旧数据可合并性的前提下调整精度 。",
+            "citations": [
+              "RF-2DCCFEB5-9"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.0185,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "ucibility: The result does not depend on the processing\norder, which often cannot be guaranteed in practice anyway. Re-\nproducibility is achieved by a commutative insert operation and a\ncommutative and associative merge operation.\nReducibility: The state can be reduced to a smaller state corre-\nsponding to a smaller precision parameter. The reduced state is\nidentical to that obtained by direct recording with lower precision.\nThis property allows adjusting the precision without affecting the\nmergeability with older records.\nEstimation: A fast and robust estimation algorithm ensures nearly\nunbia"
+          },
+          {
+            "claim": "一句话总结**：不同精度合并 = 先按 2^(p′−p) 个连续寄存器把高精度 sketch 降到低精度，再用可交换、可结合的合并操作合并；由于插入与合并的可交换/可结合性，结果与插入或合并顺序无关 。",
+            "citations": [
+              "RF-2DCCFEB5-81",
+              "RF-2DCCFEB5-9"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.02,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "larly, for large distinct counts with registers greater\nthan or equal to4𝑤, equivalent to𝑐4𝑤+𝑐4𝑤+1+𝑐4𝑤+2+𝑐4𝑤+3 > 0, the\nlarge range correction is applied based on the estimator presented\nin Section 3.6.\n4.1 Merging and Downsizing\nULL sketches can be merged which is important if the data is dis-\ntributed over space and/or time and partial results must be com-\nbined. The final result will only depend on the set of added elements\nand not on the insertion or merge order. It is even possible to merge\nULL sketches with different precisions. For that, the sketch with\nhigher precision must be reduced "
+          }
+        ]
+      },
+      "estimated_cost_usd": null,
+      "bad_case_labels": [
+        "uncited_claim",
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "e2e-05",
+      "query": "Can DREX estimate both set union and set intersection, and what principle is used for intersection?",
+      "language": "en",
+      "difficulty": "medium",
+      "answer": "Yes — DREX supports both operations [RF-b40077a8-51].\n\n**Union:** DREX merges two instances I1 and I2 (Algorithm 3). It sets r to the larger of I1.r and I2.r, then combines the per-counter values — recording the higher quantity (I1.r + I1.s[i] vs. I2.r + I2.s[i]) into the merged instance's counters, since a larger recorded leading-zeros value indicates a larger underlying count [RF-b40077a8-51][RF-b40077a8-52].\n\n**Intersection:** DREX uses the **inclusion-exclusion principle**. For two instances I1 and I2, it returns the intersection estimate as `I1.Query() + I2.Query() - Union(I1, I2).Query()` [RF-b40077a8-53].",
+      "error": null,
+      "elapsed_seconds": 9.477,
+      "prompt_tokens": 13258,
+      "completion_tokens": 186,
+      "tool_events": [
+        "read_file(\"E:\\agent\\nanobot-v0.1.4-era\\nanobot\\skil…\"), research_sources",
+        "research_decision(\"search\"), research_search(\"DREX estimate set union and set intersec…\"), research_search(\"DREX intersection principle inclusion-ex…\")",
+        "research_read",
+        "research_decision(\"record\")"
+      ],
+      "streamed_chars": 953,
+      "response_ok": true,
+      "expected_answerable": true,
+      "abstained": false,
+      "completed": true,
+      "answer_pass": true,
+      "concept_coverage": 1.0,
+      "concepts": [
+        {
+          "aliases": [
+            "union"
+          ],
+          "matched": "union"
+        },
+        {
+          "aliases": [
+            "intersection"
+          ],
+          "matched": "intersection"
+        },
+        {
+          "aliases": [
+            "inclusion-exclusion",
+            "inclusion exclusion",
+            "容斥"
+          ],
+          "matched": "inclusion-exclusion"
+        }
+      ],
+      "citations": [
+        "RF-B40077A8-51",
+        "RF-B40077A8-52",
+        "RF-B40077A8-53"
+      ],
+      "valid_citations": [
+        "RF-B40077A8-51",
+        "RF-B40077A8-52",
+        "RF-B40077A8-53"
+      ],
+      "missing_citations": [],
+      "citation_validity": 1.0,
+      "relevant_citation_recall": 1.0,
+      "relevant_label_precision": 0.6667,
+      "relevant_hits": [
+        "RF-B40077A8-51",
+        "RF-B40077A8-53"
+      ],
+      "paragraph_citation_coverage": 1.0,
+      "entailment": {
+        "claims": 3,
+        "entailed": 3,
+        "partially_supported": 0,
+        "unsupported": 0,
+        "support_rate": 1.0,
+        "details": [
+          {
+            "claim": "Yes — DREX supports both operations .",
+            "citations": [
+              "RF-B40077A8-51"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.6,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "lower than 3, so we\nsimply subtract 1 from each of them. Counters s[3],s[4] have\nvalues equal to 3. With probability 1\n2, s[3] is subtracted by 1\nands[4]remains unchanged.\nQuery:If we want to obtain the estimate after the update of\nx5, the estimate is returned by2rmln( m\nm−n ) =2 2∗8∗ln 8\n8−4≈22\nE. Union and Intersection\nNow, we demonstrate that DREX also supports union and\nintersection operations.\nUnion:Algorithm 3 shows the details of the union operation.\nThe algorithm takes two DREX instances I1, I2 as input. Then,\nwe set r as the larger one of I1.r and I2.r (Lines 3, 15). If\nI1.r≥I 2.r, we"
+          },
+          {
+            "claim": "I2.r + I2.s[i]) into the merged instance's counters, since a larger recorded leading-zeros value indicates a larger underlying count .",
+            "citations": [
+              "RF-B40077A8-51",
+              "RF-B40077A8-52"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.5714,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "lower than 3, so we\nsimply subtract 1 from each of them. Counters s[3],s[4] have\nvalues equal to 3. With probability 1\n2, s[3] is subtracted by 1\nands[4]remains unchanged.\nQuery:If we want to obtain the estimate after the update of\nx5, the estimate is returned by2rmln( m\nm−n ) =2 2∗8∗ln 8\n8−4≈22\nE. Union and Intersection\nNow, we demonstrate that DREX also supports union and\nintersection operations.\nUnion:Algorithm 3 shows the details of the union operation.\nThe algorithm takes two DREX instances I1, I2 as input. Then,\nwe set r as the larger one of I1.r and I2.r (Lines 3, 15). If\nI1.r≥I 2.r, we"
+          },
+          {
+            "claim": "For two instances I1 and I2, it returns the intersection estimate as `I1.Query() + I2.Query() - Union(I1, I2).Query()` .",
+            "citations": [
+              "RF-B40077A8-53"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.8889,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "=0 tom−1do\n17:ifI 1.r+I 1.s[i]>I 2.r+I 2.s[i]then\n18:I.s[i] =I 1.r+I 1.s[i]−I 2.r\n19:else\n20:I.s[i] =I 2.s[i]\n21:end if\n22:ifI.s[i] =0then\n23:I.n=I.n+1\n24:end if\n25:end for\n26:end if\n27:ifI.n≥vthen\n28:I.NextRound()\n29:end if\nIntersection:We leverage the inclusion-exclusion principle\nto conduct the intersection. Suppose that we have two instances\nI1 and I2 to conduct an intersection, we return the estimate of the\nintersection by I1.Query() + I2.Query() - Union( I1, I2).Query();\nIV. THEORETICAL ANALYSIS\nIn this section, We first perform theoretical analysis on the\nerror of DREX. Then, we compare"
+          }
+        ]
+      },
+      "estimated_cost_usd": null,
+      "bad_case_labels": []
+    },
+    {
+      "id": "e2e-06",
+      "query": "SeiveSketch 的分布式合并流程是什么，实验中并行化可以带来多大的加速？",
+      "language": "zh",
+      "difficulty": "hard",
+      "answer": "**SeiveSketch 的分布式合并流程**\n\n在分布式计数场景中，输入数据流被划分到多个分布式节点上并行处理，每个节点独立维护一个本地 SeiveSketch 实例来汇总自己的子流，这些本地实例会周期性地或最终合并为单一的全局 SeiveSketch 实例，用于最终的频率估计与全局分析；为保证计数结果正确一致地聚合，所有实例必须使用同一组哈希函数 [RF-9b51fd1b-51][RF-9b51fd1b-52]。\n\n合并按固定的三段顺序进行：由于合并热部（HP）可能触发条目向其他部分驱逐，因此流程先合并温部（WP），再合并冷部（CP），最后合并热部（HP）[RF-9b51fd1b-52]。具体而言（对应论文 Algorithm 6 / 图 6）：\n\n1. **合并温部（Lines 1–5）**：WP 使用传统 sketch（实现中为 Count-Min sketch），合并沿用底层 sketch 的策略——把各实例中相互对齐的计数器按**求和**聚合 [RF-9b51fd1b-52][RF-9b51fd1b-53]。\n2. **合并冷部（Lines 6–15）**：由于不同 L1 实例的采样率可能不同，先把所有实例**对齐到其中最小的采样率（down-sampling）**，然后对每个对应计数器**取最大值**作为合并结果；L2 也采用同样的“取最大值”原则 [RF-9b51fd1b-53]。\n3. **合并热部（Lines 16–20）**：先对跨实例的相同 item 计数**求和**聚合，再把每个数组中的条目按 Vt **降序排序**，每个合并后的桶数组只保留前 w_t 个条目，其余条目被**驱逐到冷部和温部** [RF-9b51fd1b-54]。\n\n**并行化带来的加速**\n\nSeiveSketch 的处理流是严格单向、无回溯的，因而论文提出两级优化：交织并行（inter-part）与部内并行（intra-part）[RF-9b51fd1b-57]。交织并行把三个部分组织为流水线，用三个线程分别执行 Hot、Cold、Warm Part，并以无锁队列在部件间传递条目，从而把整体时间复杂度从 O(H+C+W) 降到 O(max(H,C,W))（H、C、W 分别为三部的处理时间）[RF-9b51fd1b-58]。部内并行则在 HP 内用 AVX2 指令集对条目匹配与最小条目搜索做 SIMD 向量化（一次指令比较 8 个 32-bit 整数）[RF-9b51fd1b-59]。\n\n实验结果显示，在不同数据集上，并行化版本相对原串行实现取得 **1.32× 到 2.45× 的加速**；且随着 SeiveSketch 内存占用增加，吞吐量反而上升而非下降，原因是实验服务器配有 4 MB L2 缓存，足以容纳所有测试的内存配置，使内存交换开销极小 [RF-9b51fd1b-121]。此外，在分布式处理场景下改变实例数量与每实例内存分配后再合并，SeiveSketch 仍能保持稳定的估计精度 [RF-9b51fd1b-122]。\n\n*注：以上仅为已索引语料（SeiveSketch 论文）中可核实的陈述；“1.32×–2.45×”是论文关于并行优化的实测区间，未提供单一确定数值。*",
+      "error": null,
+      "elapsed_seconds": 16.908,
+      "prompt_tokens": 22456,
+      "completion_tokens": 780,
+      "tool_events": [
+        "read_file(\"E:\\agent\\nanobot-v0.1.4-era\\nanobot\\skil…\"), research_sources",
+        "research_search(\"SeiveSketch distributed merge flow\"), research_search(\"parallelization speedup merge accelerati…\")",
+        "research_read, research_search(\"merge two SeiveSketch instances warm par…\")",
+        "research_search(\"Step 2 Merging Cold Parts down-sampling …\"), research_search(\"Algorithm 6 merge procedure SeiveSketch …\")",
+        "research_decision(\"search\")",
+        "research_decision(\"record\")"
+      ],
+      "streamed_chars": 1362,
+      "response_ok": true,
+      "expected_answerable": true,
+      "abstained": false,
+      "completed": true,
+      "answer_pass": true,
+      "concept_coverage": 0.75,
+      "concepts": [
+        {
+          "aliases": [
+            "局部",
+            "local"
+          ],
+          "matched": null
+        },
+        {
+          "aliases": [
+            "全局",
+            "global"
+          ],
+          "matched": "全局"
+        },
+        {
+          "aliases": [
+            "1.32"
+          ],
+          "matched": "1.32"
+        },
+        {
+          "aliases": [
+            "2.45"
+          ],
+          "matched": "2.45"
+        }
+      ],
+      "citations": [
+        "RF-9B51FD1B-51",
+        "RF-9B51FD1B-52",
+        "RF-9B51FD1B-53",
+        "RF-9B51FD1B-54",
+        "RF-9B51FD1B-57",
+        "RF-9B51FD1B-58",
+        "RF-9B51FD1B-59",
+        "RF-9B51FD1B-121",
+        "RF-9B51FD1B-122"
+      ],
+      "valid_citations": [
+        "RF-9B51FD1B-51",
+        "RF-9B51FD1B-52",
+        "RF-9B51FD1B-53",
+        "RF-9B51FD1B-54",
+        "RF-9B51FD1B-57",
+        "RF-9B51FD1B-58",
+        "RF-9B51FD1B-59",
+        "RF-9B51FD1B-121",
+        "RF-9B51FD1B-122"
+      ],
+      "missing_citations": [],
+      "citation_validity": 1.0,
+      "relevant_citation_recall": 1.0,
+      "relevant_label_precision": 0.2222,
+      "relevant_hits": [
+        "RF-9B51FD1B-121",
+        "RF-9B51FD1B-51"
+      ],
+      "paragraph_citation_coverage": 0.8333,
+      "entailment": {
+        "claims": 7,
+        "entailed": 0,
+        "partially_supported": 3,
+        "unsupported": 4,
+        "support_rate": 0.4286,
+        "details": [
+          {
+            "claim": "在分布式计数场景中，输入数据流被划分到多个分布式节点上并行处理，每个节点独立维护一个本地 SeiveSketch 实例来汇总自己的子流，这些本地实例会周期性地或最终合并为单一的全局 SeiveSketch 实例，用于最终的频率估计与全局分析；为保证计数结果正确一致地聚合，所有实例必须使用同一组哈希函数 。",
+            "citations": [
+              "RF-9B51FD1B-51",
+              "RF-9B51FD1B-52"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.0099,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "et\nk= 3, following the analysis in Bloom filter [4], and set\nTx = 0.6321w 1, based on our theoretical analysis [31]. We\nsuggest to set the internal memory ratio between layersL 1 and\nL2 within the CP between 6:4 and 9:1 based on the evaluation\nin Section V-E.\nE. Merge\nMultiple instances of SeiveSketch can be deployed in a\ndistributed counting scenario, where the input data stream is\npartitioned across multiple distributed nodes and processed in\nparallel. Each node independently maintains a local instance\nof SeiveSketch to summarize its substream. The locally main-\ntained instances are periodic"
+          },
+          {
+            "claim": "合并按固定的三段顺序进行：由于合并热部（HP）可能触发条目向其他部分驱逐，因此流程先合并温部（WP），再合并冷部（CP），最后合并热部（HP）。具体而言（对应论文 Algorithm 6 / 图 6）：",
+            "citations": [
+              "RF-9B51FD1B-52"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.0408,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "e global SeiveSketch instance, which is then used for final\nfrequency estimation and global analysis. To enable correct\nand consistent aggregation of counting results, all instances\nmust employ the same set of hash functions. Algorithm 6\npresents the complete merging procedure for SeiveSketch. As\nmerging the hot parts may trigger item evictions to other parts,\nthe merging process proceeds by first merging the warm parts,\nfollowed by the cold parts, and finally the hot parts (see Fig. 6).\nStep 1: Merging Warm Parts(Lines 1-5). The WP uses a tradi-\ntional sketch to process warm items, and its me"
+          },
+          {
+            "claim": "1. **合并温部（Lines 1–5）**：WP 使用传统 sketch（实现中为 Count-Min sketch），合并沿用底层 sketch 的策略——把各实例中相互对齐的计数器按**求和**聚合 。",
+            "citations": [
+              "RF-9B51FD1B-52",
+              "RF-9B51FD1B-53"
+            ],
+            "label": "PARTIALLY_SUPPORTED",
+            "lexical_overlap": 0.1429,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "e global SeiveSketch instance, which is then used for final\nfrequency estimation and global analysis. To enable correct\nand consistent aggregation of counting results, all instances\nmust employ the same set of hash functions. Algorithm 6\npresents the complete merging procedure for SeiveSketch. As\nmerging the hot parts may trigger item evictions to other parts,\nthe merging process proceeds by first merging the warm parts,\nfollowed by the cold parts, and finally the hot parts (see Fig. 6).\nStep 1: Merging Warm Parts(Lines 1-5). The WP uses a tradi-\ntional sketch to process warm items, and its me"
+          },
+          {
+            "claim": "2. **合并冷部（Lines 6–15）**：由于不同 L1 实例的采样率可能不同，先把所有实例**对齐到其中最小的采样率（down-sampling）**，然后对每个对应计数器**取最大值**作为合并结果；L2 也采用同样的“取最大值”原则 。",
+            "citations": [
+              "RF-9B51FD1B-53"
+            ],
+            "label": "PARTIALLY_SUPPORTED",
+            "lexical_overlap": 0.0566,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "gy\nfollows that of the underlying sketch. In our implementation,\nWP adopts Count-Min sketch (CM). When merging multiple\nCM instances, the corresponding counters from each instance\nare aligned and aggregated by summing their values.\nStep 2: Merging Cold Parts(Lines 6-15). As differentL 1\ninstances may have varying sampling probabilities, all in-\nstances are aligned to the minimum sampling rate among them.\nSubsequently, for each corresponding counter across instances,\nthe maximum value is selected as the final merged counter\nvalue. The same principle applies to the merging ofL 2: the\nmaximum val"
+          },
+          {
+            "claim": "3. **合并热部（Lines 16–20）**：先对跨实例的相同 item 计数**求和**聚合，再把每个数组中的条目按 Vt **降序排序**，每个合并后的桶数组只保留前 w_t 个条目，其余条目被**驱逐到冷部和温部** 。",
+            "citations": [
+              "RF-9B51FD1B-54"
+            ],
+            "label": "PARTIALLY_SUPPORTED",
+            "lexical_overlap": 0.0577,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": ".\nStep 3: Merging Hot Parts(Lines 16-20). Counts are first\naggregated by summing the counters of identical items across\nall instances. Next, the items in each array are sorted in\ndescending order based onV t. Finally, the topw t items for\neach merged bucket array are retained, while the remaining\nitems are evicted to the cold and warm parts."
+          },
+          {
+            "claim": "SeiveSketch 的处理流是严格单向、无回溯的，因而论文提出两级优化：交织并行（inter-part）与部内并行（intra-part）。交织并行把三个部分组织为流水线，用三个线程分别执行 Hot、Cold、Warm Part，并以无锁队列在部件间传递条目，从而把整体时间复杂度从 O(H+C+W) 降到 O(max(H,C,W))（H、C、W 分别为三部的处理时间）。部内并行则在 HP 内用 AVX2 指令集对条目匹配与最小条目搜索做 SIMD 向量化（一次指令比较 8 个 32-bit 整数）。",
+            "citations": [
+              "RF-9B51FD1B-57",
+              "RF-9B51FD1B-58",
+              "RF-9B51FD1B-59"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.1101,
+            "missing_numbers": [
+              "8"
+            ],
+            "missing_citations": [],
+            "evidence_excerpt": "ction investigates processing speed optimizing of SeiveS-\nketch. Since the processing flow of data items in SeiveSketch\nis strictly unidirectional and involves no backtracking (see\nFigure 4), we propose a two-level optimization scheme: inter-\npart optimization and intra-part optimization.\nInter-part parallelization.The three parts of SeiveSketch can\nbe organized into a pipeline to enable concurrent processing.\nSpecifically, an item does not need to wait for the previous\nitem to complete processing in all three parts before entering\nSeiveSketch. As illustrated in Fig. 7, once an item completes\n"
+          },
+          {
+            "claim": "实验结果显示，在不同数据集上，并行化版本相对原串行实现取得 **1.32× 到 2.45× 的加速**；且随着 SeiveSketch 内存占用增加，吞吐量反而上升而非下降，原因是实验服务器配有 4 MB L2 缓存，足以容纳所有测试的内存配置，使内存交换开销极小 。此外，在分布式处理场景下改变实例数量与每实例内存分配后再合并，SeiveSketch 仍能保持稳定的估计精度 。",
+            "citations": [
+              "RF-9B51FD1B-121",
+              "RF-9B51FD1B-122"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.0455,
+            "missing_numbers": [
+              "1.32",
+              "2.45"
+            ],
+            "missing_citations": [],
+            "evidence_excerpt": "(a) Accuracy on CAIDA (b) Accuracy on MAWI\nFig. 22: Accuracy after merge.\nF . Parallel Optimization and Merge Extension\nThroughput after parallelization (Figure 21).We compares\nthe processing speed of SeiveSketch before and after applying\nparallelization across different datasets. The results show that\nthe parallelized version achieves a speedup of1.32×to2.45×\nover the original serialized implementation. As the memory\nusage of SeiveSketch increases, the throughput increases,\nrather than decreasing. This is because the experiment is\nconducted on a server equipped with a 4 MB L2 cache, which\nis "
+          }
+        ]
+      },
+      "estimated_cost_usd": null,
+      "bad_case_labels": [
+        "uncited_claim",
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "e2e-07",
+      "query": "Why can merging distributed SeiveSketch instances sometimes reduce estimation error under small memory budgets?",
+      "language": "en",
+      "difficulty": "hard",
+      "answer": "## Answer\n\nMerging distributed SeiveSketch instances can reduce estimation error under small memory budgets because splitting the stream across more instances shrinks the substream each node processes, which lets each node classify items as hot, cold, or warm more effectively — and that improves overall accuracy after merge [RF-9b51fd1b-123]. In the paper's distributed-processing experiment, the number of sketch instances and their per-instance memory allocations are varied and then merged for final frequency estimation; the authors report that SeiveSketch maintains stable estimation accuracy, and \"notably, when memory allocations are relatively small, the estimation error after merging decreases\" [RF-9b51fd1b-122][RF-9b51fd1b-123]. This result is shown in Figure 22 (\"Accuracy after merge\") on the CAIDA and MAWI datasets [RF-9b51fd1b-121].\n\n**Why this happens (mechanism).** In SeiveSketch's distributed deployment, the input stream is partitioned across nodes, each node independently maintaining a local instance that summarizes its substream, and these local instances are periodically or ultimately merged into a single global instance used for final frequency estimation [RF-9b51fd1b-51]. The accuracy gain under tight memory comes from the frequency-oriented design: frequency estimation is improved when update-time collisions are mitigated by first filtering hot items, then using adaptive scaling for cold items and a separate warm part [RF-9b51fd1b-28]. More instances mean each node's substream is smaller and less collision-prone, so its hot/cold/warm separation is more reliable; merging then aggregates these cleaner per-node summaries [RF-9b51fd1b-123].\n\n**Merge procedure context.** Aggregation must use a consistent hash function set across instances [RF-9b51fd1b-52]. Merging proceeds warm parts first, then cold parts, then hot parts, because merging hot parts can trigger item evictions into other parts [RF-9b51fd1b-52]. Warm (CM) counters are summed, cold counters are aligned to the minimum sampling rate and merged by taking the maximum, and hot counters are summed with the top-*w_t* items retained per merged bucket array while the rest are evicted to cold/warm parts [RF-9b51fd1b-53][RF-9b51fd1b-54].\n\n**Caveat on quantitative detail.** The corpus states the qualitative trend (error decreases after merging when memory is small) but does not provide a specific numeric error-reduction figure for the merge experiment beyond Figure 22 [RF-9b51fd1b-121][RF-9b51fd1b-123]. The paper's headline numeric result — reducing estimation error by up to 222.1× versus state-of-the-art — refers to the general accuracy evaluation, not specifically to the merge scenario [RF-9b51fd1b-3].\n\n**Sources cited:** RF-9b51fd1b-121, RF-9b51fd1b-122, RF-9b51fd1b-123, RF-9b51fd1b-51, RF-9b51fd1b-52, RF-9b51fd1b-53, RF-9b51fd1b-54, RF-9b51fd1b-28, RF-9b51fd1b-3 (all from *SeiveSketch*).",
+      "error": null,
+      "elapsed_seconds": 10.234,
+      "prompt_tokens": 14102,
+      "completion_tokens": 971,
+      "tool_events": [
+        "read_file(\"E:\\agent\\nanobot-v0.1.4-era\\nanobot\\skil…\"), research_sources",
+        "research_decision(\"search\"), research_search(\"SeiveSketch merging distributed instance…\"), research_search(\"SeiveSketch merge operation compression …\")",
+        "research_read, research_search(\"SeiveSketch substream each node hot cold…\")"
+      ],
+      "streamed_chars": 3137,
+      "response_ok": true,
+      "expected_answerable": true,
+      "abstained": false,
+      "completed": true,
+      "answer_pass": true,
+      "concept_coverage": 1.0,
+      "concepts": [
+        {
+          "aliases": [
+            "substream",
+            "子流"
+          ],
+          "matched": "substream"
+        },
+        {
+          "aliases": [
+            "hot",
+            "cold",
+            "冷热"
+          ],
+          "matched": "hot"
+        },
+        {
+          "aliases": [
+            "smaller",
+            "更小"
+          ],
+          "matched": "smaller"
+        }
+      ],
+      "citations": [
+        "RF-9B51FD1B-123",
+        "RF-9B51FD1B-122",
+        "RF-9B51FD1B-121",
+        "RF-9B51FD1B-51",
+        "RF-9B51FD1B-28",
+        "RF-9B51FD1B-52",
+        "RF-9B51FD1B-53",
+        "RF-9B51FD1B-54",
+        "RF-9B51FD1B-3"
+      ],
+      "valid_citations": [
+        "RF-9B51FD1B-123",
+        "RF-9B51FD1B-122",
+        "RF-9B51FD1B-121",
+        "RF-9B51FD1B-51",
+        "RF-9B51FD1B-28",
+        "RF-9B51FD1B-52",
+        "RF-9B51FD1B-53",
+        "RF-9B51FD1B-54",
+        "RF-9B51FD1B-3"
+      ],
+      "missing_citations": [],
+      "citation_validity": 1.0,
+      "relevant_citation_recall": 1.0,
+      "relevant_label_precision": 0.1111,
+      "relevant_hits": [
+        "RF-9B51FD1B-123"
+      ],
+      "paragraph_citation_coverage": 0.8,
+      "entailment": {
+        "claims": 11,
+        "entailed": 11,
+        "partially_supported": 0,
+        "unsupported": 0,
+        "support_rate": 1.0,
+        "details": [
+          {
+            "claim": "Merging distributed SeiveSketch instances can reduce estimation error under small memory budgets because splitting the stream across more instances shrinks the substream each node processes, which lets each node classify items as hot, cold, or warm more effectively — and that improves overall accuracy after merge .",
+            "citations": [
+              "RF-9B51FD1B-123"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.6176,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "at SeiveSketch maintains stable estimation accuracy in dis-\ntributed environments. Notably, when memory allocations are\nrelatively small, the estimation error after merging decreases.\nThis is because increasing the number of sketch instances\nreduces the size of the substream processed by each node,\nallowing individual nodes to more effectively identify hot,\ncold, and warm items, thereby improving overall accuracy.\nVI.CONCLUSION\nIn this paper, we propose a fine-grained and adaptive data\nstream processing framework, named SeiveSketch, to achieve\nhigh accuracy with limited memory size. SeiveSketc"
+          },
+          {
+            "claim": "In the paper's distributed-processing experiment, the number of sketch instances and their per-instance memory allocations are varied and then merged for final frequency estimation; the authors report that SeiveSketch maintains stable estimation accuracy, and \"notably, when memory allocations are relatively small, the estimation error after merging decreases\" .",
+            "citations": [
+              "RF-9B51FD1B-122",
+              "RF-9B51FD1B-123"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.8438,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "ich\nis sufficient to accommodate all tested memory configurations\nand keeps memory swapping overhead minimal. Moreover,\nincreasing the allocated memory allows the HP of SeiveSketch\nto store more items, enabling it to intercept a larger portion\nof the data stream and thereby improving overall throughput.\nAccuracy for distributed processing (Figure 22).We\nevaluate the frequency estimation accuracy of SeiveSketch in a\ndistributed processing scenario. We vary the number of Sketch\ninstances and their per-instance memory allocations, then\nmerge them for final frequency estimation. The results indica"
+          },
+          {
+            "claim": "This result is shown in Figure 22 (\"Accuracy after merge\") on the CAIDA and MAWI datasets .",
+            "citations": [
+              "RF-9B51FD1B-121"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.8,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "(a) Accuracy on CAIDA (b) Accuracy on MAWI\nFig. 22: Accuracy after merge.\nF . Parallel Optimization and Merge Extension\nThroughput after parallelization (Figure 21).We compares\nthe processing speed of SeiveSketch before and after applying\nparallelization across different datasets. The results show that\nthe parallelized version achieves a speedup of1.32×to2.45×\nover the original serialized implementation. As the memory\nusage of SeiveSketch increases, the throughput increases,\nrather than decreasing. This is because the experiment is\nconducted on a server equipped with a 4 MB L2 cache, which\nis "
+          },
+          {
+            "claim": "Why this happens (mechanism).** In SeiveSketch's distributed deployment, the input stream is partitioned across nodes, each node independently maintaining a local instance that summarizes its substream, and these local instances are periodically or ultimately merged into a single global instance used for final frequency estimation .",
+            "citations": [
+              "RF-9B51FD1B-51"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.7812,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "et\nk= 3, following the analysis in Bloom filter [4], and set\nTx = 0.6321w 1, based on our theoretical analysis [31]. We\nsuggest to set the internal memory ratio between layersL 1 and\nL2 within the CP between 6:4 and 9:1 based on the evaluation\nin Section V-E.\nE. Merge\nMultiple instances of SeiveSketch can be deployed in a\ndistributed counting scenario, where the input data stream is\npartitioned across multiple distributed nodes and processed in\nparallel. Each node independently maintains a local instance\nof SeiveSketch to summarize its substream. The locally main-\ntained instances are periodic"
+          },
+          {
+            "claim": "The accuracy gain under tight memory comes from the frequency-oriented design: frequency estimation is improved when update-time collisions are mitigated by first filtering hot items, then using adaptive scaling for cold items and a separate warm part .",
+            "citations": [
+              "RF-9B51FD1B-28"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.3929,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "h collision\nissues, SeiveSketch classifies items into hot items, warm items,\nand cold items based on their frequencies. The fine-grained\ndistinction of item frequency is not a figment of imagination.\nFor example, in the storage field, data is divided into hot,\nwarm, and cold data to improve data management and data ac-\ncess efficiency [16]. The steps for handling items with different\nfrequencies depend on their sensitivity to hash collisions. Due\nto the very high frequency of hot items, hot items have the\ngreatest impact on the estimates of non-hot items when hash\ncollisions occur. Thus, Seive"
+          },
+          {
+            "claim": "More instances mean each node's substream is smaller and less collision-prone, so its hot/cold/warm separation is more reliable; merging then aggregates these cleaner per-node summaries .",
+            "citations": [
+              "RF-9B51FD1B-123"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.375,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "at SeiveSketch maintains stable estimation accuracy in dis-\ntributed environments. Notably, when memory allocations are\nrelatively small, the estimation error after merging decreases.\nThis is because increasing the number of sketch instances\nreduces the size of the substream processed by each node,\nallowing individual nodes to more effectively identify hot,\ncold, and warm items, thereby improving overall accuracy.\nVI.CONCLUSION\nIn this paper, we propose a fine-grained and adaptive data\nstream processing framework, named SeiveSketch, to achieve\nhigh accuracy with limited memory size. SeiveSketc"
+          },
+          {
+            "claim": "Merge procedure context.** Aggregation must use a consistent hash function set across instances .",
+            "citations": [
+              "RF-9B51FD1B-52"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.5833,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "e global SeiveSketch instance, which is then used for final\nfrequency estimation and global analysis. To enable correct\nand consistent aggregation of counting results, all instances\nmust employ the same set of hash functions. Algorithm 6\npresents the complete merging procedure for SeiveSketch. As\nmerging the hot parts may trigger item evictions to other parts,\nthe merging process proceeds by first merging the warm parts,\nfollowed by the cold parts, and finally the hot parts (see Fig. 6).\nStep 1: Merging Warm Parts(Lines 1-5). The WP uses a tradi-\ntional sketch to process warm items, and its me"
+          },
+          {
+            "claim": "Merging proceeds warm parts first, then cold parts, then hot parts, because merging hot parts can trigger item evictions into other parts .",
+            "citations": [
+              "RF-9B51FD1B-52"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.8571,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "e global SeiveSketch instance, which is then used for final\nfrequency estimation and global analysis. To enable correct\nand consistent aggregation of counting results, all instances\nmust employ the same set of hash functions. Algorithm 6\npresents the complete merging procedure for SeiveSketch. As\nmerging the hot parts may trigger item evictions to other parts,\nthe merging process proceeds by first merging the warm parts,\nfollowed by the cold parts, and finally the hot parts (see Fig. 6).\nStep 1: Merging Warm Parts(Lines 1-5). The WP uses a tradi-\ntional sketch to process warm items, and its me"
+          },
+          {
+            "claim": "Warm (CM) counters are summed, cold counters are aligned to the minimum sampling rate and merged by taking the maximum, and hot counters are summed with the top-*w_t* items retained per merged bucket array while the rest are evicted to cold/warm parts .",
+            "citations": [
+              "RF-9B51FD1B-53",
+              "RF-9B51FD1B-54"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.75,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "gy\nfollows that of the underlying sketch. In our implementation,\nWP adopts Count-Min sketch (CM). When merging multiple\nCM instances, the corresponding counters from each instance\nare aligned and aggregated by summing their values.\nStep 2: Merging Cold Parts(Lines 6-15). As differentL 1\ninstances may have varying sampling probabilities, all in-\nstances are aligned to the minimum sampling rate among them.\nSubsequently, for each corresponding counter across instances,\nthe maximum value is selected as the final merged counter\nvalue. The same principle applies to the merging ofL 2: the\nmaximum val"
+          },
+          {
+            "claim": "Caveat on quantitative detail.** The corpus states the qualitative trend (error decreases after merging when memory is small) but does not provide a specific numeric error-reduction figure for the merge experiment beyond Figure 22 .",
+            "citations": [
+              "RF-9B51FD1B-121",
+              "RF-9B51FD1B-123"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.4231,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "(a) Accuracy on CAIDA (b) Accuracy on MAWI\nFig. 22: Accuracy after merge.\nF . Parallel Optimization and Merge Extension\nThroughput after parallelization (Figure 21).We compares\nthe processing speed of SeiveSketch before and after applying\nparallelization across different datasets. The results show that\nthe parallelized version achieves a speedup of1.32×to2.45×\nover the original serialized implementation. As the memory\nusage of SeiveSketch increases, the throughput increases,\nrather than decreasing. This is because the experiment is\nconducted on a server equipped with a 4 MB L2 cache, which\nis "
+          },
+          {
+            "claim": "The paper's headline numeric result — reducing estimation error by up to 222.1× versus state-of-the-art — refers to the general accuracy evaluation, not specifically to the merge scenario .",
+            "citations": [
+              "RF-9B51FD1B-3"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.3,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "the error bound of SeiveSketch. We conduct extensive\nexperiments on real-world and synthetic datasets, and the results\nshow that, compared to the state-of-the-art, SeiveSketch reduces\nthe estimation error by up to 222.1 times.\nIndex Terms—Data stream processing, sketch, item frequency\nestimation.\nI. INTRODUCTION\nEstimating item frequency is pervasive in numerous appli-\ncations, such as click-stream analysis [33], database opera-\ntions [28], [44], [25], network monitoring [8], [13], [21], [29],\nand recommendation systems [11]. These scenarios often in-\nvolve frequency-related tasks, including f"
+          }
+        ]
+      },
+      "estimated_cost_usd": null,
+      "bad_case_labels": [
+        "uncited_claim"
+      ]
+    },
+    {
+      "id": "e2e-08",
+      "query": "在指定 F1=0.9 的超扩散者检测任务中，DREX 相比 HLL 最多节省多少内存？",
+      "language": "zh",
+      "difficulty": "medium",
+      "answer": "在指定 F1=0.9 的超扩散者检测任务中，DREX 相比 HLL 最多可节省 **9.14×** 的内存（即 DREX 的内存用量最多仅为 HLL 的约 1/9.14 ≈ 10.9%，相当于节省约 89%）。\n\n依据：DREX 论文 Experiment 6（超扩散者检测）明确指出，在固定 F1 分数为 0.9 时，DREX 相比 MRB、SMB、SLB、KMV、HLL 分别可将内存用量降低最多 2.86×、4.57×、9.14×、16× 和 9.14× [RF-b40077a8-77]。该实验中，各方法的内存被调节至达到指定 F1 分数所需的水平，DREX 在 CAIDA19A 与 CAIDA18B 上内存用量最小，并在所有数据集上整体表现最佳 [RF-b40077a8-76]。\n\n注：该对比中 KMV 才是被超越最多的基线（16×）；就 HLL 而言，答案为 9.14× [RF-b40077a8-77]。",
+      "error": null,
+      "elapsed_seconds": 9.607,
+      "prompt_tokens": 14902,
+      "completion_tokens": 688,
+      "tool_events": [
+        "read_file(\"E:\\agent\\nanobot-v0.1.4-era\\nanobot\\skil…\"), research_sources",
+        "research_decision(\"search\"), research_search(\"DREX memory savings compared to HLL supe…\")",
+        "research_read, research_search(\"DREX HLL superspreader detection memory …\")"
+      ],
+      "streamed_chars": 648,
+      "response_ok": true,
+      "expected_answerable": true,
+      "abstained": false,
+      "completed": true,
+      "answer_pass": true,
+      "concept_coverage": 1.0,
+      "concepts": [
+        {
+          "aliases": [
+            "F1=0.9",
+            "F1 = 0.9"
+          ],
+          "matched": "F1=0.9"
+        },
+        {
+          "aliases": [
+            "9.14"
+          ],
+          "matched": "9.14"
+        }
+      ],
+      "citations": [
+        "RF-B40077A8-77",
+        "RF-B40077A8-76"
+      ],
+      "valid_citations": [
+        "RF-B40077A8-77",
+        "RF-B40077A8-76"
+      ],
+      "missing_citations": [],
+      "citation_validity": 1.0,
+      "relevant_citation_recall": 1.0,
+      "relevant_label_precision": 0.5,
+      "relevant_hits": [
+        "RF-B40077A8-76"
+      ],
+      "paragraph_citation_coverage": 0.6667,
+      "entailment": {
+        "claims": 2,
+        "entailed": 2,
+        "partially_supported": 0,
+        "unsupported": 0,
+        "support_rate": 1.0,
+        "details": [
+          {
+            "claim": "依据：DREX 论文 Experiment 6（超扩散者检测）明确指出，在固定 F1 分数为 0.9 时，DREX 相比 MRB、SMB、SLB、KMV、HLL 分别可将内存用量降低最多 2.86×、4.57×、9.14×、16× 和 9.14× 。该实验中，各方法的内存被调节至达到指定 F1 分数所需的水平，DREX 在 CAIDA19A 与 CAIDA18B 上内存用量最小，并在所有数据集上整体表现最佳 。",
+            "citations": [
+              "RF-B40077A8-77",
+              "RF-B40077A8-76"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.1842,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "DREX shows the best performance on superspreader detection\nacross all datasets. Given an F1 score of 0.9, DREX reduces\nthe memory usage of superspreader detection by up to 2.86×,\n4.57×, 9.14×, 16×, and 9.14×, respectively, compared with\nMRB, SMB, SLB, KMV , and HLL.\nE. Time Overhead\nExperiment 7 (Update throughput and query throughput).\nWe fix the true cardinality N=2 24 and vary the memory usage.\nFigure 12(a) shows the update throughput. KMV shows the\nhighest update throughput, as it triggers limited heap operations\nwith the given small memory. DREX exhibits the second highest\nthroughput that"
+          },
+          {
+            "claim": "注：该对比中 KMV 才是被超越最多的基线（16×）；就 HLL 而言，答案为 9.14× 。",
+            "citations": [
+              "RF-B40077A8-77"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.2105,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "DREX shows the best performance on superspreader detection\nacross all datasets. Given an F1 score of 0.9, DREX reduces\nthe memory usage of superspreader detection by up to 2.86×,\n4.57×, 9.14×, 16×, and 9.14×, respectively, compared with\nMRB, SMB, SLB, KMV , and HLL.\nE. Time Overhead\nExperiment 7 (Update throughput and query throughput).\nWe fix the true cardinality N=2 24 and vary the memory usage.\nFigure 12(a) shows the update throughput. KMV shows the\nhighest update throughput, as it triggers limited heap operations\nwith the given small memory. DREX exhibits the second highest\nthroughput that"
+          }
+        ]
+      },
+      "estimated_cost_usd": null,
+      "bad_case_labels": [
+        "uncited_claim"
+      ]
+    },
+    {
+      "id": "e2e-09",
+      "query": "What update throughput does DREX report, and why is this relevant to network traffic measurement?",
+      "language": "en",
+      "difficulty": "medium",
+      "answer": "**DREX update throughput:** In Experiment 7 (fixed true cardinality N = 2²⁴, varying memory), DREX exhibits the *second highest* update throughput, **reaching 53.95 Mops** (million operations per second), behind only KMV (which wins because it triggers limited heap operations at small memory); DREX's advantage stems from its sampling rate being small for large cardinalities, leading to fewer memory accesses [RF-b40077a8-77]. Its update throughput is **12.44%, 49.03%, 85.56%, and 113% higher than LC, HLL, MRB, and SLB**, respectively [RF-b40077a8-78].\n\n**Why this matters for network traffic measurement:** DREX is a cardinality counting mechanism that dynamically expands its counting range as observed cardinality in network traffic grows, so it maintains accuracy across different counting ranges [RF-b40077a8-2]. Update throughput is the rate at which a measurement algorithm can ingest per-item updates, so it directly bounds the traffic volume a cardinality estimator can process; DREX is shown via trace-driven experiments to \"maintain high update and query throughput under limited memory footprints\" while achieving high accuracy [RF-b40077a8-12]. Overall, its high update/query throughput relative to advanced existing methods is presented as a key result for practical deployment [RF-b40077a8-80].",
+      "error": null,
+      "elapsed_seconds": 7.047,
+      "prompt_tokens": 10837,
+      "completion_tokens": 534,
+      "tool_events": [
+        "read_file(\"E:\\agent\\nanobot-v0.1.4-era\\nanobot\\skil…\"), research_sources",
+        "research_decision(\"search\"), research_search(\"DREX update throughput million updates p…\")",
+        "research_read"
+      ],
+      "streamed_chars": 1511,
+      "response_ok": true,
+      "expected_answerable": true,
+      "abstained": false,
+      "completed": true,
+      "answer_pass": true,
+      "concept_coverage": 1.0,
+      "concepts": [
+        {
+          "aliases": [
+            "53.95"
+          ],
+          "matched": "53.95"
+        },
+        {
+          "aliases": [
+            "Mops"
+          ],
+          "matched": "Mops"
+        },
+        {
+          "aliases": [
+            "throughput",
+            "吞吐"
+          ],
+          "matched": "throughput"
+        }
+      ],
+      "citations": [
+        "RF-B40077A8-77",
+        "RF-B40077A8-78",
+        "RF-B40077A8-2",
+        "RF-B40077A8-12",
+        "RF-B40077A8-80"
+      ],
+      "valid_citations": [
+        "RF-B40077A8-77",
+        "RF-B40077A8-78",
+        "RF-B40077A8-2",
+        "RF-B40077A8-12",
+        "RF-B40077A8-80"
+      ],
+      "missing_citations": [],
+      "citation_validity": 1.0,
+      "relevant_citation_recall": 1.0,
+      "relevant_label_precision": 0.2,
+      "relevant_hits": [
+        "RF-B40077A8-77"
+      ],
+      "paragraph_citation_coverage": 1.0,
+      "entailment": {
+        "claims": 5,
+        "entailed": 5,
+        "partially_supported": 0,
+        "unsupported": 0,
+        "support_rate": 1.0,
+        "details": [
+          {
+            "claim": "DREX update throughput:** In Experiment 7 (fixed true cardinality N = 2²⁴, varying memory), DREX exhibits the *second highest* update throughput, **reaching 53.95 Mops** (million operations per second), behind only KMV (which wins because it triggers limited heap operations at small memory); DREX's advantage stems from its sampling rate being small for large cardinalities, leading to fewer memory accesses .",
+            "citations": [
+              "RF-B40077A8-77"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.6098,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "DREX shows the best performance on superspreader detection\nacross all datasets. Given an F1 score of 0.9, DREX reduces\nthe memory usage of superspreader detection by up to 2.86×,\n4.57×, 9.14×, 16×, and 9.14×, respectively, compared with\nMRB, SMB, SLB, KMV , and HLL.\nE. Time Overhead\nExperiment 7 (Update throughput and query throughput).\nWe fix the true cardinality N=2 24 and vary the memory usage.\nFigure 12(a) shows the update throughput. KMV shows the\nhighest update throughput, as it triggers limited heap operations\nwith the given small memory. DREX exhibits the second highest\nthroughput that"
+          },
+          {
+            "claim": "Its update throughput is **12.44%, 49.03%, 85.56%, and 113% higher than LC, HLL, MRB, and SLB**, respectively .",
+            "citations": [
+              "RF-B40077A8-78"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.9412,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "ampling rate of DREX is small for large cardinalities, leading\nto less memory accesses. LC also maintains a high update\nthroughput as it only requires one hash computation and one\nLC\n MRB\n KMV\n HLL\n HLLP\n SLB\n SMB\n DREX\n2\n5\n2\n6\n2\n7\n2\n8\n2\n9\n2\n10\nMemory (bit)\n0\n20\n40\n60Throughput (Mops)\n2\n5\n2\n6\n2\n7\n2\n8\n2\n9\n2\n10\nMemory (bit)\n0\n200\n400\n600Throughput (Mops)\n(a) Update throughput (b) Query throughput\nFig. 12:Experiment 7 (Update throughput and query throughput).\nmemory access for each item. HLL and HLLP always require\ntwo hash computations and one memory access, resulting in\nrelatively lower through"
+          },
+          {
+            "claim": "Why this matters for network traffic measurement:** DREX is a cardinality counting mechanism that dynamically expands its counting range as observed cardinality in network traffic grows, so it maintains accuracy across different counting ranges .",
+            "citations": [
+              "RF-B40077A8-2"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.7619,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "ns, or provide the same counting range simultaneously\nfor large or small cardinalities. In this paper, we propose DREX,\na cardinality counting mechanism that dynamically expands the\ncounting range based on the increase of the observed cardinality\nin network traffic, so as to maintain the accuracy for different\ncounting ranges. We theoretically prove the error bounds of\nDREX. We also conduct extensive trace-driven experiments to\ncompare DREX with state-of-the-art distinct counting approaches.\nOur trace-driven evaluation results show that DREX consistently\nachieves the highest accuracy with smal"
+          },
+          {
+            "claim": "Update throughput is the rate at which a measurement algorithm can ingest per-item updates, so it directly bounds the traffic volume a cardinality estimator can process; DREX is shown via trace-driven experiments to \"maintain high update and query throughput under limited memory footprints\" while achieving high accuracy .",
+            "citations": [
+              "RF-B40077A8-12"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.4571,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "value higher than 0\nv the threshold where DREX advances to the next round\nr the current round in DREX, which hasp= 1\n2r\ns[i] value of thei-th counter in DREX\nI an instance of DREX\nDefined in Section IV\nˆN the estimated cardinality forN\nNr number of distinct items left in DREX afterrrounds\nthat the error of DREX can be effectively bounded. Furthermore,\nbased on extensive trace-driven experiments on various datasets\nand counting ranges, DREX consistently achieves high accuracy,\nwhile maintaining high update and query throughput under\nlimited memory footprints.\nThe contributions of this paper are"
+          },
+          {
+            "claim": "Overall, its high update/query throughput relative to advanced existing methods is presented as a key result for practical deployment .",
+            "citations": [
+              "RF-B40077A8-80"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.5333,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "S\nWe present DREX, a novel cardinality counting mechanism\nthat excels in dynamically expanding the counting range while\nproviding accurate estimates for different counting ranges. We\nshow via theoretical analysis that the relative and standard errors\nof DREX are bounded. Extensive experiments show that DREX\noutperforms state-of-the-art distinct counting algorithms in\nterms of accuracy across various datasets. DREX also exhibits\nhigh update and query throughput when compared to the most\nadvanced existing methods.\n9"
+          }
+        ]
+      },
+      "estimated_cost_usd": null,
+      "bad_case_labels": []
+    },
+    {
+      "id": "e2e-10",
+      "query": "Explain the trade-off of the non-mergeable martingale variant of UltraLogLog.",
+      "language": "en",
+      "difficulty": "hard",
+      "answer": "**Trade-off of the non-mergeable martingale variant of UltraLogLog**\n\nUltraLogLog's headline design needs no such trade-off: it is commutative, idempotent, mergeable, and has a fast guaranteed constant-time insert, while requiring 28% less space than HyperLogLog (HLL) to encode the same distinct-count information when the maximum-likelihood estimator is used [RF-2dccfeb5-1]. In a non-distributed setting where martingale (historic inverse probability, HIP) estimation can be used, ULL reduces space by 17% [RF-2dccfeb5-2].\n\nThe martingale variant applies specifically \"if the data is not distributed and merging of sketches is not needed\"; it estimates the distinct count online through incremental updates, which even leads to smaller estimation errors, and it works by keeping track of the state-change probability μ (initially 1, decreasing whenever a register is changed) [RF-2dccfeb5-73]. That incremental update is order-dependent: whenever a register is altered from r to r′, the estimate is incremented and μ is updated via μ ← μ − h(r) + h(r′) [RF-2dccfeb5-82].\n\nThe trade-off is therefore space vs. mergeability: sacrificing mergeability buys space efficiency. When the data is not distributed and a merge is not actually needed, the MVP of HLL can be reduced by 36% (down to 4.16) using martingale/HIP estimation; the theoretical limit of MVP for non-mergeable sketches is at most 1.63, nearly reached by the serialized CPC sketch [RF-2dccfeb5-19]. For ULL specifically, martingale estimation yields an MVP 17% smaller than that of HLL [RF-2dccfeb5-73].\n\nThe cost is not only mergeability but also reproducibility: because insertions in these non-mergeable approaches are not commutative, they do not support reproducibility either [RF-2dccfeb5-20]. This is a real loss, since the MVP of sketches supporting mergeability and reproducibility has a conjectured general lower bound of 1.98 [RF-2dccfeb5-13]. So the martingale variant of ULL trades away distributed merging (and order-independent reproducibility) in exchange for ~17% less space and somewhat lower estimation error.",
+      "error": null,
+      "elapsed_seconds": 13.718,
+      "prompt_tokens": 16200,
+      "completion_tokens": 1290,
+      "tool_events": [
+        "read_file(\"E:\\agent\\nanobot-v0.1.4-era\\nanobot\\skil…\"), research_sources",
+        "research_decision(\"search\"), research_search(\"UltraLogLog non-mergeable martingale var…\")",
+        "research_search(\"martingale estimator UltraLogLog mergeab…\"), research_search(\"UltraLogLog variance relative error trad…\")",
+        "research_read, research_search(\"sacrificing mergeability martingale Ultr…\")"
+      ],
+      "streamed_chars": 2092,
+      "response_ok": true,
+      "expected_answerable": true,
+      "abstained": false,
+      "completed": true,
+      "answer_pass": true,
+      "concept_coverage": 1.0,
+      "concepts": [
+        {
+          "aliases": [
+            "17%"
+          ],
+          "matched": "17%"
+        },
+        {
+          "aliases": [
+            "non-mergeable",
+            "not mergeable",
+            "不可合并"
+          ],
+          "matched": "non-mergeable"
+        },
+        {
+          "aliases": [
+            "martingale"
+          ],
+          "matched": "martingale"
+        }
+      ],
+      "citations": [
+        "RF-2DCCFEB5-1",
+        "RF-2DCCFEB5-2",
+        "RF-2DCCFEB5-73",
+        "RF-2DCCFEB5-82",
+        "RF-2DCCFEB5-19",
+        "RF-2DCCFEB5-20",
+        "RF-2DCCFEB5-13"
+      ],
+      "valid_citations": [
+        "RF-2DCCFEB5-1",
+        "RF-2DCCFEB5-2",
+        "RF-2DCCFEB5-73",
+        "RF-2DCCFEB5-82",
+        "RF-2DCCFEB5-19",
+        "RF-2DCCFEB5-20",
+        "RF-2DCCFEB5-13"
+      ],
+      "missing_citations": [],
+      "citation_validity": 1.0,
+      "relevant_citation_recall": 1.0,
+      "relevant_label_precision": 0.1429,
+      "relevant_hits": [
+        "RF-2DCCFEB5-20"
+      ],
+      "paragraph_citation_coverage": 0.8,
+      "entailment": {
+        "claims": 8,
+        "entailed": 8,
+        "partially_supported": 0,
+        "unsupported": 0,
+        "support_rate": 1.0,
+        "details": [
+          {
+            "claim": "UltraLogLog's headline design needs no such trade-off: it is commutative, idempotent, mergeable, and has a fast guaranteed constant-time insert, while requiring 28% less space than HyperLogLog (HLL) to encode the same distinct-count information when the maximum-likelihood estimator is used .",
+            "citations": [
+              "RF-2DCCFEB5-1"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.5714,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "UltraLogLog: A Practical and More Space-Efficient Alternative to\nHyperLogLog for Approximate Distinct Counting\nOtmar Ertl\nDynatrace Research\nLinz, Austria\notmar.ertl@dynatrace.com\nABSTRACT\nSince its invention HyperLogLog has become the standard algo-\nrithm for approximate distinct counting. Due to its space efficiency\nand suitability for distributed systems, it is widely used and also\nimplemented in numerous databases. This work presents UltraLog-\nLog, which shares the same practical properties as HyperLogLog. It\nis commutative, idempotent, mergeable, and has a fast guaranteed\nconstant-time in"
+          },
+          {
+            "claim": "In a non-distributed setting where martingale (historic inverse probability, HIP) estimation can be used, ULL reduces space by 17% .",
+            "citations": [
+              "RF-2DCCFEB5-2"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.6,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "insert operation. At the same time, it requires 28%\nless space to encode the same amount of distinct count information,\nwhich can be extracted using the maximum likelihood method.\nAlternatively, a simpler and faster estimator is proposed, which\nstill achieves a space reduction of 24%, but at an estimation speed\ncomparable to that of HyperLogLog. In a non-distributed setting\nwhere martingale estimation can be used, UltraLogLog is able to\nreduce space by 17%. Moreover, its smaller entropy and its 8-bit\nregisters lead to better compaction when using standard compres-\nsion algorithms. All this is "
+          },
+          {
+            "claim": "The martingale variant applies specifically \"if the data is not distributed and merging of sketches is not needed\"; it estimates the distinct count online through incremental updates, which even leads to smaller estimation errors, and it works by keeping track of the state-change probability μ (initially 1, decreasing whenever a register is changed) .",
+            "citations": [
+              "RF-2DCCFEB5-73"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.7143,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "nc-\ntion of the base 𝒃 for 𝒒 = 6 and various values of 𝒅 when\nusing martingale estimation. The MVP of UltraLogLog (ULL)\nis 17% smaller compared to HyperLogLog (HLL).\n3.7 Martingale Estimator\nIf the data is not distributed and merging of sketches is not needed,\nthe distinct count can be estimated in an online fashion by incre-\nmental updates, which is known as martingale or historic inverse\nprobability (HIP) estimation [16, 42] and which even leads to smaller\nestimation errors. This estimation approach can also be used for\nULL. It keeps track of the state change probability𝜇. Initially,𝜇 = 1\nas"
+          },
+          {
+            "claim": "That incremental update is order-dependent: whenever a register is altered from r to r′, the estimate is incremented and μ is updated via μ ← μ − h(r) + h(r′) .",
+            "citations": [
+              "RF-2DCCFEB5-82"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.4545,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": ".\nDownsizing from precision𝑝′ to𝑝 <𝑝′ is realized by merging\nthe information of batches of 2𝑝′−𝑝 consecutive registers. The re-\nsulting register value depends not only on the individual register\nvalues, but also on the least significant𝑝′−𝑝 bits of the register\nAlgorithm 2: Incrementally updates the martingale estimate𝑛ˆmartingale and the\nstate change probability 𝜇 whenever a register is altered from 𝑟 to𝑟′ (𝑟 < 𝑟′).\nInitially,𝑛ˆmartingale = 0 and𝜇 = 1.\n𝑛ˆmartingale←𝑛ˆmartingale+ 1\n𝜇 ⊲ up\ndate estimate\n𝜇←𝜇−ℎ(𝑟)+ ℎ(𝑟′) ⊲ update state change probability, see (25)\nAlgorithm 3: Inserts an element "
+          },
+          {
+            "claim": "When the data is not distributed and a merge is not actually needed, the MVP of HLL can be reduced by 36% (down to 4.16) using martingale/HIP estimation; the theoretical limit of MVP for non-mergeable sketches is at most 1.63, nearly reached by the serialized CPC sketch .",
+            "citations": [
+              "RF-2DCCFEB5-19"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.9667,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "pproaches such as HyperBitBit/HyperBit [41], they\ntrade idempotency for less space and are therefore risky to use\n[36]. In contrast, sacrificing mergeability for less space is of greater\npractical interest [14, 26, 30]. When the data is not distributed and\na merge operation is not actually needed, the MVP of HLL can be\nreduced by 36% down to 4.16 by martingale also known as historic\ninverse probability (HIP) estimation [16, 42]. The theoretical limit\nof MVP for non-mergeable sketches is at most 1.63 [37], and is also\nnearly reached by the serialized representation of the CPC sketch\n[3]. Data s"
+          },
+          {
+            "claim": "For ULL specifically, martingale estimation yields an MVP 17% smaller than that of HLL .",
+            "citations": [
+              "RF-2DCCFEB5-73"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.7,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "nc-\ntion of the base 𝒃 for 𝒒 = 6 and various values of 𝒅 when\nusing martingale estimation. The MVP of UltraLogLog (ULL)\nis 17% smaller compared to HyperLogLog (HLL).\n3.7 Martingale Estimator\nIf the data is not distributed and merging of sketches is not needed,\nthe distinct count can be estimated in an online fashion by incre-\nmental updates, which is known as martingale or historic inverse\nprobability (HIP) estimation [16, 42] and which even leads to smaller\nestimation errors. This estimation approach can also be used for\nULL. It keeps track of the state change probability𝜇. Initially,𝜇 = 1\nas"
+          },
+          {
+            "claim": "The cost is not only mergeability but also reproducibility: because insertions in these non-mergeable approaches are not commutative, they do not support reproducibility either .",
+            "citations": [
+              "RF-2DCCFEB5-20"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.7222,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "structures with in-memory representations that can be\nupdated in constant time in the worst case areHLL with vectorized\ncounters [11] and the martingale curtain sketch which achieves a\nMVP of 2.31 [37]. As the insertions are not commutative, all these\nnon-mergeable approaches also do not support reproducibility.\nThe only mergeable data structure we know of that is more space-\nefficient than HLL while having essentially the same properties,\nin particular constant-time worst-case updates, is ExtendedHyper-\nLogLog (EHLL) [33]. It extends the HLL registers from 6 to 7 bits to\nstore not only the ma"
+          },
+          {
+            "claim": "This is a real loss, since the MVP of sketches supporting mergeability and reproducibility has a conjectured general lower bound of 1.98 .",
+            "citations": [
+              "RF-2DCCFEB5-13"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.7857,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "ort distinct counts beyond the billion range, resulting\nin a MVP of 6.48 [ 37]. A recent theoretical work conjectured a\ngeneral lower bound of 1.98 for the MVP of sketches supporting\nmergeability and reproducibility [36], which shows the potential\nfor improvement. Many different approaches have been proposed\nto beat the space efficiency of HLL, but they all sacrificed at least\none of the properties listed above.\n1.1 Related Work\nLossless compression of HyperLogLog (HLL) can significantly re-\nduce the storage size [18, 29, 40]. Since the compressed state pre-\nvents random access to registers as"
+          }
+        ]
+      },
+      "estimated_cost_usd": null,
+      "bad_case_labels": [
+        "uncited_claim"
+      ]
+    },
+    {
+      "id": "e2e-11",
+      "query": "为什么不能直接用同一个精度指标比较 SeiveSketch 与 HLL？",
+      "language": "zh",
+      "difficulty": "easy",
+      "answer": "## 为什么不能直接用同一个精度指标比较 SeiveSketch 与 HLL\n\n**核心原因：两者估计的对象不同，因此\"误差\"的真值和聚合方式根本不同。**\n\n**1. 估计任务不同。** SeiveSketch 是一个面向**项频率估计（item frequency estimation）**的流处理框架，估计的是某个 item 在数据流中出现的次数 [RF-9b51fd1b-1]；而 HLL 是一个**基数估计器**，单遍扫描后给出的是流中不同元素个数（cardinality）的估计 [RF-f6b914c4-2]。一个精度指标不可能同时对齐这两种不同的\"真值\"。\n\n**2. 精度指标的定义与形式不同。** SeiveSketch 使用的精度指标是 ARE（平均相对误差）＝ 1/N · Σ|f̂_ui − f_ui|/f_ui（N 为不同 item 数），此外还有 WMRE 与\"相对误差 CDF\" [RF-9b51fd1b-79][RF-9b51fd1b-80][RF-9b51fd1b-90]。HLL 的精度则被表述为**标准误差/相对精度，约 1.04/√m**（m 为寄存器数）[RF-f6b914c4-2]，其严格定义是 (1/n)·√V_n(E)，即在相对意义下典型的（均方）误差 [RF-f6b914c4-24]。两者一个是\"逐项相对误差的均值/分布\"，一个是\"单次基数估计的统计标准误差\"。\n\n**3. 聚合粒度不同，且 SeiveSketch 的指标受数据分布主导。** ARE 是在 N 个不同 item 上求平均，由于数据偏斜它**偏向冷门 item（cold items）**，而冷门项因频率低、对哈希冲突最敏感且数量占多数，其估计精度主导了整体平均精度 [RF-9b51fd1b-79][RF-9b51fd1b-27]。相对地，HLL 的标准误差是对\"单个基数估计值\"的标量统计刻画，不涉及逐项聚合 [RF-f6b914c4-24]。\n\n**4. 对数据分布的依赖不同。** HLL（及 KMV）的误差**只取决于 m，即计数单元的数量**，与基数大小无关 [RF-b40077a8-24]。而 SeiveSketch 的 ARE 会随数据偏斜度变化：偏斜从 0 增到 1.2 时，冷门项与非冷门项哈希冲突增多使其精度下降、ARE 上升；1.2 增至 1.8 时冲突减少、ARE 又下降 [RF-9b51fd1b-89]。因此同一个\"相对误差\"数值在不同数据分布下含义并不相同。\n\n**5. 理论保证的形式不同。** HLL 给出的是渐近近似无偏 + 标准误差 ≈ β_m/√m 的集中性保证（如 m≥16 时 |δ₁|<5×10⁻⁵、|δ₂|<5×10⁻⁴）[RF-f6b914c4-24]；SeiveSketch 给出的则是**逐项**的界——对每个 item u_i，相对误差落在 [1−2^{i−1}, ε‖f_l‖₁] 区间内、概率至少 1−… [RF-9b51fd1b-73][RF-9b51fd1b-74]。一个是\"整体单值的统计误差\"，一个是\"逐项频率的区间界\"，无法用同一个标量指标衡量。\n\n**结论**：由于二者估计的量（基数 vs. 逐项频率）、误差参考基准（真基数 n vs. 真频率 f_ui）、聚合方式（标量标准误差 vs. 逐项误差的均值/分布）以及理论保证形式都不同，单一精度指标（无论是标准误差还是 ARE）都会把不同尺度的量放在一起比较，因而不能直接用于公平比较 SeiveSketch 与 HLL。（此综合判断基于上述指标定义的差异。）\n\n**引用的 RF 来源：** RF-9b51fd1b-1, RF-9b51fd1b-27, RF-9b51fd1b-73, RF-9b51fd1b-74, RF-9b51fd1b-79, RF-9b51fd1b-80, RF-9b51fd1b-89, RF-9b51fd1b-90, RF-f6b914c4-2, RF-f6b914c4-24, RF-b40077a8-24。",
+      "error": null,
+      "elapsed_seconds": 38.453,
+      "prompt_tokens": 41447,
+      "completion_tokens": 1033,
+      "tool_events": [
+        "read_file(\"E:\\agent\\nanobot-v0.1.4-era\\nanobot\\skil…\"), research_sources",
+        "research_decision(\"search\"), research_search(\"SeiveSketch accuracy metric evaluation\"), research_search(\"HyperLogLog accuracy metric relative err…\")",
+        "research_search(\"SeiveSketch relative error compared with…\"), research_search(\"SeiveSketch motivation difference from c…\"), research_search(\"spread estimation accuracy metric distin…\")",
+        "research_search(\"SeiveSketch HLL comparison accuracy metr…\"), research_search(\"relative error evaluation metric definit…\"), research_search(\"standard error 1.04/sqrt(m) cardinality …\")",
+        "research_search(\"fair comparison same memory different me…\"), research_search(\"cardinality estimation versus frequency …\"), research_search(\"HLL LogLog counter used inside filter fr…\")",
+        "research_search(\"comparison sketch accuracy metric cardin…\"), research_search(\"HyperLogLog accuracy guarantee uniform r…\"), research_search(\"frequency estimation ARE biased towards …\")",
+        "research_read, research_search(\"why accuracy metrics differ between sket…\"), research_search(\"estimate error bound per item relative e…\")",
+        "research_decision(\"record\")"
+      ],
+      "streamed_chars": 1945,
+      "response_ok": true,
+      "expected_answerable": true,
+      "abstained": false,
+      "completed": true,
+      "answer_pass": true,
+      "concept_coverage": 1.0,
+      "concepts": [
+        {
+          "aliases": [
+            "频率估计",
+            "frequency estimation"
+          ],
+          "matched": "频率估计"
+        },
+        {
+          "aliases": [
+            "基数估计",
+            "cardinality estimation"
+          ],
+          "matched": "基数估计"
+        },
+        {
+          "aliases": [
+            "任务不同",
+            "different task"
+          ],
+          "matched": "任务不同"
+        }
+      ],
+      "citations": [
+        "RF-9B51FD1B-1",
+        "RF-F6B914C4-2",
+        "RF-9B51FD1B-79",
+        "RF-9B51FD1B-80",
+        "RF-9B51FD1B-90",
+        "RF-F6B914C4-24",
+        "RF-9B51FD1B-27",
+        "RF-B40077A8-24",
+        "RF-9B51FD1B-89",
+        "RF-9B51FD1B-73",
+        "RF-9B51FD1B-74"
+      ],
+      "valid_citations": [
+        "RF-9B51FD1B-1",
+        "RF-F6B914C4-2",
+        "RF-9B51FD1B-79",
+        "RF-9B51FD1B-80",
+        "RF-9B51FD1B-90",
+        "RF-F6B914C4-24",
+        "RF-9B51FD1B-27",
+        "RF-B40077A8-24",
+        "RF-9B51FD1B-89",
+        "RF-9B51FD1B-73",
+        "RF-9B51FD1B-74"
+      ],
+      "missing_citations": [],
+      "citation_validity": 1.0,
+      "relevant_citation_recall": 0.5,
+      "relevant_label_precision": 0.0909,
+      "relevant_hits": [
+        "RF-9B51FD1B-1"
+      ],
+      "paragraph_citation_coverage": 0.7143,
+      "entailment": {
+        "claims": 5,
+        "entailed": 0,
+        "partially_supported": 2,
+        "unsupported": 3,
+        "support_rate": 0.4,
+        "details": [
+          {
+            "claim": "1. 估计任务不同。** SeiveSketch 是一个面向**项频率估计（item frequency estimation）**的流处理框架，估计的是某个 item 在数据流中出现的次数 ；而 HLL 是一个**基数估计器**，单遍扫描后给出的是流中不同元素个数（cardinality）的估计 。一个精度指标不可能同时对齐这两种不同的\"真值\"。",
+            "citations": [
+              "RF-9B51FD1B-1",
+              "RF-F6B914C4-2"
+            ],
+            "label": "PARTIALLY_SUPPORTED",
+            "lexical_overlap": 0.0571,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING 1\nSeiveSketch: A Fine-grained and Adaptive Sketch Framework for\nAccurate Frequency Estimation\nLu Tang, Xiaomeng Chen, Siying Zhou, Shishi Zhang, Yi Xie, Xiaochou Chen, Dongzhan Zhang\nAbstract—Estimating the frequency of items in a data stream is\na fundamental task underlying various applications. To improve\naccuracy, existing algorithms use filters to process cold (infre-\nquent) items and hot (frequent) items separately. However, they\noften fail to perform well in different data streams due to their\nfixed parameter configurations. When the fi"
+          },
+          {
+            "claim": "2. 精度指标的定义与形式不同。** SeiveSketch 使用的精度指标是 ARE（平均相对误差）＝ 1/N · Σ|f̂_ui − f_ui|/f_ui（N 为不同 item 数），此外还有 WMRE 与\"相对误差 CDF\" 。HLL 的精度则被表述为**标准误差/相对精度，约 1.04/√m**（m 为寄存器数），其严格定义是 (1/n)·√V_n(E)，即在相对意义下典型的（均方）误差 。两者一个是\"逐项相对误差的均值/分布\"，一个是\"单次基数估计的统计标准误差\"。",
+            "citations": [
+              "RF-9B51FD1B-79",
+              "RF-9B51FD1B-80",
+              "RF-9B51FD1B-90",
+              "RF-F6B914C4-2",
+              "RF-F6B914C4-24"
+            ],
+            "label": "PARTIALLY_SUPPORTED",
+            "lexical_overlap": 0.0649,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "ems.\n•F1 Score: 2×Precision×Recall\nPrecision+Recall .\n•Average Relative Error (ARE): 1\nN\nPN\ni=1\n| ˆfui−fui|\nfui\n, where\nˆfui andf ui are the estimated and true frequency of the\nitemu i respectively, andNis the number of distinct\nitems. We use ARE to measure the average accuracy of\nfrequency estimates of all items. ARE is biased towards the\ncold items, due to their lower frequency and skewed data\ndistribution. Thus, we use ARE S, ARE M and ARE L to\nshow the average relative error of cold, warm, and hot items,\nrespectively. We define items whose frequency is greater\nthan 99% and 80% of items as "
+          },
+          {
+            "claim": "3. 聚合粒度不同，且 SeiveSketch 的指标受数据分布主导。** ARE 是在 N 个不同 item 上求平均，由于数据偏斜它**偏向冷门 item（cold items）**，而冷门项因频率低、对哈希冲突最敏感且数量占多数，其估计精度主导了整体平均精度 。相对地，HLL 的标准误差是对\"单个基数估计值\"的标量统计刻画，不涉及逐项聚合 。",
+            "citations": [
+              "RF-9B51FD1B-79",
+              "RF-9B51FD1B-27",
+              "RF-F6B914C4-24"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.0357,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "ems.\n•F1 Score: 2×Precision×Recall\nPrecision+Recall .\n•Average Relative Error (ARE): 1\nN\nPN\ni=1\n| ˆfui−fui|\nfui\n, where\nˆfui andf ui are the estimated and true frequency of the\nitemu i respectively, andNis the number of distinct\nitems. We use ARE to measure the average accuracy of\nfrequency estimates of all items. ARE is biased towards the\ncold items, due to their lower frequency and skewed data\ndistribution. Thus, we use ARE S, ARE M and ARE L to\nshow the average relative error of cold, warm, and hot items,\nrespectively. We define items whose frequency is greater\nthan 99% and 80% of items as "
+          },
+          {
+            "claim": "4. 对数据分布的依赖不同。** HLL（及 KMV）的误差**只取决于 m，即计数单元的数量**，与基数大小无关 。而 SeiveSketch 的 ARE 会随数据偏斜度变化：偏斜从 0 增到 1.2 时，冷门项与非冷门项哈希冲突增多使其精度下降、ARE 上升；1.2 增至 1.8 时冲突减少、ARE 又下降 。因此同一个\"相对误差\"数值在不同数据分布下含义并不相同。",
+            "citations": [
+              "RF-B40077A8-24",
+              "RF-9B51FD1B-89"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.038,
+            "missing_numbers": [
+              "4"
+            ],
+            "missing_citations": [],
+            "evidence_excerpt": "determined only by the size of the counting\nunit used in them. Specifically, HLL can achieve a counting\nrange of O(22q\n) by using q-bit registers, while KMV can count\nup toO(2 32)with 32-bit counters.\nStandard error.The standard error of LC is\nq\net−t−1\ntN\ndepending on both m and N. Given a fixed m, an increasingly\nlarge N results in a large load factor t, and hence a large error.\nThis makes LC unable to count cardinalities that may span a\nwide range with limited memory. However, if t remains small\n(e.g., 1≤t≤5 ), LC can achieve a very low standard error of\nO( 1√\nN ). HLL and KMV have errors de"
+          },
+          {
+            "claim": "5. 理论保证的形式不同。** HLL 给出的是渐近近似无偏 + 标准误差 ≈ β_m/√m 的集中性保证（如 m≥16 时 |δ₁|<5×10⁻⁵、|δ₂|<5×10⁻⁴）；SeiveSketch 给出的则是**逐项**的界——对每个 item u_i，相对误差落在 [1−2^{i−1}, ε‖f_l‖₁] 区间内、概率至少 1−… 。一个是\"整体单值的统计误差\"，一个是\"逐项频率的区间界\"，无法用同一个标量指标衡量。",
+            "citations": [
+              "RF-F6B914C4-24",
+              "RF-9B51FD1B-73",
+              "RF-9B51FD1B-74"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.0423,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "e resulting cardinality estimate.\n(i) The estimateE is asymptotically almost unbiased in the sense that\n1\nn En(E) =\nn→∞\n1 +δ1(n) +o(1), where|δ1(n)|< 5· 10−5 as soon asm≥ 16.\n(ii) The standard error deﬁned as 1\nn\n√\nVn(E) satisﬁes asn→∞ ,\n1\nn\n√\nVn(E) =\nn→∞\nβm√m +δ2(n) +o(1), where|δ2(n)|< 5· 10−4 as soon asm≥ 16,\nthe constantsβm being bounded, withβ16\n.= 1.106,β32\n.= 1.070,β64\n.= 1.054,β128\n.= 1.046, andβ∞ =√\n3 log(2)− 1 .= 1.03896.\nThe standard error measures in relative terms the typical error to be observed (in a mean quadratic\nsense). The functions δ1(n),δ 2(n) represent oscillating functio"
+          }
+        ]
+      },
+      "estimated_cost_usd": null,
+      "bad_case_labels": [
+        "uncited_claim",
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "e2e-12",
+      "query": "What are the exchangeability, idempotence, and mergeability properties claimed for UltraLogLog?",
+      "language": "en",
+      "difficulty": "easy",
+      "answer": "UltraLogLog (ULL) is presented as sharing the same practical properties as HyperLogLog, and the paper states these properties explicitly. Answer is grounded only in the indexed ULL paper.\n\n**Properties claimed.** ULL \"shares the same practical properties as HyperLogLog. It is commutative, idempotent, mergeable, and has a fast guaranteed constant-time insert operation.\" The same abstract quantifies the benefit: it \"requires 28% less space to encode the same amount of distinct count information\" [RF-2dccfeb5-1]. A companion chunk adds that the maximum-likelihood estimator achieves the full 28% reduction, a simpler estimator achieves 24%, and in non-distributed martingale settings ULL reduces space by 17% [RF-2dccfeb5-2].\n\n**Idempotence.** \"Further insertions of the same element will never change the state. This is actually a natural property every count-distinct algorithm should support to prevent duplicates from changing the result\" [RF-2dccfeb5-8]. Mechanically, in the register update model each register stores the maximum update value seen plus extra bits, and \"this update procedure is idempotent meaning that further occurrences of the same elements will never change any register state\" [RF-2dccfeb5-27].\n\n**Mergeability.** \"Partial results calculated over subsets can be easily merged to a final result. This is important when data is distributed or processed in parallel\" [RF-2dccfeb5-8]. The paper provides Algorithm 7, which \"merges an UltraLogLog with registers r'0,…,r'm'−1 and m' = 2^p' into another UltraLogLog with registers r0,…,rm−1 and m = 2^p where p ≤ p'\"; the same algorithm \"also allows to downsize an existing UltraLogLog by merging it into an empty UltraLogLog (ri = 0) with smaller precision parameter p < p'\" [RF-2dccfeb5-91].\n\n**Exchangeability / commutativity (order-independence).** The paper frames this as \"Reproducibility\": \"The result does not depend on the processing order, which often cannot be guaranteed in practice anyway. Reproducibility is achieved by a commutative insert operation and a commutative and associative merge operation\" [RF-2dccfeb5-9]. In the same list it also claims \"Reducibility\" — reducing to a smaller-precision state identical to direct recording at lower precision, allowing precision adjustment without affecting mergeability with older records [RF-2dccfeb5-9]. By contrast, the paper notes that data structures whose insertions are not commutative are non-mergeable and therefore \"do not support reproducibility\" [RF-2dccfeb5-20].\n\nSo the three properties asked about — commutativity (order-independence/exchangeability), idempotence, and mergeability — are claimed directly for ULL, alongside reducibility, constant-time insert, and near-unbiased estimation [RF-2dccfeb5-1][RF-2dccfeb5-8][RF-2dccfeb5-9].",
+      "error": null,
+      "elapsed_seconds": 13.255,
+      "prompt_tokens": 17393,
+      "completion_tokens": 1105,
+      "tool_events": [
+        "read_file(\"E:\\agent\\nanobot-v0.1.4-era\\nanobot\\skil…\"), research_sources",
+        "research_search(\"UltraLogLog exchangeability idempotence …\"), research_search(\"UltraLogLog mergeable idempotent exchang…\")",
+        "research_search(\"UltraLogLog commutative idempotent merge…\"), research_search(\"merge operation union commutative idempo…\")",
+        "research_read, research_search(\"UltraLogLog insert operation commutative…\")",
+        "research_read",
+        "research_read"
+      ],
+      "streamed_chars": 2784,
+      "response_ok": true,
+      "expected_answerable": true,
+      "abstained": false,
+      "completed": true,
+      "answer_pass": true,
+      "concept_coverage": 1.0,
+      "concepts": [
+        {
+          "aliases": [
+            "exchangeable",
+            "exchangeability",
+            "交换"
+          ],
+          "matched": "exchangeability"
+        },
+        {
+          "aliases": [
+            "idempotent",
+            "idempotence",
+            "幂等"
+          ],
+          "matched": "idempotent"
+        },
+        {
+          "aliases": [
+            "mergeable",
+            "mergeability",
+            "可合并"
+          ],
+          "matched": "mergeable"
+        }
+      ],
+      "citations": [
+        "RF-2DCCFEB5-1",
+        "RF-2DCCFEB5-2",
+        "RF-2DCCFEB5-8",
+        "RF-2DCCFEB5-27",
+        "RF-2DCCFEB5-91",
+        "RF-2DCCFEB5-9",
+        "RF-2DCCFEB5-20"
+      ],
+      "valid_citations": [
+        "RF-2DCCFEB5-1",
+        "RF-2DCCFEB5-2",
+        "RF-2DCCFEB5-8",
+        "RF-2DCCFEB5-27",
+        "RF-2DCCFEB5-91",
+        "RF-2DCCFEB5-9",
+        "RF-2DCCFEB5-20"
+      ],
+      "missing_citations": [],
+      "citation_validity": 1.0,
+      "relevant_citation_recall": 1.0,
+      "relevant_label_precision": 0.1429,
+      "relevant_hits": [
+        "RF-2DCCFEB5-1"
+      ],
+      "paragraph_citation_coverage": 0.8333,
+      "entailment": {
+        "claims": 10,
+        "entailed": 10,
+        "partially_supported": 0,
+        "unsupported": 0,
+        "support_rate": 1.0,
+        "details": [
+          {
+            "claim": "It is commutative, idempotent, mergeable, and has a fast guaranteed constant-time insert operation.\" The same abstract quantifies the benefit: it \"requires 28% less space to encode the same amount of distinct count information\" .",
+            "citations": [
+              "RF-2DCCFEB5-1"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.913,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "UltraLogLog: A Practical and More Space-Efficient Alternative to\nHyperLogLog for Approximate Distinct Counting\nOtmar Ertl\nDynatrace Research\nLinz, Austria\notmar.ertl@dynatrace.com\nABSTRACT\nSince its invention HyperLogLog has become the standard algo-\nrithm for approximate distinct counting. Due to its space efficiency\nand suitability for distributed systems, it is widely used and also\nimplemented in numerous databases. This work presents UltraLog-\nLog, which shares the same practical properties as HyperLogLog. It\nis commutative, idempotent, mergeable, and has a fast guaranteed\nconstant-time in"
+          },
+          {
+            "claim": "A companion chunk adds that the maximum-likelihood estimator achieves the full 28% reduction, a simpler estimator achieves 24%, and in non-distributed martingale settings ULL reduces space by 17% .",
+            "citations": [
+              "RF-2DCCFEB5-2"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.65,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "insert operation. At the same time, it requires 28%\nless space to encode the same amount of distinct count information,\nwhich can be extracted using the maximum likelihood method.\nAlternatively, a simpler and faster estimator is proposed, which\nstill achieves a space reduction of 24%, but at an estimation speed\ncomparable to that of HyperLogLog. In a non-distributed setting\nwhere martingale estimation can be used, UltraLogLog is able to\nreduce space by 17%. Moreover, its smaller entropy and its 8-bit\nregisters lead to better compaction when using standard compres-\nsion algorithms. All this is "
+          },
+          {
+            "claim": "This is actually a natural property every count-distinct algorithm should support to prevent duplicates from changing the result\" .",
+            "citations": [
+              "RF-2DCCFEB5-8"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.9231,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "nt insertion is a fast and allocation-free operation\nwith a constant time complexity independent of the sketch size. In\nparticular, given the hash value of the element, the update requires\nonly a few CPU instructions.\nIdempotency: Further insertions of the same element will never\nchange the state. This is actually a natural property every count-\ndistinct algorithm should support to prevent duplicates from chang-\ning the result.\nMergeability: Partial results calculated over subsets can be easily\nmerged to a final result. This is important when data is distributed\nor processed in parallel.\nRepro"
+          },
+          {
+            "claim": "Mechanically, in the register update model each register stores the maximum update value seen plus extra bits, and \"this update procedure is idempotent meaning that further occurrences of the same elements will never change any register state\" .",
+            "citations": [
+              "RF-2DCCFEB5-27"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.7917,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "f𝑚 registers which\nare initially set to zero. For every added element a uniformly dis-\ntributed hash value is computed. This hash value is used to extract\na uniform random register index𝑖∈[ 0,𝑚) and some geometrically\ndistributed integer value with probability mass function (PMF)\n𝜌update(𝑘) =(𝑏− 1)𝑏−𝑘 𝑘≥ 1,𝑏 > 1, (2)\nparameterized by the base parameter𝑏, that is used to update the\n𝑖-th register. Each register consists of 𝑞+𝑑 bits.𝑞 bits are used\nto store the maximum update value𝑢𝑖 seen so far. The remaining\n𝑑 bits indicate whether there have been any updates with values\n𝑢𝑖− 1,...,𝑢 𝑖−𝑑, respec"
+          },
+          {
+            "claim": "This is important when data is distributed or processed in parallel\" .",
+            "citations": [
+              "RF-2DCCFEB5-8"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 1.0,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "nt insertion is a fast and allocation-free operation\nwith a constant time complexity independent of the sketch size. In\nparticular, given the hash value of the element, the update requires\nonly a few CPU instructions.\nIdempotency: Further insertions of the same element will never\nchange the state. This is actually a natural property every count-\ndistinct algorithm should support to prevent duplicates from chang-\ning the result.\nMergeability: Partial results calculated over subsets can be easily\nmerged to a final result. This is important when data is distributed\nor processed in parallel.\nRepro"
+          },
+          {
+            "claim": "The paper provides Algorithm 7, which \"merges an UltraLogLog with registers r'0,…,r'm'−1 and m' = 2^p' into another UltraLogLog with registers r0,…,rm−1 and m = 2^p where p ≤ p'\"; the same algorithm \"also allows to downsize an existing UltraLogLog by merging it into an empty UltraLogLog (ri = 0) with smaller precision parameter p < p'\" .",
+            "citations": [
+              "RF-2DCCFEB5-91"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.6957,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "-tested probabilistic data structures like HLL would\nnot work. This fact allows us to simplify the experiments and per-\nform them without real or artificially generated data. Insertion\nof a new element can be simulated by simply generating a 64-bit\nAlgorithm 7: Merges an UltraLogLog with registers𝑟′\n0,𝑟′\n1,...,𝑟 ′\n𝑚′−1 and𝑚′ = 2𝑝′\ninto another UltraLogLog with registers𝑟0,𝑟 1,...,𝑟 𝑚−1 and𝑚 = 2𝑝 where𝑝≤𝑝′.\nThis algorithm also allows to downsize an existing UltraLogLog by merging it\ninto an empty UltraLogLog(𝑟𝑖 = 0) with smaller precision parameter𝑝 <𝑝′.\n𝑗← 0\nfor𝑖← 0 to𝑚− 1 do\n𝑥← unpack(𝑟𝑖 ) or"
+          },
+          {
+            "claim": "Reproducibility is achieved by a commutative insert operation and a commutative and associative merge operation\" .",
+            "citations": [
+              "RF-2DCCFEB5-9"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.8571,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "ucibility: The result does not depend on the processing\norder, which often cannot be guaranteed in practice anyway. Re-\nproducibility is achieved by a commutative insert operation and a\ncommutative and associative merge operation.\nReducibility: The state can be reduced to a smaller state corre-\nsponding to a smaller precision parameter. The reduced state is\nidentical to that obtained by direct recording with lower precision.\nThis property allows adjusting the precision without affecting the\nmergeability with older records.\nEstimation: A fast and robust estimation algorithm ensures nearly\nunbia"
+          },
+          {
+            "claim": "In the same list it also claims \"Reducibility\" — reducing to a smaller-precision state identical to direct recording at lower precision, allowing precision adjustment without affecting mergeability with older records .",
+            "citations": [
+              "RF-2DCCFEB5-9"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.619,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "ucibility: The result does not depend on the processing\norder, which often cannot be guaranteed in practice anyway. Re-\nproducibility is achieved by a commutative insert operation and a\ncommutative and associative merge operation.\nReducibility: The state can be reduced to a smaller state corre-\nsponding to a smaller precision parameter. The reduced state is\nidentical to that obtained by direct recording with lower precision.\nThis property allows adjusting the precision without affecting the\nmergeability with older records.\nEstimation: A fast and robust estimation algorithm ensures nearly\nunbia"
+          },
+          {
+            "claim": "By contrast, the paper notes that data structures whose insertions are not commutative are non-mergeable and therefore \"do not support reproducibility\" .",
+            "citations": [
+              "RF-2DCCFEB5-20"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.6667,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "structures with in-memory representations that can be\nupdated in constant time in the worst case areHLL with vectorized\ncounters [11] and the martingale curtain sketch which achieves a\nMVP of 2.31 [37]. As the insertions are not commutative, all these\nnon-mergeable approaches also do not support reproducibility.\nThe only mergeable data structure we know of that is more space-\nefficient than HLL while having essentially the same properties,\nin particular constant-time worst-case updates, is ExtendedHyper-\nLogLog (EHLL) [33]. It extends the HLL registers from 6 to 7 bits to\nstore not only the ma"
+          },
+          {
+            "claim": "So the three properties asked about — commutativity (order-independence/exchangeability), idempotence, and mergeability — are claimed directly for ULL, alongside reducibility, constant-time insert, and near-unbiased estimation .",
+            "citations": [
+              "RF-2DCCFEB5-1",
+              "RF-2DCCFEB5-8",
+              "RF-2DCCFEB5-9"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.4091,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "UltraLogLog: A Practical and More Space-Efficient Alternative to\nHyperLogLog for Approximate Distinct Counting\nOtmar Ertl\nDynatrace Research\nLinz, Austria\notmar.ertl@dynatrace.com\nABSTRACT\nSince its invention HyperLogLog has become the standard algo-\nrithm for approximate distinct counting. Due to its space efficiency\nand suitability for distributed systems, it is widely used and also\nimplemented in numerous databases. This work presents UltraLog-\nLog, which shares the same practical properties as HyperLogLog. It\nis commutative, idempotent, mergeable, and has a fast guaranteed\nconstant-time in"
+          }
+        ]
+      },
+      "estimated_cost_usd": null,
+      "bad_case_labels": [
+        "uncited_claim"
+      ]
+    },
+    {
+      "id": "e2e-13",
+      "query": "SeiveSketch 在 CAIDA 数据集上的误差优势有多大？它在哪类数据项上可能不如 CU？",
+      "language": "zh",
+      "difficulty": "hard",
+      "answer": "## SeiveSketch 在 CAIDA 数据集上的误差优势\n\n**总体误差优势。** 在 CAIDA 上，SeiveSketch 的平均相对误差（ARE）相比基线最高分别降低约 **97.77%（CM）、96.71%（CU）、97.78%（AS）、99.75%（CF）、79.16%（Ladder）和 78.69%（Elastic）** [RF-9b51fd1b-86]。从相对误差 CDF 看，在 CAIDA 上相对误差小于 1.0 的不同数据项占比，SeiveSketch 最高比 **CM、CU、AS、CF、Ladder、Elastic 分别高 37.09x、24.39x、36.95x、27.33x、14.73x、4.54x** [RF-9b51fd1b-90]。论文整体上称其相对当前最优方法可将估计误差最多降低 **222.1 倍** [RF-9b51fd1b-3]。此外，当内存为 256KiB 时，SeiveSketch 在 CAIDA 上的吞吐率分别是 CU、AS、CF、Ladder 的 **1.49、1.54、2.34、2.02 倍**（但比 CM 和 Elastic 分别慢 1.78 倍和 1.15 倍）[RF-9b51fd1b-95][RF-9b51fd1b-96]。\n\n## 哪类数据项上可能不如 CU\n\n**热项（hot items）。** 按频率区间细分 CAIDA 的精度时：对 **冷项（cold items）和温项（warm items），SeiveSketch 精度最高**；但对 **热项（hot items），CU 的精度优于 SeiveSketch** [RF-9b51fd1b-87]。原因是 SeiveSketch 在 CP 部分采用自适应缩放（adaptive scaling），被淘汰进入 CP 的热项只被采样记录部分频率，从而影响热项估计精度；当内存增大后，SeiveSketch 在任意频率区间都能取得最佳表现 [RF-9b51fd1b-87]。\n\n一个相关的边界情况：在相对误差小于 0.5 的极严格区间内，CF 与 Elastic 的曲线略高于 SeiveSketch（冷项高精度计数不及大内存的 sketch 方法），但 SeiveSketch 能将冷项误差控制在可容忍范围内，在其余误差区间反超 [RF-9b51fd1b-94]。\n\n**结论：** SeiveSketch 在 CAIDA 上整体误差优势显著（ARE 相对 CU 最多降低约 96.7%，相对误差 <1.0 的项占比最高达 24.39 倍），但其短板是 **热项（hot items）估计精度不如 CU**，根源是 CP 中对热项的采样式自适应缩放 [RF-9b51fd1b-86][RF-9b51fd1b-87][RF-9b51fd1b-90]。",
+      "error": null,
+      "elapsed_seconds": 12.184,
+      "prompt_tokens": 19176,
+      "completion_tokens": 990,
+      "tool_events": [
+        "read_file(\"E:\\agent\\nanobot-v0.1.4-era\\nanobot\\skil…\"), research_sources",
+        "research_search(\"SeiveSketch CAIDA dataset error reductio…\"), research_search(\"SeiveSketch compared with CU on which da…\"), research_decision(\"search\")",
+        "research_read, research_search(\"CAIDA ARE relative error SeiveSketch tim…\"), research_search(\"SeiveSketch hot items CU accuracy better…\")",
+        "research_search(\"ARE SeiveSketch CAIDA dataset times lowe…\"), research_search(\"frequency estimation error reduction 222…\")"
+      ],
+      "streamed_chars": 1481,
+      "response_ok": true,
+      "expected_answerable": true,
+      "abstained": false,
+      "completed": true,
+      "answer_pass": true,
+      "concept_coverage": 1.0,
+      "concepts": [
+        {
+          "aliases": [
+            "99.75"
+          ],
+          "matched": "99.75"
+        },
+        {
+          "aliases": [
+            "hot items",
+            "热项"
+          ],
+          "matched": "hot items"
+        },
+        {
+          "aliases": [
+            "CU"
+          ],
+          "matched": "CU"
+        }
+      ],
+      "citations": [
+        "RF-9B51FD1B-86",
+        "RF-9B51FD1B-90",
+        "RF-9B51FD1B-3",
+        "RF-9B51FD1B-95",
+        "RF-9B51FD1B-96",
+        "RF-9B51FD1B-87",
+        "RF-9B51FD1B-94"
+      ],
+      "valid_citations": [
+        "RF-9B51FD1B-86",
+        "RF-9B51FD1B-90",
+        "RF-9B51FD1B-3",
+        "RF-9B51FD1B-95",
+        "RF-9B51FD1B-96",
+        "RF-9B51FD1B-87",
+        "RF-9B51FD1B-94"
+      ],
+      "missing_citations": [],
+      "citation_validity": 1.0,
+      "relevant_citation_recall": 1.0,
+      "relevant_label_precision": 0.1429,
+      "relevant_hits": [
+        "RF-9B51FD1B-87"
+      ],
+      "paragraph_citation_coverage": 1.0,
+      "entailment": {
+        "claims": 4,
+        "entailed": 1,
+        "partially_supported": 2,
+        "unsupported": 1,
+        "support_rate": 0.75,
+        "details": [
+          {
+            "claim": "总体误差优势。** 在 CAIDA 上，SeiveSketch 的平均相对误差（ARE）相比基线最高分别降低约 **97.77%（CM）、96.71%（CU）、97.78%（AS）、99.75%（CF）、79.16%（Ladder）和 78.69%（Elastic）** 。从相对误差 CDF 看，在 CAIDA 上相对误差小于 1.0 的不同数据项占比，SeiveSketch 最高比 **CM、CU、AS、CF、Ladder、Elastic 分别高 37.09x、24.39x、36.95x、27.33x、14.73x、4.54x** 。论文整体上称其相对当前最优方法可将估计误差最多降低 **222.1 倍** 。此外，当内存为 256KiB 时，SeiveSketch 在 CAIDA 上的吞吐率分别是 CU、AS、CF、Ladder 的 **1.49、1.54、2.34、2.02 倍**（但比 CM 和 Elastic 分别慢 1.78 倍和 1.15 倍）。",
+            "citations": [
+              "RF-9B51FD1B-86",
+              "RF-9B51FD1B-90",
+              "RF-9B51FD1B-3",
+              "RF-9B51FD1B-95",
+              "RF-9B51FD1B-96"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.3495,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "SS) [26].\nFor CM with heap, we set the heap size to 512 items.\nFor DHS, we set the bucket size to 32B. For Elastic, its\nparameter settings are the same as those in the frequency\nestimation experiment. For Waving, we set the number of\ncounters in each bucket to 16. For these algorithms, the\nnumber of buckets is determined by the memory size.\nB. Item Frequency Estimation\nAccuracy (Figure 8).Results show that SeiveSketch performs\nbetter than other algorithms in accuracy. Figure 8(a) reports\nthat ARE of SeiveSketch is up to 97.77%, 96.71%, 97.78%,\n99.75%, 79.16% and 78.69% less than that of CM, CU"
+          },
+          {
+            "claim": "热项（hot items）。** 按频率区间细分 CAIDA 的精度时：对 **冷项（cold items）和温项（warm items），SeiveSketch 精度最高**；但对 **热项（hot items），CU 的精度优于 SeiveSketch** 。原因是 SeiveSketch 在 CP 部分采用自适应缩放（adaptive scaling），被淘汰进入 CP 的热项只被采样记录部分频率，从而影响热项估计精度；当内存增大后，SeiveSketch 在任意频率区间都能取得最佳表现 。",
+            "citations": [
+              "RF-9B51FD1B-87"
+            ],
+            "label": "PARTIALLY_SUPPORTED",
+            "lexical_overlap": 0.1351,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "d Elastic on CAIDA, respectively. Figure 8(b)-\n(d) show the accuracy of items with different frequency ranges\non CAIDA. For cold items and warm items, SeiveSketch has\nthe highest accuracy. However, for hot items, CU performs\nbetter accuracy than SeiveSketch. This is because SeiveSketch\nuses adaptive scaling in CP, and sampling partial frequencies\nof hot items evicted to CP affects the accuracy of hot items.\nWhen memory becomes larger, SeiveSketch performs the best\nin estimating items of arbitrary different frequencies. Fig-\nure 8(e)-(h) show that SeiveSketch outperforms other methods\non differ"
+          },
+          {
+            "claim": "一个相关的边界情况：在相对误差小于 0.5 的极严格区间内，CF 与 Elastic 的曲线略高于 SeiveSketch（冷项高精度计数不及大内存的 sketch 方法），但 SeiveSketch 能将冷项误差控制在可容忍范围内，在其余误差区间反超 。",
+            "citations": [
+              "RF-9B51FD1B-94"
+            ],
+            "label": "PARTIALLY_SUPPORTED",
+            "lexical_overlap": 0.0667,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "(h) ARE on MAWI\nFig. 12: Accuracy for heavy hitter detection.\nthe corresponding percentage for CM, CU, AS, CF, Ladder,\nand Elastic, respectively. As depicted in Figure 10(c), when the\nrelative error is less than 0.5, the curves of CF and Elastic are\nnearly above that of SeiveSketch. Since the adaptive scaling\nutilized by SeiveSketch in the cold part is less effective in\naccurate measurement of cold items compared to the sketch-\nbased methods with large memory usage, the number of items\nwith relative error less than 0.5 for SeiveSketch is fewer than\nthat for CF and Elastic. However, using the a"
+          },
+          {
+            "claim": "结论：** SeiveSketch 在 CAIDA 上整体误差优势显著（ARE 相对 CU 最多降低约 96.7%，相对误差 <1.0 的项占比最高达 24.39 倍），但其短板是 **热项（hot items）估计精度不如 CU**，根源是 CP 中对热项的采样式自适应缩放 。",
+            "citations": [
+              "RF-9B51FD1B-86",
+              "RF-9B51FD1B-87",
+              "RF-9B51FD1B-90"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.1509,
+            "missing_numbers": [
+              "96.7%"
+            ],
+            "missing_citations": [],
+            "evidence_excerpt": "SS) [26].\nFor CM with heap, we set the heap size to 512 items.\nFor DHS, we set the bucket size to 32B. For Elastic, its\nparameter settings are the same as those in the frequency\nestimation experiment. For Waving, we set the number of\ncounters in each bucket to 16. For these algorithms, the\nnumber of buckets is determined by the memory size.\nB. Item Frequency Estimation\nAccuracy (Figure 8).Results show that SeiveSketch performs\nbetter than other algorithms in accuracy. Figure 8(a) reports\nthat ARE of SeiveSketch is up to 97.77%, 96.71%, 97.78%,\n99.75%, 79.16% and 78.69% less than that of CM, CU"
+          }
+        ]
+      },
+      "estimated_cost_usd": null,
+      "bad_case_labels": [
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "e2e-14",
+      "query": "How does the classical HyperLogLog error compare with LogLog and Adaptive Sampling?",
+      "language": "en",
+      "difficulty": "medium",
+      "answer": "## HyperLogLog error vs. LogLog and Adaptive Sampling\n\nClassical HyperLogLog (HLL) has a relative accuracy, i.e. standard error, of **1.04/√m** for m registers [RF-f6b914c4-13]. This is the lowest among the compared estimators: **LogLog** has a larger error of **1.30/√m**, and **Adaptive Sampling** sits in between at **1.20/√m** [RF-f6b914c4-13].\n\nEquivalently, HLL improves on LogLog such that the older algorithm's accuracy can only be matched by HLL using **64% of the memory** — i.e., HLL achieves LogLog-level accuracy at roughly two-thirds the space [RF-f6b914c4-2][RF-f6b914c4-16]. Asymptotically, HLL's error approaches β∞/√m, where β∞ = √(3 log 2 − 1) ≈ **1.03896** [RF-f6b914c4-16].\n\nConcretely, with m = 2048 registers, 32-bit hashing, and 5-bit \"short\" registers, HLL estimates cardinalities beyond 10⁹ with a typical accuracy of **2%** using only **1.5 kB** of storage [RF-f6b914c4-16]. Independent sources confirm the same standard error of about 1.04/√m for HLL [RF-b40077a8-20][RF-2dccfeb5-4].\n\n**Summary comparison (relative accuracy, from the HLL paper's Fig. 1):**\n\n| Estimator | Memory/unit | Relative accuracy |\n|---|---|---|\n| Adaptive Sampling | m words (≈32 bits) | 1.20/√m |\n| LogLog | m bytes (≤5 bits) | 1.30/√m |\n| **HyperLogLog** | m bytes (≤5 bits) | **1.04/√m** |\n\nSo HLL is strictly more accurate than both LogLog (1.30/√m) and Adaptive Sampling (1.20/√m), and notably achieves LogLog's accuracy with only 64% of the memory [RF-f6b914c4-2][RF-f6b914c4-13][RF-f6b914c4-16].",
+      "error": null,
+      "elapsed_seconds": 16.315,
+      "prompt_tokens": 25105,
+      "completion_tokens": 847,
+      "tool_events": [
+        "read_file(\"E:\\agent\\nanobot-v0.1.4-era\\nanobot\\skil…\"), research_sources",
+        "research_search(\"HyperLogLog error compared to LogLog and…\"), research_search(\"HyperLogLog standard error 1.04/sqrt(m) …\"), research_search(\"LogLog algorithm error estimate improvem…\"), research_search(\"Adaptive Sampling cardinality estimation…\"), research_decision(\"search\")",
+        "research_search(\"LogLog SuperLogLog accuracy 1.30/sqrt m …\"), research_search(\"adaptive sampling cardinality estimate e…\"), research_search(\"HyperLogLog 64% memory LogLog same accur…\"), research_read",
+        "research_read, research_search(\"Adaptive Sampling 1.20 square root m wor…\")"
+      ],
+      "streamed_chars": 1797,
+      "response_ok": true,
+      "expected_answerable": true,
+      "abstained": false,
+      "completed": true,
+      "answer_pass": true,
+      "concept_coverage": 1.0,
+      "concepts": [
+        {
+          "aliases": [
+            "1.04"
+          ],
+          "matched": "1.04"
+        },
+        {
+          "aliases": [
+            "1.30"
+          ],
+          "matched": "1.30"
+        },
+        {
+          "aliases": [
+            "1.20"
+          ],
+          "matched": "1.20"
+        }
+      ],
+      "citations": [
+        "RF-F6B914C4-13",
+        "RF-F6B914C4-2",
+        "RF-F6B914C4-16",
+        "RF-B40077A8-20",
+        "RF-2DCCFEB5-4"
+      ],
+      "valid_citations": [
+        "RF-F6B914C4-13",
+        "RF-F6B914C4-2",
+        "RF-F6B914C4-16",
+        "RF-B40077A8-20",
+        "RF-2DCCFEB5-4"
+      ],
+      "missing_citations": [],
+      "citation_validity": 1.0,
+      "relevant_citation_recall": 1.0,
+      "relevant_label_precision": 0.2,
+      "relevant_hits": [
+        "RF-F6B914C4-13"
+      ],
+      "paragraph_citation_coverage": 0.6667,
+      "entailment": {
+        "claims": 7,
+        "entailed": 6,
+        "partially_supported": 0,
+        "unsupported": 1,
+        "support_rate": 0.8571,
+        "details": [
+          {
+            "claim": "Classical HyperLogLog (HLL) has a relative accuracy, i.e. standard error, of **1.04/√m** for m registers .",
+            "citations": [
+              "RF-F6B914C4-13"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.3,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "140 P . Flajolet, É. Fusy, O. Gandouet, F . Meunier\nAlgorithm Cost (units) Accuracy\nHit Counting [24] 1\n10N bits ≈2%\nAdaptive Sampling [12] m words (≈32 bits) 1.20/√m\nProbabilistic Counting [15] m words (≤32 bits) 0.78/√m\nMINCOUNT [2, 6, 16, 18] m words (≤32 bits) 1.00/√m\nLOGLOG [10] m bytes (≤5 bits) 1.30/√m\nHYPER LOGLOG m bytes (≤5 bits) 1.04/√m\nFig. 1: A comparison of major cardinality estimators for cardinalities≤N: (i) algorithms; (ii) memory complexity\nand units (forN≤ 109); (iii) relative accuracy.\nwhose quality should improve, due to averaging effects, in proportion to 1/√m, as m incre"
+          },
+          {
+            "claim": "This is the lowest among the compared estimators: **LogLog** has a larger error of **1.30/√m**, and **Adaptive Sampling** sits in between at **1.20/√m** .",
+            "citations": [
+              "RF-F6B914C4-13"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.4,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "140 P . Flajolet, É. Fusy, O. Gandouet, F . Meunier\nAlgorithm Cost (units) Accuracy\nHit Counting [24] 1\n10N bits ≈2%\nAdaptive Sampling [12] m words (≈32 bits) 1.20/√m\nProbabilistic Counting [15] m words (≤32 bits) 0.78/√m\nMINCOUNT [2, 6, 16, 18] m words (≤32 bits) 1.00/√m\nLOGLOG [10] m bytes (≤5 bits) 1.30/√m\nHYPER LOGLOG m bytes (≤5 bits) 1.04/√m\nFig. 1: A comparison of major cardinality estimators for cardinalities≤N: (i) algorithms; (ii) memory complexity\nand units (forN≤ 109); (iii) relative accuracy.\nwhose quality should improve, due to averaging effects, in proportion to 1/√m, as m incre"
+          },
+          {
+            "claim": "Equivalently, HLL improves on LogLog such that the older algorithm's accuracy can only be matched by HLL using **64% of the memory** — i.e., HLL achieves LogLog-level accuracy at roughly two-thirds the space .",
+            "citations": [
+              "RF-F6B914C4-2",
+              "RF-F6B914C4-16"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.6,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "memory\nofm units (typically, “short bytes”), HYPER LOGLOG performs a single pass over the data and produces an estimate\nof the cardinality such that the relative accuracy (the standard error) is typically about 1.04/√m. This improves on\nthe best previously known cardinality estimator, LOGLOG, whose accuracy can be matched by consuming only 64%\nof the original memory. For instance, the new algorithm makes it possible to estimate cardinalities well beyond 109\nwith a typical accuracy of 2% while using a memory of only 1.5 kilobytes. The algorithm parallelizes optimally and\nadapts to the sliding w"
+          },
+          {
+            "claim": "Asymptotically, HLL's error approaches β∞/√m, where β∞ = √(3 log 2 − 1) ≈ **1.03896** .",
+            "citations": [
+              "RF-F6B914C4-16"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.4286,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "ically close to β∞/√m,\nwhereβ∞ =√3 log 2− 1 .= 1.03896. The algorithm needs to maintain a collection of registers, each\nof which is at most log2 log2N +O(1) bits, when cardinalities≤N need to be estimated. In particular,\nHYPER LOGLOG achieves an accuracy matching that of standard L OGLOG by consuming only 64% of\nthe corresponding memory. As a consequence, using m = 2048, hashing on 32 bits, and short bytes of 5\nbit length each: cardinalities till values over N = 109 can be estimated with a typical accuracy of 2%\nusing 1.5kB (kilobyte) of storage.\nThe proofs base themselves in part on technique"
+          },
+          {
+            "claim": "Concretely, with m = 2048 registers, 32-bit hashing, and 5-bit \"short\" registers, HLL estimates cardinalities beyond 10⁹ with a typical accuracy of **2%** using only **1.5 kB** of storage .",
+            "citations": [
+              "RF-F6B914C4-16"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.6667,
+            "missing_numbers": [
+              "10"
+            ],
+            "missing_citations": [],
+            "evidence_excerpt": "ically close to β∞/√m,\nwhereβ∞ =√3 log 2− 1 .= 1.03896. The algorithm needs to maintain a collection of registers, each\nof which is at most log2 log2N +O(1) bits, when cardinalities≤N need to be estimated. In particular,\nHYPER LOGLOG achieves an accuracy matching that of standard L OGLOG by consuming only 64% of\nthe corresponding memory. As a consequence, using m = 2048, hashing on 32 bits, and short bytes of 5\nbit length each: cardinalities till values over N = 109 can be estimated with a typical accuracy of 2%\nusing 1.5kB (kilobyte) of storage.\nThe proofs base themselves in part on technique"
+          },
+          {
+            "claim": "Independent sources confirm the same standard error of about 1.04/√m for HLL .",
+            "citations": [
+              "RF-B40077A8-20",
+              "RF-2DCCFEB5-4"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.4444,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "s, HLL offers a significantly larger counting\nrange that reaches O(22q\n). Its standard error is asymptotically\n1.04√m . Given limited memory space, HLL suffers from a high\nerror rate. In addition, HLL shows low query throughput, as\nits estimation involves calculating the harmonic mean of all\nregisters. Many studies focus on optimizing the accuracy and\n2\ndynatrace-research/ultraloglog-paper.\n1 INTRODUCTION\nMany applications require counting the number of distinct elements\nin a data set or data stream. It is well-known that exact counting\nneeds linear space [6]. However, the space requirements c"
+          },
+          {
+            "claim": "So HLL is strictly more accurate than both LogLog (1.30/√m) and Adaptive Sampling (1.20/√m), and notably achieves LogLog's accuracy with only 64% of the memory .",
+            "citations": [
+              "RF-F6B914C4-2",
+              "RF-F6B914C4-13",
+              "RF-F6B914C4-16"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.5556,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "memory\nofm units (typically, “short bytes”), HYPER LOGLOG performs a single pass over the data and produces an estimate\nof the cardinality such that the relative accuracy (the standard error) is typically about 1.04/√m. This improves on\nthe best previously known cardinality estimator, LOGLOG, whose accuracy can be matched by consuming only 64%\nof the original memory. For instance, the new algorithm makes it possible to estimate cardinalities well beyond 109\nwith a typical accuracy of 2% while using a memory of only 1.5 kilobytes. The algorithm parallelizes optimally and\nadapts to the sliding w"
+          }
+        ]
+      },
+      "estimated_cost_usd": null,
+      "bad_case_labels": [
+        "uncited_claim",
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "e2e-15",
+      "query": "需要支持集合交并运算、受限内存和动态计数范围的网络流量场景，应优先选择哪个方案？说明证据。",
+      "language": "zh",
+      "difficulty": "hard",
+      "answer": "## 结论：应优先选择 DREX\n\n**推荐方案：DREX（Dynamic Range EXpansion，支持动态范围扩展的基数计数机制）。** 它是语料中唯一同时满足\"集合交并运算 + 受限内存 + 动态计数范围\"三项要求的方案。\n\n### 证据\n\n**1. 显式支持集合的并集与交集运算 [RF-b40077a8-51] [RF-b40077a8-53]**\nDREX 明确给出两种集合运算：并集通过 Algorithm 3 对两个实例 I1、I2 逐计数器合并来实现（取较大的轮次 r，按 `I1.r+I1.s[i]` 与 `I2.r+I2.s[i]` 的大小关系合并计数）[RF-b40077a8-51]；交集则利用容斥原理 `I1.Query() + I2.Query() - Union(I1,I2).Query()` 计算得出 [RF-b40077a8-53]。这是直接的\"交并运算\"能力证据，而语料中其他基数计数器（HLL、KMV、LC、MRB、SMB 等）未见此功能。\n\n**2. 面向受限内存设计，并支持动态计数范围 [RF-b40077a8-9] [RF-b40077a8-1] [RF-b40077a8-8]**\nDREX 基于位图，通过自适应采样并对\"不再被采样\"的项进行剔除，使位图中的去重项数始终处于位图的计数范围之内，从而把最终计数范围扩大 1/p 倍——即\"在小内存下自适应多种计数范围\"[RF-b40077a8-9]。其动机正是应对网络监控内存受限、网络流量动态多变的挑战，并解决既有方法\"需要预先知道基数\"或\"对大/小基数给出相同计数范围\"的问题 [RF-b40077a8-1] [RF-b40077a8-8]。证据表明基于位图的方法可在小内存下保持高精度，但现有方法未考虑流量动态性、无法在固定内存下覆盖宽基数范围 [RF-b40077a8-8]。\n\n**3. 精度对比：在宽计数范围与低内存下最优 [RF-b40077a8-69] [RF-b40077a8-70]**\n在广泛基数范围与多种内存设置的实验中，DREX 在几乎所有范围与内存配置下误差最低，相比 MRB、SMB、SLB、HLL、KMV 分别将总体相对误差最多降低 **86.05%、81.65%、85.27%、87.07%、88.79%** [RF-b40077a8-69]；论文摘要亦给出\"最多降低 88.79%\"的一致结论 [RF-b40077a8-13]。对照方案存在明显短板：LC 在范围 2、3 因内存不足而失效，MRB、SMB 在范围 3 失效，HLL 与 KMV 虽能覆盖全部三个范围，但在小内存（如小于 2⁷ bit）下误差很大——例如 KMV 在 64-bit 内存、范围 3 时误差可达 **78%** [RF-b40077a8-70]。此外，LC 计数范围受内存严格限制（最大基数 m·ln m），且为保持低误差需内存与真实基数线性相关 [RF-b40077a8-16] [RF-b40077a8-24]。\n\n### 小结\n在上述三类需求下，DREX 是证据支持的首选：它原生支持并集与交集 [RF-b40077a8-51] [RF-b40077a8-53]，在小内存下实现动态范围扩展 [RF-b40077a8-9]，并在宽基数范围/低内存场景中取得最低误差（对比基线最多降低 88.79%）[RF-b40077a8-69] [RF-b40077a8-13]，而主要竞争方案在受限内存或高计数范围下均出现失效或高误差 [RF-b40077a8-70]。\n\n*注：已将该结论连同引用记入证据账本（项目 `network-sketch-selection`，ID `ED-be94009a9b4c`），未生成报告文件。*",
+      "error": null,
+      "elapsed_seconds": 20.465,
+      "prompt_tokens": 22826,
+      "completion_tokens": 936,
+      "tool_events": [
+        "read_file(\"E:\\agent\\nanobot-v0.1.4-era\\nanobot\\skil…\"), research_sources",
+        "research_decision(\"search\"), research_search(\"set intersection and union operations su…\"), research_search(\"dynamic counting range limited memory me…\")",
+        "research_read, research_search(\"DREX union intersection accuracy memory …\"), research_search(\"sketch supports union intersection limit…\")",
+        "research_search(\"DREX only distinct counter supports unio…\"), research_search(\"union intersection distinct counters com…\")",
+        "research_decision(\"record\")"
+      ],
+      "streamed_chars": 1977,
+      "response_ok": true,
+      "expected_answerable": true,
+      "abstained": false,
+      "completed": true,
+      "answer_pass": true,
+      "concept_coverage": 1.0,
+      "concepts": [
+        {
+          "aliases": [
+            "DREX"
+          ],
+          "matched": "DREX"
+        },
+        {
+          "aliases": [
+            "union",
+            "并集"
+          ],
+          "matched": "union"
+        },
+        {
+          "aliases": [
+            "intersection",
+            "交集"
+          ],
+          "matched": "交集"
+        },
+        {
+          "aliases": [
+            "adaptive sampling",
+            "自适应采样"
+          ],
+          "matched": "自适应采样"
+        }
+      ],
+      "citations": [
+        "RF-B40077A8-51",
+        "RF-B40077A8-53",
+        "RF-B40077A8-9",
+        "RF-B40077A8-1",
+        "RF-B40077A8-8",
+        "RF-B40077A8-69",
+        "RF-B40077A8-70",
+        "RF-B40077A8-13",
+        "RF-B40077A8-16",
+        "RF-B40077A8-24"
+      ],
+      "valid_citations": [
+        "RF-B40077A8-51",
+        "RF-B40077A8-53",
+        "RF-B40077A8-9",
+        "RF-B40077A8-1",
+        "RF-B40077A8-8",
+        "RF-B40077A8-69",
+        "RF-B40077A8-70",
+        "RF-B40077A8-13",
+        "RF-B40077A8-16",
+        "RF-B40077A8-24"
+      ],
+      "missing_citations": [],
+      "citation_validity": 1.0,
+      "relevant_citation_recall": 0.6667,
+      "relevant_label_precision": 0.2,
+      "relevant_hits": [
+        "RF-B40077A8-51",
+        "RF-B40077A8-8"
+      ],
+      "paragraph_citation_coverage": 0.6,
+      "entailment": {
+        "claims": 7,
+        "entailed": 0,
+        "partially_supported": 2,
+        "unsupported": 5,
+        "support_rate": 0.2857,
+        "details": [
+          {
+            "claim": "1. 显式支持集合的并集与交集运算  **",
+            "citations": [
+              "RF-B40077A8-51",
+              "RF-B40077A8-53"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.0,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "lower than 3, so we\nsimply subtract 1 from each of them. Counters s[3],s[4] have\nvalues equal to 3. With probability 1\n2, s[3] is subtracted by 1\nands[4]remains unchanged.\nQuery:If we want to obtain the estimate after the update of\nx5, the estimate is returned by2rmln( m\nm−n ) =2 2∗8∗ln 8\n8−4≈22\nE. Union and Intersection\nNow, we demonstrate that DREX also supports union and\nintersection operations.\nUnion:Algorithm 3 shows the details of the union operation.\nThe algorithm takes two DREX instances I1, I2 as input. Then,\nwe set r as the larger one of I1.r and I2.r (Lines 3, 15). If\nI1.r≥I 2.r, we"
+          },
+          {
+            "claim": "DREX 明确给出两种集合运算：并集通过 Algorithm 3 对两个实例 I1、I2 逐计数器合并来实现（取较大的轮次 r，按 `I1.r+I1.s[i]` 与 `I2.r+I2.s[i]` 的大小关系合并计数）；交集则利用容斥原理 `I1.Query() + I2.Query() - Union(I1,I2).Query()` 计算得出 。这是直接的\"交并运算\"能力证据，而语料中其他基数计数器（HLL、KMV、LC、MRB、SMB 等）未见此功能。",
+            "citations": [
+              "RF-B40077A8-51",
+              "RF-B40077A8-53"
+            ],
+            "label": "PARTIALLY_SUPPORTED",
+            "lexical_overlap": 0.0769,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "lower than 3, so we\nsimply subtract 1 from each of them. Counters s[3],s[4] have\nvalues equal to 3. With probability 1\n2, s[3] is subtracted by 1\nands[4]remains unchanged.\nQuery:If we want to obtain the estimate after the update of\nx5, the estimate is returned by2rmln( m\nm−n ) =2 2∗8∗ln 8\n8−4≈22\nE. Union and Intersection\nNow, we demonstrate that DREX also supports union and\nintersection operations.\nUnion:Algorithm 3 shows the details of the union operation.\nThe algorithm takes two DREX instances I1, I2 as input. Then,\nwe set r as the larger one of I1.r and I2.r (Lines 3, 15). If\nI1.r≥I 2.r, we"
+          },
+          {
+            "claim": "2. 面向受限内存设计，并支持动态计数范围   **",
+            "citations": [
+              "RF-B40077A8-9",
+              "RF-B40077A8-1",
+              "RF-B40077A8-8"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.0,
+            "missing_numbers": [
+              "2"
+            ],
+            "missing_citations": [],
+            "evidence_excerpt": "space.\nIn this paper, we present DREX, a cardinality counting\nmechanism that supports dynamic range expansion, so as to\nbe adaptive to a variety of counting ranges with small memory\nspace. DREX builds on a bitmap and adaptively samples\nitems to be counted in the bitmap. By adaptively reducing\nthe sampling rate p and removing items that are no longer\nsampled from the bitmap, DREX keeps the number of distinct\nitems in the bitmap always within the counting range of the\nbitmap, thereby expanding the final counting range by a factor\nof 1\np. To remove items precisely, DREX pre-assigns each item\nwith"
+          },
+          {
+            "claim": "DREX 基于位图，通过自适应采样并对\"不再被采样\"的项进行剔除，使位图中的去重项数始终处于位图的计数范围之内，从而把最终计数范围扩大 1/p 倍——即\"在小内存下自适应多种计数范围\"。其动机正是应对网络监控内存受限、网络流量动态多变的挑战，并解决既有方法\"需要预先知道基数\"或\"对大/小基数给出相同计数范围\"的问题  。证据表明基于位图的方法可在小内存下保持高精度，但现有方法未考虑流量动态性、无法在固定内存下覆盖宽基数范围 。",
+            "citations": [
+              "RF-B40077A8-9",
+              "RF-B40077A8-1",
+              "RF-B40077A8-8"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.008,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "space.\nIn this paper, we present DREX, a cardinality counting\nmechanism that supports dynamic range expansion, so as to\nbe adaptive to a variety of counting ranges with small memory\nspace. DREX builds on a bitmap and adaptively samples\nitems to be counted in the bitmap. By adaptively reducing\nthe sampling rate p and removing items that are no longer\nsampled from the bitmap, DREX keeps the number of distinct\nitems in the bitmap always within the counting range of the\nbitmap, thereby expanding the final counting range by a factor\nof 1\np. To remove items precisely, DREX pre-assigns each item\nwith"
+          },
+          {
+            "claim": "3. 精度对比：在宽计数范围与低内存下最优  **",
+            "citations": [
+              "RF-B40077A8-69",
+              "RF-B40077A8-70"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.0,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "erage error in each range in\nFigure 9(a)-(c). DREX shows the lowest error across almost\nall ranges and memory settings. It reduces the overall relative\nerror by up to 86.05%, 81.65%, 85.27% , 87.07%, and 88.79%,\nrespectively, compared to MRB, SMB, SLB, HLL and KMV .\nLC exhibits a small error as DREX in Range 1 (Figure 9(a)),\nyet it becomes invalid in Range 2 and 3 due to insufficient\nLC\n MRB\n KMV\n HLL\n HLLP\n SLB\n SMB\n DREX\n0.00\n0.10\n0.20\n0.30\n0.40\n0.50\n Memory = 64bits\n20\n23\n26\n29\n212\n215\n218\n221\n224\nCardinality\n0.00\n0.02\n0.04\n0.06\n0.08\n0.10\n Memory = 1024bits\nRelative error\nFig. 8:Experiment "
+          },
+          {
+            "claim": "在广泛基数范围与多种内存设置的实验中，DREX 在几乎所有范围与内存配置下误差最低，相比 MRB、SMB、SLB、HLL、KMV 分别将总体相对误差最多降低 **86.05%、81.65%、85.27%、87.07%、88.79%** ；论文摘要亦给出\"最多降低 88.79%\"的一致结论 。对照方案存在明显短板：LC 在范围 2、3 因内存不足而失效，MRB、SMB 在范围 3 失效，HLL 与 KMV 虽能覆盖全部三个范围，但在小内存（如小于 2⁷ bit）下误差很大——例如 KMV 在 64-bit 内存、范围 3 时误差可达 **78%** 。此外，LC 计数范围受内存严格限制（最大基数 m·ln m），且为保持低误差需内存与真实基数线性相关  。",
+            "citations": [
+              "RF-B40077A8-69",
+              "RF-B40077A8-13",
+              "RF-B40077A8-70",
+              "RF-B40077A8-16",
+              "RF-B40077A8-24"
+            ],
+            "label": "PARTIALLY_SUPPORTED",
+            "lexical_overlap": 0.1515,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "erage error in each range in\nFigure 9(a)-(c). DREX shows the lowest error across almost\nall ranges and memory settings. It reduces the overall relative\nerror by up to 86.05%, 81.65%, 85.27% , 87.07%, and 88.79%,\nrespectively, compared to MRB, SMB, SLB, HLL and KMV .\nLC exhibits a small error as DREX in Range 1 (Figure 9(a)),\nyet it becomes invalid in Range 2 and 3 due to insufficient\nLC\n MRB\n KMV\n HLL\n HLLP\n SLB\n SMB\n DREX\n0.00\n0.10\n0.20\n0.30\n0.40\n0.50\n Memory = 64bits\n20\n23\n26\n29\n212\n215\n218\n221\n224\nCardinality\n0.00\n0.02\n0.04\n0.06\n0.08\n0.10\n Memory = 1024bits\nRelative error\nFig. 8:Experiment "
+          },
+          {
+            "claim": "在上述三类需求下，DREX 是证据支持的首选：它原生支持并集与交集  ，在小内存下实现动态范围扩展 ，并在宽基数范围/低内存场景中取得最低误差（对比基线最多降低 88.79%） ，而主要竞争方案在受限内存或高计数范围下均出现失效或高误差 。",
+            "citations": [
+              "RF-B40077A8-51",
+              "RF-B40077A8-53",
+              "RF-B40077A8-9",
+              "RF-B40077A8-69",
+              "RF-B40077A8-13",
+              "RF-B40077A8-70"
+            ],
+            "label": "NOT_SUPPORTED",
+            "lexical_overlap": 0.037,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "lower than 3, so we\nsimply subtract 1 from each of them. Counters s[3],s[4] have\nvalues equal to 3. With probability 1\n2, s[3] is subtracted by 1\nands[4]remains unchanged.\nQuery:If we want to obtain the estimate after the update of\nx5, the estimate is returned by2rmln( m\nm−n ) =2 2∗8∗ln 8\n8−4≈22\nE. Union and Intersection\nNow, we demonstrate that DREX also supports union and\nintersection operations.\nUnion:Algorithm 3 shows the details of the union operation.\nThe algorithm takes two DREX instances I1, I2 as input. Then,\nwe set r as the larger one of I1.r and I2.r (Lines 3, 15). If\nI1.r≥I 2.r, we"
+          }
+        ]
+      },
+      "estimated_cost_usd": null,
+      "bad_case_labels": [
+        "uncited_claim",
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "e2e-16",
+      "query": "Which indexed documents should be excluded from a cardinality-sketch comparison, and why?",
+      "language": "en",
+      "difficulty": "easy",
+      "answer": "## Which documents to exclude from a cardinality-sketch comparison\n\nThe corpus contains 10 documents, but only a subset actually proposes or studies **cardinality / distinct-count estimation** for data streams. The following five should be **excluded**, because they solve different problems or are not sketches at all:\n\n**1. SeiveSketch — wrong estimation target (frequency, not cardinality).**\nIts own title and abstract describe \"a fine-grained and adaptive sketch framework for accurate frequency estimation,\" i.e. it estimates per-item **frequencies**, not the number of distinct elements. It belongs in a frequency-estimation comparison, not a cardinality one. [RF-9b51fd1b-1] [RF-9b51fd1b-14]\n\n**2. RAP — a frequent-pattern *mining* system, not a cardinality sketch.**\nRAP is \"a real-time solution to mine frequent patterns that appear in a large number of distinct flows.\" Cardinality counters are only an internal component; the output and success metrics are pattern-set based (bounded error on pattern cardinality, false-positive/negative probabilities on mined patterns), not a cardinality estimate. [RF-ea8ee7ab-1] [RF-ea8ee7ab-11] [RF-ea8ee7ab-18]\n\n**3. RVCC — not a sketch at all (congestion control).**\nRVCC is \"a novel in-network computing congestion control architecture based on programmable data planes (P4)\" that uses queue selection and hop-by-hop feedback for latency control—no cardinality/sketch primitive. [RF-e26a02a... ] → [RF-e26b02a3-17]\n\n**4. Mycroft — not a sketch (LLM-training reliability tracing).**\nMycroft is \"a lightweight distributed tracing and root cause analysis system\" for collective-communication reliability in LLM training; it performs no cardinality estimation. [RF-02fc78c3-4] [RF-02fc78c3-115]\n\n**5. sigcomm25 — not a sketch (datacenter network architecture).**\nThis is the Astral datacenter-network paper: a same-rail GPU interconnect architecture \"capable of interconnecting half a million GPUs\" for LLM training/inference, not a sketch algorithm. [RF-58aa680d-116] [RF-58aa680d-31]\n\n---\n\n### Borderline case worth flagging\n\n**SpreadSketch** is a **distinct-counting** sketch—reviewers describe it as \"a novel sketch data structure for tracking keys with large distinct count of values\" for superspreader detection, and its counters apply the same multiresolution-bitmap distinct-count primitive. So it should be **kept** if the comparison scope includes per-key distinct counting (spread/superspreader estimation), and **excluded only if** the scope is restricted to whole-stream cardinality. [RF-977c4044-29] [RF-977c4044-33]\n\n### Documents that clearly belong (kept for reference)\nHLL (near-optimal cardinality estimation) [RF-f6b914c4-1], UltraLogLog (28% less space than HLL for the same distinct-count information) [RF-2dccfeb5-1], DREX (dynamic-range distinct counting of network cardinalities) [RF-b40077a8-2], and SMB (online stream cardinality estimation via self-morphing bitmaps) [RF-83330c9c-1].\n\n**Summary:** exclude **SeiveSketch, RAP, RVCC, Mycroft, and sigcomm25** — two are non-cardinality sketches/miners (frequency estimation, pattern mining) and three are non-sketch systems (congestion control, LLM-training tracing, datacenter networking). Treat **SpreadSketch** as a scope-dependent borderline inclusion.",
+      "error": null,
+      "elapsed_seconds": 41.819,
+      "prompt_tokens": 34921,
+      "completion_tokens": 1683,
+      "tool_events": [
+        "read_file(\"E:\\agent\\nanobot-v0.1.4-era\\nanobot\\skil…\"), research_sources",
+        "research_decision(\"search\"), research_search(\"cardinality estimation sketch HyperLogLo…\")",
+        "research_search(\"SpreadSketch abstract what does it estim…\"), research_search(\"SMB sketch abstract\"), research_search(\"SeiveSketch abstract\"), research_search(\"RVCC abstract\"), research_search(\"Mycroft abstract\"), research_search(\"sigcomm25 abstract paper title\"), research_search(\"RAP abstract frequent pattern mining\")",
+        "research_search(\"we propose sketch\"), research_search(\"we propose\"), research_search(\"we propose\"), research_search(\"we propose\"), research_search(\"we propose\"), research_search(\"sketch\")",
+        "research_search(\"cardinality distinct\"), research_search(\"cardinality distinct\"), research_search(\"cardinality distinct counting\"), research_search(\"the sketch data structure\"), research_search(\"sketch memory\"), research_search(\"network measurement\")",
+        "research_search(\"Mycroft system design goal\"), research_search(\"we present system\"), research_search(\"introduction\"), research_search(\"superspreader detection distinct count v…\"), research_search(\"SpreadSketch first paper abstract introd…\")",
+        "list_dir(\"E:\\agent\\nanobot-v0.1.4-era\\research-dem…\"), research_decision(\"search\"), list_dir(\"E:\\agent\\nanobot-v0.1.4-era\\papers\")",
+        "research_search(\"SpreadSketch tracking superspreaders dis…\"), research_search(\"frequency estimation framework adaptive …\"), research_search(\"Self-Morphing Bitmap stream cardinality …\"), research_search(\"DREX distinct counting network traffic a…\")",
+        "research_search(\"Astral network architecture LLM training…\"), research_search(\"RAP frequent pattern mining problem defi…\"), research_decision(\"search\")"
+      ],
+      "streamed_chars": 3958,
+      "response_ok": true,
+      "expected_answerable": true,
+      "abstained": false,
+      "completed": true,
+      "answer_pass": false,
+      "concept_coverage": 0.75,
+      "concepts": [
+        {
+          "aliases": [
+            "Mycroft"
+          ],
+          "matched": "Mycroft"
+        },
+        {
+          "aliases": [
+            "Astral",
+            "sigcomm25"
+          ],
+          "matched": "Astral"
+        },
+        {
+          "aliases": [
+            "LLM",
+            "training",
+            "训练"
+          ],
+          "matched": "LLM"
+        },
+        {
+          "aliases": [
+            "not related",
+            "unrelated",
+            "无关"
+          ],
+          "matched": null
+        }
+      ],
+      "citations": [
+        "RF-9B51FD1B-1",
+        "RF-9B51FD1B-14",
+        "RF-EA8EE7AB-1",
+        "RF-EA8EE7AB-11",
+        "RF-EA8EE7AB-18",
+        "RF-E26B02A3-17",
+        "RF-02FC78C3-4",
+        "RF-02FC78C3-115",
+        "RF-58AA680D-116",
+        "RF-58AA680D-31",
+        "RF-977C4044-29",
+        "RF-977C4044-33",
+        "RF-F6B914C4-1",
+        "RF-2DCCFEB5-1",
+        "RF-B40077A8-2",
+        "RF-83330C9C-1"
+      ],
+      "valid_citations": [
+        "RF-9B51FD1B-1",
+        "RF-9B51FD1B-14",
+        "RF-EA8EE7AB-1",
+        "RF-EA8EE7AB-11",
+        "RF-EA8EE7AB-18",
+        "RF-E26B02A3-17",
+        "RF-02FC78C3-4",
+        "RF-02FC78C3-115",
+        "RF-58AA680D-116",
+        "RF-58AA680D-31",
+        "RF-977C4044-29",
+        "RF-977C4044-33",
+        "RF-F6B914C4-1",
+        "RF-2DCCFEB5-1",
+        "RF-B40077A8-2",
+        "RF-83330C9C-1"
+      ],
+      "missing_citations": [],
+      "citation_validity": 1.0,
+      "relevant_citation_recall": 0.0,
+      "relevant_label_precision": 0.0,
+      "relevant_hits": [],
+      "paragraph_citation_coverage": 0.75,
+      "entailment": {
+        "claims": 7,
+        "entailed": 7,
+        "partially_supported": 0,
+        "unsupported": 0,
+        "support_rate": 1.0,
+        "details": [
+          {
+            "claim": "It belongs in a frequency-estimation comparison, not a cardinality one.",
+            "citations": [
+              "RF-9B51FD1B-1",
+              "RF-9B51FD1B-14"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.2857,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING 1\nSeiveSketch: A Fine-grained and Adaptive Sketch Framework for\nAccurate Frequency Estimation\nLu Tang, Xiaomeng Chen, Siying Zhou, Shishi Zhang, Yi Xie, Xiaochou Chen, Dongzhan Zhang\nAbstract—Estimating the frequency of items in a data stream is\na fundamental task underlying various applications. To improve\naccuracy, existing algorithms use filters to process cold (infre-\nquent) items and hot (frequent) items separately. However, they\noften fail to perform well in different data streams due to their\nfixed parameter configurations. When the fi"
+          },
+          {
+            "claim": "RAP is \"a real-time solution to mine frequent patterns that appear in a large number of distinct flows.\" Cardinality counters are only an internal component; the output and success metrics are pattern-set based (bounded error on pattern cardinality, false-positive/negative probabilities on mined patterns), not a cardinality estimate.",
+            "citations": [
+              "RF-EA8EE7AB-1",
+              "RF-EA8EE7AB-11",
+              "RF-EA8EE7AB-18"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.6562,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "RAP: Real-Time Approximate Frequent Pattern\nMining in Network Traffic\nPaper ID: #142\nAbstract—The ubiquitous attack events pose a significant\nchallenge to the network operations. We observe that the attack\nevents usually show patterns that are frequent across distinct flows.\nSuch frequent patterns are good indicators for the abnormal events\nin the networks. However, as network traffic changes dynamically,\nit is unable for users to accurately predict the ongoing abnormal\nevents or know what frequent patterns will appear in advance.\nThis motivates us to adopt a pattern mining approach to mine\nab"
+          },
+          {
+            "claim": "RVCC is \"a novel in-network computing congestion control architecture based on programmable data planes (P4)\" that uses queue selection and hop-by-hop feedback for latency control—no cardinality/sketch primitive. [RF-e26a02a... ] →",
+            "citations": [
+              "RF-E26B02A3-17"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.7083,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "handling\nbursty Internet traffic.\n• We propose RVCC, a novel in-network computing congestion control architecture based\non programmable data planes (P4). It leverages fine-grained queue selection and hop-by-\nhop upstream feedback to provide ultra-low latency in high-speed networks, particularly\nperforming exceptionally well in severe Incast scenarios.\n• We demonstrate that RVCC is incrementally deployable in existing cloud infrastructures.\nBy preserving standard packet formats at the edge switches, it maintains zero-modification\ntransparency to end-host NICs and network stacks.\n• We conduct ex"
+          },
+          {
+            "claim": "Mycroft is \"a lightweight distributed tracing and root cause analysis system\" for collective-communication reliability in LLM training; it performs no cardinality estimation.",
+            "citations": [
+              "RF-02FC78C3-4",
+              "RF-02FC78C3-115"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.7647,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "com-\nmunication libraries operate as black boxes, hiding critical\ninformation needed for effective root cause analysis.\nWe propose Mycroft, a lightweight distributed tracing and\nroot cause analysis system designed to address previously\nhidden reliability issues in collective communication. My-\ncroft’s key idea is to trace collective communication states\nand leverage internal control and data dependencies to re-\nsolve reliability problems in LLM training. Mycroft has been\ndeployed at ByteDance for over six months to debug collec-\ntive communication–related issues at runtime. It detected\nanomali"
+          },
+          {
+            "claim": "This is the Astral datacenter-network paper: a same-rail GPU interconnect architecture \"capable of interconnecting half a million GPUs\" for LLM training/inference, not a sketch algorithm.",
+            "citations": [
+              "RF-58AA680D-116",
+              "RF-58AA680D-31"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.7,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "t for LLM, which is capable of interconnecting half a\nmillion GPUs. Astral features a same-rail interconnection network\narchitecture, a full-stack monitoring system with cross-host and hi-\nerarchical correlation, and operator-granular performance forecast-\ning. These components come together to deliver a high-performance,\nscalable, ￿exible, and reliable datacenter infrastructure for LLM\nworkloads. We envision that Astral can be a powerful knob for\nexploring the extremes of LLM’s capabilities.\nAcknowledgments\nWe thank our shepherd Soudeh Ghorbani and other anonymous\nSIGCOMM reviewers for their "
+          },
+          {
+            "claim": "So it should be **kept** if the comparison scope includes per-key distinct counting (spread/superspreader estimation), and **excluded only if** the scope is restricted to whole-stream cardinality.",
+            "citations": [
+              "RF-977C4044-29",
+              "RF-977C4044-33"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.2,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "on why it is necessary to achieve high\nupdate performance and our motivation of introducing the HP-Filter in this work.\n3 Reply to Reviewer 2\n1.Reviewer:The paper described a novel sketch data structure for tracking keys with large\ndistinct count of values. Although the author presented the work in the context of DDoS\ndetection in network traffic, the proposed data structure is broadly applicable in other appli-\ncations as well.\n6\ne multiresolution bitmap can count up to 10,000 distinct items with an\nerror smaller than 0.1 based on its error bound. However, it does not mean that SpreadSketch c"
+          },
+          {
+            "claim": "HLL (near-optimal cardinality estimation) , UltraLogLog (28% less space than HLL for the same distinct-count information) , DREX (dynamic-range distinct counting of network cardinalities) , and SMB (online stream cardinality estimation via self-morphing bitmaps) .",
+            "citations": [
+              "RF-F6B914C4-1",
+              "RF-2DCCFEB5-1",
+              "RF-B40077A8-2",
+              "RF-83330C9C-1"
+            ],
+            "label": "ENTAILED",
+            "lexical_overlap": 0.8148,
+            "missing_numbers": [],
+            "missing_citations": [],
+            "evidence_excerpt": "2007 Conference on Analysis of Algorithms, AofA 07 DMTCS proc. AH, 2007, 137–156\nHyperLogLog: the analysis of a near-optimal\ncardinality estimation algorithm\nPhilippe Flajolet1 and Éric Fusy 1 and Olivier Gandouet2 and Frédéric\nMeunier1\n1Algorithms Project, INRIA–Rocquencourt, F78153 Le Chesnay (France)\n2LIRMM, 161 rue Ada, 34392 Montpellier (France)\nThis extended abstract describes and analyses a near-optimal probabilistic algorithm, H YPER LOGLOG, dedicated to\nestimating the number of distinct elements (the cardinality) of very large data ensembles. Using an auxiliary memory\nofm units (typic"
+          }
+        ]
+      },
+      "estimated_cost_usd": null,
+      "bad_case_labels": [
+        "retrieval_or_ranking_miss",
+        "uncited_claim"
+      ]
+    }
+  ],
+  "dataset": "E:\\agent\\nanobot-v0.1.4-era\\benchmarks\\researchflow\\cardinality_e2e_holdout_16_768.jsonl",
+  "model": "deepseek-flash"
+}

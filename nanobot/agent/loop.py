@@ -23,6 +23,7 @@ from nanobot.agent.tools.filesystem import EditFileTool, ListDirTool, ReadFileTo
 from nanobot.agent.tools.message import MessageTool
 from nanobot.agent.tools.registry import ToolRegistry
 from nanobot.agent.tools.research import register_research_tools
+from nanobot.agent.tools.research_delegate import ResearchDelegateTool
 from nanobot.agent.tools.shell import ExecTool
 from nanobot.agent.tools.spawn import SpawnTool
 from nanobot.agent.tools.web import WebFetchTool, WebSearchTool
@@ -253,6 +254,7 @@ class AgentLoop:
         self.tools.register(WebFetchTool(proxy=self.web_proxy))
         self.tools.register(MessageTool(send_callback=self.bus.publish_outbound))
         self.tools.register(SpawnTool(manager=self.subagents))
+        self.tools.register(ResearchDelegateTool(manager=self.subagents))
         register_research_tools(self.tools, self.workspace, allowed_dir=allowed_dir)
         if self.cron_service:
             self.tools.register(

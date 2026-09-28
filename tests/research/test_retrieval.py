@@ -1,11 +1,20 @@
 from __future__ import annotations
 
+import sys
+import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 
-from nanobot.research.benchmark import benchmark_retrieval, validate_cases
-from nanobot.research.retrieval import DenseRetriever, RetrievalSuite, reflect_query
+from nanobot.research.benchmark import benchmark_retrieval, tune_rrf_weights, validate_cases
+from nanobot.research.retrieval import (
+    BGEM3DenseEmbedder,
+    DenseRetriever,
+    RetrievalSuite,
+    reflect_query,
+)
 from nanobot.research.store import ResearchStore
 
 
@@ -67,6 +76,27 @@ def test_reflection_expands_cross_language_retrieval_terms() -> None:
     assert "ULL" not in expanded
 
 
+def test_bge_model_initialization_is_singleton_under_concurrent_queries(monkeypatch) -> None:
+    instances: list[object] = []
+
+    class FakeModel:
+        def __init__(self, *_args, **_kwargs) -> None:
+            time.sleep(0.05)
+            instances.append(self)
+
+    monkeypatch.setitem(
+        sys.modules,
+        "FlagEmbedding",
+        SimpleNamespace(BGEM3FlagModel=FakeModel),
+    )
+    embedder = BGEM3DenseEmbedder()
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        models = list(executor.map(lambda _index: embedder.model, range(4)))
+
+    assert len(instances) == 1
+    assert all(model is instances[0] for model in models)
+
+
 def test_benchmark_compares_all_methods(tmp_path: Path) -> None:
     store = _store(tmp_path)
     rabbit = store.search("RabbitMQ acknowledgement", top_k=1)[0]["citation"]
@@ -102,6 +132,38 @@ def test_benchmark_compares_all_methods(tmp_path: Path) -> None:
     }
     assert result["methods"]["vector"]["metrics"]["at_1"]["mrr"] == 1.0
     assert validate_cases(store, cases) == cases
+
+
+def test_rrf_tuning_reuses_retrieval_and_prefers_recall(tmp_path: Path) -> None:
+    store = _store(tmp_path)
+    rabbit = store.search("RabbitMQ acknowledgement", top_k=1)[0]["citation"]
+    redis = store.search("Redis consumer group", top_k=1)[0]["citation"]
+    cases = [
+        {
+            "id": "rabbit",
+            "query": "RabbitMQ acknowledgement",
+            "relevant_citations": [rabbit],
+        },
+        {
+            "id": "redis",
+            "query": "Redis consumer group",
+            "relevant_citations": [redis],
+        },
+    ]
+    dense = DenseRetriever(store, model_name="test/model", embedder=_KeywordEmbedder())
+    dense.build_index()
+    result = tune_rrf_weights(
+        store,
+        RetrievalSuite(store, dense),
+        cases,
+        top_k=2,
+        weight_ratios=(0.5, 1.0, 2.0),
+        rank_constants=(20,),
+    )
+
+    assert result["best"] is not None
+    assert result["best"]["metrics"]["recall_at_k"] >= 0.0
+    assert len(result["candidates"]) == 3
 
 
 def test_online_hybrid_supports_abstention_fallback_and_reranking(tmp_path: Path) -> None:
@@ -145,3 +207,20 @@ def test_online_hybrid_supports_abstention_fallback_and_reranking(tmp_path: Path
     )
     assert degraded.degraded is True
     assert degraded.used_strategy == "bm25"
+
+    class BrokenBackend:
+        def bm25(self, *_args, **_kwargs):
+            raise OSError("Milvus offline")
+
+        def vector(self, *_args, **_kwargs):
+            raise OSError("Milvus offline")
+
+    external_degraded = RetrievalSuite(store, dense, backend=BrokenBackend()).search(
+        "RabbitMQ acknowledgement",
+        strategy="hybrid",
+        no_answer_threshold=0.0,
+    )
+    assert external_degraded.degraded is True
+    assert external_degraded.used_strategy == "bm25"
+    assert external_degraded.results[0]["title"] == "rabbit"
+    assert "sparse backend unavailable" in external_degraded.fallback_reason

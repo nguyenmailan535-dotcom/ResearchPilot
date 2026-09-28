@@ -1,0 +1,20 @@
+{"id":"rap-v2-01","query":"How does RAP mine frequent patterns in one pass while reducing memory and reporting results in real time?","relevant_citations":["RF-EA8EE7AB-12"],"language":"en","difficulty":"medium","source":"RAP"}
+{"id":"rap-v2-02","query":"RAP 在哪些平台实现，相比已有方案的数据包处理吞吐提升了多少？","relevant_citations":["RF-EA8EE7AB-3"],"language":"zh","difficulty":"easy","source":"RAP"}
+{"id":"rap-v2-03","query":"What are RAP's theoretical space and time complexities in terms of X, b, m, epsilon, delta, and l?","relevant_citations":["RF-EA8EE7AB-53"],"language":"en","difficulty":"hard","source":"RAP"}
+{"id":"rap-v2-04","query":"RAP 对频繁模式的估计误差、假阴性和小模式假阳性分别给出了什么概率保证？","relevant_citations":["RF-EA8EE7AB-18"],"language":"zh","difficulty":"hard","source":"RAP"}
+{"id":"rvcc-v2-01","query":"What problem do PFC storms and slow end-to-end feedback create, and what architecture does RVCC propose?","relevant_citations":["RF-E26B02A3-1"],"language":"en","difficulty":"medium","source":"RVCC"}
+{"id":"rvcc-v2-02","query":"RVCC 如何在不增加主机 CPU 开销的情况下缓解队头阻塞，在 Incast 场景中尾延迟最多降低多少？","relevant_citations":["RF-E26B02A3-3"],"language":"zh","difficulty":"medium","source":"RVCC"}
+{"id":"rvcc-v2-03","query":"What tail-latency reductions does RVCC report for small flows generally and in an Incast scenario?","relevant_citations":["RF-E26B02A3-16"],"language":"en","difficulty":"easy","source":"RVCC"}
+{"id":"rvcc-v2-04","query":"为什么端到端拥塞控制的反馈可能赶不上逐跳传播的 PFC storm？","relevant_citations":["RF-E26B02A3-12"],"language":"zh","difficulty":"hard","source":"RVCC"}
+{"id":"smb-v2-01","query":"How does a self-morphing bitmap automatically adapt its sampling probability as stream cardinality grows?","relevant_citations":["RF-83330C9C-1"],"language":"en","difficulty":"medium","source":"SMB"}
+{"id":"smb-v2-02","query":"为什么 HLL++ 不适合高频在线查询，而传统 bitmap 又受到估计范围限制？","relevant_citations":["RF-83330C9C-13"],"language":"zh","difficulty":"medium","source":"SMB"}
+{"id":"smb-v2-03","query":"What probability bound is reported for relative error below 0.1 when the SMB bitmap uses 10,000 bits?","relevant_citations":["RF-83330C9C-71"],"language":"en","difficulty":"hard","source":"SMB"}
+{"id":"smb-v2-04","query":"SMB 与 MRB 在 bitmap 数量、采样概率以及已记录信息利用方式上有何区别？","relevant_citations":["RF-83330C9C-16"],"language":"zh","difficulty":"hard","source":"SMB"}
+{"id":"spread-v2-01","query":"What fan-out skew was observed in the UNI2 and enterprise traces used to justify SpreadSketch's scope?","relevant_citations":["RF-977C4044-10"],"language":"en","difficulty":"medium","source":"SpreadSketch"}
+{"id":"spread-v2-02","query":"为什么继续增大 HP-Filter 的内存不一定提升准确率？论文修订增加了哪些相关实验？","relevant_citations":["RF-977C4044-41"],"language":"zh","difficulty":"hard","source":"SpreadSketch"}
+{"id":"spread-v2-03","query":"How was the hardware feasibility of HP-SpreadSketch demonstrated on a programmable switch?","relevant_citations":["RF-977C4044-27"],"language":"en","difficulty":"medium","source":"SpreadSketch"}
+{"id":"spread-v2-04","query":"HP-SpreadSketch 相比 SpreadSketch 的更新性能与内存开销之间有什么权衡？","relevant_citations":["RF-977C4044-23"],"language":"zh","difficulty":"medium","source":"SpreadSketch"}
+{"id":"cross-v2-01","query":"Compare how RAP and SMB adapt their maintained state as an initially unknown stream evolves.","relevant_citations":["RF-EA8EE7AB-12","RF-83330C9C-16"],"language":"en","difficulty":"hard","source":"cross-paper"}
+{"id":"cross-v2-02","query":"RAP 与 RVCC 分别如何利用 P4 可编程数据平面解决网络测量和拥塞控制问题？","relevant_citations":["RF-EA8EE7AB-3","RF-E26B02A3-1"],"language":"zh","difficulty":"hard","source":"cross-paper"}
+{"id":"cross-v2-03","query":"How do RVCC and HP-SpreadSketch differ in what they deploy on Tofino switches and the objective they optimize?","relevant_citations":["RF-E26B02A3-1","RF-977C4044-27"],"language":"en","difficulty":"hard","source":"cross-paper"}
+{"id":"cross-v2-04","query":"比较 SMB 的流基数估计任务与 SpreadSketch 的网络级 superspreader 检测任务。","relevant_citations":["RF-83330C9C-1","RF-977C4044-2"],"language":"zh","difficulty":"hard","source":"cross-paper"}

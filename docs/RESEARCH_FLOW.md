@@ -19,26 +19,46 @@ auditable event log.
 ## Architecture
 
 ```text
-Web UI / CLI / HTTP API
+Web UI / CLI / FastAPI
        |
 Persistent task state + resumable SSE events
        |
 nanobot AgentRunner (existing ReAct loop)
        |
-       +-- research_ingest  -> fixed/structure-aware configurable chunking
-       +-- research_search  -> BM25 / dense / RRF / reflection / optional reranking
+       +-- research_delegate -> 2-3 parallel read-only evidence researchers
+       |                         +-- research_sources / search / read only
+       |                         +-- structured findings + citation validation
+       |                         +-- main-Agent synthesis and writes
+       +-- research_ingest  -> Unstructured element parsing + configurable chunking
+       +-- research_search  -> Milvus BM25 / BGE-M3 HNSW / RRF / reflection / reranking
        +-- research_read    -> exact evidence lookup
        +-- research_decision-> cited, versioned Evidence Ledger
        +-- research_report  -> citation + Claim/Evidence verification
        +-- research_sources -> corpus and audit statistics
-                              |
-                        SQLite research.db
+                +-------------+----------------+
+                |                              |
+        Milvus retrieval plane          SQLite control plane
+        dense + sparse indexes          tasks / events / ledger
 ```
 
-The SQLite store contains sources, evidence chunks, an Evidence Ledger, and append-only research
-events. Generic conversation memory remains owned by the nanobot runtime. The store also persists
-API task state and replayable task events. Citation IDs are stable
+SQLite remains the source of truth for sources, evidence chunks, the Evidence Ledger, asynchronous
+task state and replayable events. Milvus is a rebuildable retrieval projection: Unstructured
+element metadata and chunks are synchronized incrementally, BGE-M3 emits normalized 1024-dimensional
+dense vectors, a Milvus BM25 Function generates sparse vectors, and HNSW serves dense ANN search.
+The local SQLite/NumPy backend remains available for unit tests and degraded development runs.
+For a non-trivial corpus, run `nanobot research sync-index --workspace <workspace>` after ingest so
+embedding and index construction happen before the first interactive query. The Docker profile uses
+Milvus standalone with embedded etcd and local persistent storage, avoiding an external object-store
+dependency for the single-node resume/demo deployment.
+Generic conversation memory remains owned by the nanobot runtime. Citation IDs are stable
 (`RF-<source>-<chunk>`) across unchanged re-indexing.
+
+For substantial questions with independent dimensions, the main Agent can delegate two or three
+evidence investigations concurrently. Delegated researchers have a deliberately read-only tool
+surface: they can inspect sources, search, and read exact chunks, but cannot ingest documents,
+save reports, execute shell commands, or mutate memory/the Evidence Ledger. Each worker returns
+structured findings, gaps, queries and RF citations; the coordinator validates citation IDs,
+resolves conflicts, performs final synthesis and remains the only writer.
 
 ## Design references
 
@@ -106,7 +126,7 @@ Compare BM25, multilingual dense retrieval, weighted hybrid RRF, and determinist
 reflection on the checked-in 40-question benchmark:
 
 ```powershell
-pip install -e ".[research]"
+pip install -e ".[research,api,eval]"
 
 nanobot research benchmark `
   .\benchmarks\researchflow\cardinality_sketch_40.jsonl `
@@ -150,14 +170,27 @@ nanobot research judge-evaluate `
   .\benchmarks\researchflow\results\e2e-p0-p1-final.json `
   --workspace .\research-demo --judge-model deepseek-v4-pro `
   --semantic-entailment --limit 1
+
+# RAGAS is isolated because its OpenAI/LangChain pins conflict with the online runtime.
+docker compose -f docker-compose.research.yml build researchflow
+docker compose -f docker-compose.research.yml --profile eval build researchflow-eval
+docker compose -f docker-compose.research.yml --profile eval run --rm researchflow-eval `
+  /data/workspace/research/evaluations/e2e-bge-m3-milvus-resumed.json `
+  --workspace /data/workspace --model deepseek-v4-pro `
+  --output /data/workspace/research/evaluations/ragas-bge-m3.json
+
+# If a provider/model failure interrupted only part of the metrics, rerun incomplete cases only.
+docker compose -f docker-compose.research.yml --profile eval run --rm researchflow-eval `
+  /data/workspace/research/evaluations/e2e-bge-m3-milvus-resumed.json `
+  --workspace /data/workspace --model deepseek-v4-pro `
+  --resume-from /data/workspace/research/evaluations/ragas-bge-m3.json `
+  --output /data/workspace/research/evaluations/ragas-bge-m3.json
 ```
 
 ## What is deliberately out of scope
 
 - A Feishu-specific channel. Existing nanobot channels remain compatible, but they are delivery
   adapters rather than the project's core contribution.
-- An external vector database. The benchmark layer uses a local FastEmbed/ONNX index with a
-  corpus-addressed NumPy cache, keeping the project self-contained and reproducible.
 - An online LLM judge in the serving hot path. The optional judge is evaluation-only; deterministic
   retrieval, citation, Claim/Evidence, latency and token metrics remain the primary signals.
 
@@ -175,3 +208,7 @@ The repository includes a 40-question bilingual retrieval development set and a 
 
 Keep the dataset, evaluator, and raw JSON results in the repository so every resume number is
 reproducible.
+
+The checked-in MiniLM/NumPy benchmark is a migration baseline. Current BGE-M3/Milvus raw outputs
+are checked in separately; mapped citation labels still require human audit before the migration
+metrics are treated as final ground truth.

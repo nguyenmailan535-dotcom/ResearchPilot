@@ -2,7 +2,9 @@
 
 本目录保存两套可复现的领域检索评测，用于比较 ResearchFlow 的 BM25、向量检索、
 混合检索、查询反思和可选 Reranker。V1 是 6 篇论文、480 个稳定引用块的原始快照；
-当前 `research-demo` 已扩展为 10 篇论文、752 个稳定引用块，并增加 V2 扩展诊断集。
+当前语料已扩展为 10 篇论文。新的 Unstructured 元素打包 + `768/120` 固定窗口索引包含
+1,243 个稳定引用块；
+旧 `research-demo` 快照仍保留，便于复现历史指标。
 
 ## 数据集
 
@@ -22,11 +24,10 @@
 ## 对比方案
 
 1. **BM25**：ResearchStore 内置的中英文分词与 BM25 检索。
-2. **向量检索**：使用
-   `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`；将原始证据块进一步
-   切成 480 字符、80 字符重叠的段落，在 1,385 个段落上生成 384 维向量，并以段落
-   最高相似度作为证据块得分。向量由 FastEmbed/ONNX 本地推理并按语料指纹缓存。
-3. **混合检索**：分别取 BM25 和向量候选，以权重 2:1 执行 Reciprocal Rank Fusion。
+2. **向量检索**：生产链路使用 `BAAI/bge-m3` 生成 1024 维归一化 Dense 向量，并由
+   Milvus HNSW 索引召回；早期 MiniLM/NumPy 指标仅保留作迁移前历史基线。
+3. **混合检索**：Milvus BM25 Sparse 与 BGE-M3 Dense 双路召回；在 V2 开发集上网格搜索后，
+   使用 BM25:Dense=`1:1`、RRF rank constant=`20`，不在 V1 回归集上调参。
 4. **查询反思**：对中英文领域术语进行确定性扩展，执行第二轮混合检索，再融合两轮
    排名。此版本不调用 LLM，避免评测结果受模型随机性和 API 状态影响。
 
@@ -143,11 +144,48 @@ P95 检索延迟为 135.72 ms。这里的相关性通过原标注块的 source/p
 [`results/chunk-ablation.json`](./results/chunk-ablation.json)。在重建正式语料和重新标注
 holdout 前，现有 1,200/160 索引仍保留，以避免让已发布的稳定引用失效。
 
-20 条阈值开发集上，Hybrid 推荐阈值为 0.75：平衡准确率 0.90、可回答准确率 0.80、
-不可回答召回率 1.00、误答率 0。该数字仅用于选择阈值，不作为最终泛化成绩；原始结果
-见 [`results/abstention-calibration.json`](./results/abstention-calibration.json)。
+## BGE-M3 + Milvus 正式重建结果（10 篇论文）
 
-## 端到端独立测试
+根据开发集消融结论，在独立工作区用 Unstructured 提取页级元素，再将相邻元素按页和章节
+打包并执行固定窗口 `768/120`，完整重建 10 篇论文，得到 1,243 个证据块。块长均值为
+668.5 字符、中位数 706、P95 765，仅 22 块短于 200 字符。Milvus 中的精确行数为 1,243，
+二次同步 `upserted=0/deleted=0`，验证了索引同步幂等性。
+
+旧标签依据 source、page 和 token Jaccard 机械映射到新引用；46 个唯一引用的平均/最低
+映射分数为 0.6197/0.4041。因此下列结果属于可复现的迁移回归测试，作为正式 ground truth
+发布前仍需人工抽检。映射记录见
+[`results/citation-remap-bge-m3-packed.json`](./results/citation-remap-bge-m3-packed.json)。
+
+V2 开发集用于选择 RRF 参数，最优配置为 BM25:Dense=`1:1`、`k=20`。固定参数后在 40 条
+V1 映射回归集复测：
+
+| 方法 | Recall@5 | MRR@5 | P95 |
+|---|---:|---:|---:|
+| BM25 | 0.4625 | 0.3858 | 100.21 ms |
+| BGE-M3 Dense | 0.7000 | 0.4196 | 852.47 ms |
+| Hybrid RRF | **0.7125** | **0.4654** | 994.27 ms |
+| Reflected Hybrid | 0.6875 | 0.4508 | 2149.80 ms |
+
+Hybrid 相比 BM25 的 Recall@5 相对提升 **54.1%**、MRR@5 相对提升 **20.6%**。规则反思
+在这次复测中效果和延迟都弱于已调参 Hybrid，因此只保留为低置信度降级策略，不作为默认链路。
+原始结果见
+[`results/retrieval-bge-m3-milvus-v1-tuned.json`](./results/retrieval-bge-m3-milvus-v1-tuned.json)，
+调参轨迹见 [`results/rrf-tuning-bge-m3-v2.json`](./results/rrf-tuning-bge-m3-v2.json)。
+
+20 条拒答开发集推荐阈值为 0.75：平衡准确率 0.85、可回答准确率 0.70、不可回答召回率
+1.00、误答率 0；它只用于选择阈值，不作为最终泛化成绩。原始结果见
+[`results/abstention-bge-m3-milvus-dev.json`](./results/abstention-bge-m3-milvus-dev.json)。
+
+16 条端到端复测结果为：任务完成率 1.0000、答案通过率 0.8750、概念覆盖率 0.8958、
+引用有效率 1.0000、相关引用召回率 0.7292、段落引用覆盖率 0.8281、规则 Claim 支持率
+0.7776，平均/P95 延迟 33.20/105.89 秒，平均输入/输出 Token 为 19,183.56/1,095.94。
+DeepSeek V4-Pro 结构化 Judge 平均总分为 1.0000；RAGAS 的 16 条 Answer Relevancy 为
+0.8928，Faithfulness 因模型服务余额不足未完成，不能与已完成指标混写。原始结果分别见
+[`results/e2e-bge-m3-milvus.json`](./results/e2e-bge-m3-milvus.json)、
+[`results/judge-deepseek-v4-pro-bge-m3.json`](./results/judge-deepseek-v4-pro-bge-m3.json) 和
+[`results/ragas-deepseek-v4-pro-bge-m3.partial.json`](./results/ragas-deepseek-v4-pro-bge-m3.partial.json)。
+
+## 历史 MiniLM/NumPy 端到端基线
 
 为避免只证明“检索到了证据”，另建了 16 条未参与检索方案调参的中英双语问题，检查
 最终回答中的必需概念、引用有效性、相关证据召回、段落引用覆盖、延迟和 token。
@@ -185,7 +223,7 @@ nanobot research e2e-evaluate `
 Bad Case 自动归类为：1 条检索/排序未命中、9 条存在未引用段落、8 条被规则验证器标记为
 至少一个不充分支持 Claim。这些标签用于建立回归集，仍需人工复核，不能直接当作事实错误率。
 
-### DeepSeek V4-Pro LLM-as-Judge
+### 历史答案的 DeepSeek V4-Pro LLM-as-Judge
 
 对上述 16 条已保存答案使用 `deepseek-v4-pro` 进行独立辅助评分。Judge 读取题目、必需概念、
 答案、原始 Gold Evidence 和答案实际引用的原文块，按正确性、忠实度、完整性、引用对齐四个

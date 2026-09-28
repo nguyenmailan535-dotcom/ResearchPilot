@@ -152,12 +152,18 @@
 ## 🔬 ResearchFlow: Evidence-Grounded Research Agent
 
 This branch extends nanobot v0.1.4 with **ResearchFlow**, a technical and academic research
-workflow built directly on the existing AgentRunner and ToolRegistry. It indexes local PDFs,
-Markdown, text, and source files; retrieves multilingual evidence with selectable BM25, dense,
+workflow built directly on the existing AgentRunner and ToolRegistry. It parses local PDFs with
+Unstructured, stores workflow state in SQLite, and projects evidence into Milvus for BGE-M3 dense
+HNSW and BM25 sparse retrieval. It supports selectable BM25, dense,
 weighted-RRF hybrid and reflected-hybrid retrieval; optionally reranks candidates; abstains when
 evidence is weak; validates Claim—Evidence alignment; and keeps cited project decisions in a
-versioned Evidence Ledger. A persistent asynchronous task API, resumable SSE event stream, and
+versioned Evidence Ledger. A FastAPI asynchronous task API, resumable SSE event stream, and
 zero-build web client turn the workflow into a complete local application.
+
+For substantial questions with independent dimensions, the coordinator can run 2-3 read-only
+research SubAgents concurrently. Workers receive only source-listing, evidence-search and
+exact-read tools, return structured findings with validated RF citations, and leave conflict
+resolution, final synthesis, report saving and Evidence Ledger writes to the main Agent.
 
 ```bash
 # Build a local evidence corpus
@@ -173,12 +179,14 @@ nanobot agent --workspace ./research-workspace
 nanobot serve --host 127.0.0.1 --port 18791 --workspace ./research-workspace
 ```
 
-The core workflow is **decompose → retrieve → inspect evidence gaps → refine → synthesize →
+The core workflow is **decompose → retrieve → inspect evidence gaps → refine → optional Tavily
+fallback → synthesize →
 verify claims and citations → record cited decisions**. A checked-in 40-question bilingual benchmark
-compares BM25, dense, hybrid, and reflected-hybrid retrieval; the best Recall@5 is 0.6625. See
-the separate 16-question end-to-end holdout evaluation for grounded-answer metrics: 100% task
-completion and citation validity, 93.75% answer pass rate, 85.94% concept coverage, and 82.29%
-relevant-citation recall. Evaluation also records P50/P95 latency, token/cost totals, abstention
+now records both the historical MiniLM/NumPy baseline and the rebuilt BGE-M3/Milvus path. On the
+40-case mapped migration set, tuned Hybrid reaches 0.7125 Recall@5 and 0.4654 MRR@5, relative gains
+of 54.1% and 20.6% over BM25. The 16-question end-to-end run records 100% task completion and
+citation validity, 87.5% answer pass rate, and 33.20/105.89-second average/P95 latency. Evaluation
+also records P50/P95 latency, token/cost totals, abstention
 quality, deterministic Claim—Evidence support, Bad Cases, and an optional structured LLM judge.
 See [ResearchFlow architecture](./docs/RESEARCH_FLOW.md), the
 [HTTP/SSE API](./docs/RESEARCH_API.md), and the
@@ -196,11 +204,17 @@ The animation is generated from a real local run. See the [full workspace screen
 
 ```bash
 docker compose -f docker-compose.research.yml up -d --build
+docker compose -f docker-compose.research.yml exec researchflow \
+  nanobot research ingest /data/papers --workspace /data/workspace
+docker compose -f docker-compose.research.yml exec researchflow \
+  nanobot research sync-index --workspace /data/workspace
 curl http://127.0.0.1:18791/health
 ```
 
 Open `http://127.0.0.1:18791` for the web workspace. Runtime data is persisted under
-`./workspace` and is intentionally excluded from version control.
+`./workspace` and is intentionally excluded from version control. Put PDFs in `./papers` (mounted
+read-only at `/data/papers`), or set `RESEARCHFLOW_WORKSPACE` / `RESEARCHFLOW_PAPERS` in `.env`
+before starting Compose.
 
 ## 📦 Install
 

@@ -1,0 +1,220 @@
+{
+  "cases": 10,
+  "strategy": "hybrid",
+  "recommended": {
+    "threshold": 0.85,
+    "balanced_accuracy": 0.6,
+    "answerable_accuracy": 0.2,
+    "unanswerable_recall": 1.0,
+    "false_answer_rate": 0.0,
+    "retrieval_recall": 0.6
+  },
+  "scores": [
+    {
+      "threshold": 0.05,
+      "balanced_accuracy": 0.5,
+      "answerable_accuracy": 1.0,
+      "unanswerable_recall": 0.0,
+      "false_answer_rate": 1.0,
+      "retrieval_recall": 0.6
+    },
+    {
+      "threshold": 0.1,
+      "balanced_accuracy": 0.5,
+      "answerable_accuracy": 1.0,
+      "unanswerable_recall": 0.0,
+      "false_answer_rate": 1.0,
+      "retrieval_recall": 0.6
+    },
+    {
+      "threshold": 0.15,
+      "balanced_accuracy": 0.5,
+      "answerable_accuracy": 1.0,
+      "unanswerable_recall": 0.0,
+      "false_answer_rate": 1.0,
+      "retrieval_recall": 0.6
+    },
+    {
+      "threshold": 0.2,
+      "balanced_accuracy": 0.5,
+      "answerable_accuracy": 1.0,
+      "unanswerable_recall": 0.0,
+      "false_answer_rate": 1.0,
+      "retrieval_recall": 0.6
+    },
+    {
+      "threshold": 0.25,
+      "balanced_accuracy": 0.5,
+      "answerable_accuracy": 1.0,
+      "unanswerable_recall": 0.0,
+      "false_answer_rate": 1.0,
+      "retrieval_recall": 0.6
+    },
+    {
+      "threshold": 0.3,
+      "balanced_accuracy": 0.5,
+      "answerable_accuracy": 1.0,
+      "unanswerable_recall": 0.0,
+      "false_answer_rate": 1.0,
+      "retrieval_recall": 0.6
+    },
+    {
+      "threshold": 0.35,
+      "balanced_accuracy": 0.5,
+      "answerable_accuracy": 1.0,
+      "unanswerable_recall": 0.0,
+      "false_answer_rate": 1.0,
+      "retrieval_recall": 0.6
+    },
+    {
+      "threshold": 0.4,
+      "balanced_accuracy": 0.5,
+      "answerable_accuracy": 1.0,
+      "unanswerable_recall": 0.0,
+      "false_answer_rate": 1.0,
+      "retrieval_recall": 0.6
+    },
+    {
+      "threshold": 0.45,
+      "balanced_accuracy": 0.5,
+      "answerable_accuracy": 1.0,
+      "unanswerable_recall": 0.0,
+      "false_answer_rate": 1.0,
+      "retrieval_recall": 0.6
+    },
+    {
+      "threshold": 0.5,
+      "balanced_accuracy": 0.5,
+      "answerable_accuracy": 1.0,
+      "unanswerable_recall": 0.0,
+      "false_answer_rate": 1.0,
+      "retrieval_recall": 0.6
+    },
+    {
+      "threshold": 0.55,
+      "balanced_accuracy": 0.6,
+      "answerable_accuracy": 1.0,
+      "unanswerable_recall": 0.2,
+      "false_answer_rate": 0.8,
+      "retrieval_recall": 0.6
+    },
+    {
+      "threshold": 0.6,
+      "balanced_accuracy": 0.5,
+      "answerable_accuracy": 0.4,
+      "unanswerable_recall": 0.6,
+      "false_answer_rate": 0.4,
+      "retrieval_recall": 0.6
+    },
+    {
+      "threshold": 0.65,
+      "balanced_accuracy": 0.5,
+      "answerable_accuracy": 0.4,
+      "unanswerable_recall": 0.6,
+      "false_answer_rate": 0.4,
+      "retrieval_recall": 0.6
+    },
+    {
+      "threshold": 0.7,
+      "balanced_accuracy": 0.6,
+      "answerable_accuracy": 0.4,
+      "unanswerable_recall": 0.8,
+      "false_answer_rate": 0.2,
+      "retrieval_recall": 0.6
+    },
+    {
+      "threshold": 0.75,
+      "balanced_accuracy": 0.6,
+      "answerable_accuracy": 0.4,
+      "unanswerable_recall": 0.8,
+      "false_answer_rate": 0.2,
+      "retrieval_recall": 0.6
+    },
+    {
+      "threshold": 0.8,
+      "balanced_accuracy": 0.5,
+      "answerable_accuracy": 0.2,
+      "unanswerable_recall": 0.8,
+      "false_answer_rate": 0.2,
+      "retrieval_recall": 0.6
+    },
+    {
+      "threshold": 0.85,
+      "balanced_accuracy": 0.6,
+      "answerable_accuracy": 0.2,
+      "unanswerable_recall": 1.0,
+      "false_answer_rate": 0.0,
+      "retrieval_recall": 0.6
+    },
+    {
+      "threshold": 0.9,
+      "balanced_accuracy": 0.5,
+      "answerable_accuracy": 0.0,
+      "unanswerable_recall": 1.0,
+      "false_answer_rate": 0.0,
+      "retrieval_recall": 0.6
+    }
+  ],
+  "observations": [
+    {
+      "id": "v2-pos-rap",
+      "answerable": true,
+      "confidence": 0.5604,
+      "retrieval_hit": false
+    },
+    {
+      "id": "v2-pos-rvcc",
+      "answerable": true,
+      "confidence": 0.7845,
+      "retrieval_hit": true
+    },
+    {
+      "id": "v2-pos-smb",
+      "answerable": true,
+      "confidence": 0.5506,
+      "retrieval_hit": true
+    },
+    {
+      "id": "v2-pos-spread",
+      "answerable": true,
+      "confidence": 0.8534,
+      "retrieval_hit": true
+    },
+    {
+      "id": "v2-pos-cross",
+      "answerable": true,
+      "confidence": 0.5859,
+      "retrieval_hit": false
+    },
+    {
+      "id": "v2-neg-01",
+      "answerable": false,
+      "confidence": 0.5762,
+      "retrieval_hit": false
+    },
+    {
+      "id": "v2-neg-02",
+      "answerable": false,
+      "confidence": 0.681,
+      "retrieval_hit": false
+    },
+    {
+      "id": "v2-neg-03",
+      "answerable": false,
+      "confidence": 0.5944,
+      "retrieval_hit": false
+    },
+    {
+      "id": "v2-neg-04",
+      "answerable": false,
+      "confidence": 0.8284,
+      "retrieval_hit": false
+    },
+    {
+      "id": "v2-neg-05",
+      "answerable": false,
+      "confidence": 0.5038,
+      "retrieval_hit": false
+    }
+  ]
+}

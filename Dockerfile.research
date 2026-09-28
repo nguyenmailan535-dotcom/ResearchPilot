@@ -1,13 +1,25 @@
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    PIP_DEFAULT_TIMEOUT=1000
 
 WORKDIR /app
 
+RUN apt-get -o Acquire::Retries=5 update && \
+    apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
+    libgl1 libmagic1 poppler-utils tesseract-ocr && \
+    rm -rf /var/lib/apt/lists/*
+
+# Keep the large CPU PyTorch layer independent of project metadata changes.
+RUN pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu \
+        "torch==2.9.1+cpu" "torchvision==0.24.1+cpu"
+
+ENV PIP_RETRIES=10
+
 COPY pyproject.toml README.md LICENSE ./
-RUN mkdir -p nanobot bridge && touch nanobot/__init__.py && \
-    pip install --no-cache-dir ".[api,research]" && \
+RUN mkdir -p nanobot bridge && touch nanobot/__init__.py
+RUN pip install --no-cache-dir ".[api,research]" && \
     rm -rf nanobot bridge
 
 COPY nanobot/ nanobot/

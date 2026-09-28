@@ -4,6 +4,7 @@ from types import SimpleNamespace
 import pytest
 
 from nanobot.research.end_to_end import (
+    aggregate_evaluation_details,
     evaluate_agent_answers,
     load_end_to_end_cases,
     score_answer,
@@ -75,3 +76,5 @@ async def test_evaluate_agent_answers_aggregates_runtime_metrics(tmp_path: Path)
     assert result["metrics"]["answer_pass_rate"] == 1.0
     assert result["metrics"]["average_prompt_tokens"] == 100.0
     assert result["metrics"]["average_tool_events"] == 1.0
+    resumed = aggregate_evaluation_details(result["details"])
+    assert resumed["metrics"] == result["metrics"]

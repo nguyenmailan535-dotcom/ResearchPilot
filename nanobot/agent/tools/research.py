@@ -5,12 +5,14 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import threading
 from pathlib import Path
 from typing import Any
 
 from nanobot.agent.tools.base import Tool
 from nanobot.agent.tools.registry import ToolRegistry
 from nanobot.research.retrieval import (
+    DEFAULT_EMBEDDING_MODEL,
     DenseRetriever,
     FastEmbedReranker,
     RetrievalSuite,
@@ -29,29 +31,55 @@ class _StoreHandle:
         self.workspace = workspace
         self._store: ResearchStore | None = None
         self._retrieval: RetrievalSuite | None = None
+        self._initialization_lock = threading.RLock()
 
     @property
     def store(self) -> ResearchStore:
         if self._store is None:
-            self._store = ResearchStore(Path(self.workspace))
+            with self._initialization_lock:
+                if self._store is None:
+                    self._store = ResearchStore(Path(self.workspace))
         return self._store
 
     @property
     def retrieval(self) -> RetrievalSuite:
         if self._retrieval is None:
-            dense = DenseRetriever(
-                self.store,
-                model_name=os.getenv(
-                    "RESEARCH_EMBEDDING_MODEL",
-                    "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
-                ),
-            )
-            reranker = None
-            if os.getenv("RESEARCH_ENABLE_RERANKER", "0").lower() in {"1", "true", "yes"}:
-                reranker = FastEmbedReranker(
-                    os.getenv("RESEARCH_RERANKER_MODEL", "BAAI/bge-reranker-base")
-                )
-            self._retrieval = RetrievalSuite(self.store, dense, reranker=reranker)
+            with self._initialization_lock:
+                if self._retrieval is None:
+                    model_name = os.getenv(
+                        "RESEARCH_EMBEDDING_MODEL", DEFAULT_EMBEDDING_MODEL
+                    )
+                    dense = DenseRetriever(
+                        self.store,
+                        model_name=model_name,
+                    )
+                    backend = None
+                    backend_name = os.getenv(
+                        "RESEARCH_RETRIEVAL_BACKEND",
+                        "milvus" if os.getenv("RESEARCH_MILVUS_URI") else "local",
+                    ).strip().lower()
+                    if backend_name == "milvus":
+                        from nanobot.research.milvus import MilvusResearchBackend
+
+                        backend = MilvusResearchBackend(
+                            self.store,
+                            model_name=model_name,
+                            embedder=dense.embedder,
+                        )
+                    elif backend_name != "local":
+                        raise ValueError(
+                            "RESEARCH_RETRIEVAL_BACKEND must be either 'local' or 'milvus'"
+                        )
+                    reranker = None
+                    if os.getenv("RESEARCH_ENABLE_RERANKER", "0").lower() in {
+                        "1", "true", "yes",
+                    }:
+                        reranker = FastEmbedReranker(
+                            os.getenv("RESEARCH_RERANKER_MODEL", "BAAI/bge-reranker-base")
+                        )
+                    self._retrieval = RetrievalSuite(
+                        self.store, dense, backend=backend, reranker=reranker
+                    )
         return self._retrieval
 
 
@@ -112,9 +140,9 @@ class ResearchIngestTool(_ResearchTool):
         self,
         path: str,
         max_files: int = 100,
-        chunk_size: int = 1200,
-        chunk_overlap: int = 160,
-        chunk_strategy: str = "structure",
+        chunk_size: int = 768,
+        chunk_overlap: int = 120,
+        chunk_strategy: str = "fixed",
     ) -> str:
         try:
             result = await asyncio.to_thread(
@@ -463,4 +491,17 @@ def register_research_tools(
         ResearchReportTool,
         ResearchSourcesTool,
     ):
+        registry.register(tool_cls(handle, allowed_dir=allowed_dir))
+
+
+def register_research_read_tools(
+    registry: ToolRegistry, workspace: Path, allowed_dir: Path | None = None
+) -> None:
+    """Register the read-only ResearchFlow tools used by delegated researchers.
+
+    Deliberately exclude ingest, report saving, memory and Evidence Ledger mutation. The
+    coordinator remains the only writer while subagents search and inspect exact evidence.
+    """
+    handle = _StoreHandle(workspace)
+    for tool_cls in (ResearchSourcesTool, ResearchSearchTool, ResearchReadTool):
         registry.register(tool_cls(handle, allowed_dir=allowed_dir))

@@ -1,0 +1,184 @@
+{
+  "model": "deepseek-v4-pro",
+  "cases": 16,
+  "completed_cases": 0,
+  "failed_cases": 16,
+  "faithfulness": null,
+  "answer_relevancy": 0.8928,
+  "details": [
+    {
+      "id": "e2e-01",
+      "contexts": 12,
+      "faithfulness": null,
+      "answer_relevancy": 0.8543,
+      "completed": false,
+      "errors": {
+        "faithfulness": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: 31bdbebd-e7a5-4088-a56a-615c0c81b0c0)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}"
+      }
+    },
+    {
+      "id": "e2e-02",
+      "contexts": 12,
+      "faithfulness": null,
+      "answer_relevancy": 0.9314,
+      "completed": false,
+      "errors": {
+        "faithfulness": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: 9ab72a3e-4ffa-4bb0-ba88-5120d924d731)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}"
+      }
+    },
+    {
+      "id": "e2e-03",
+      "contexts": 9,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "completed": false,
+      "errors": {
+        "faithfulness": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: a82b2c31-4086-43bc-bf7a-2703461fbea2)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}",
+        "answer_relevancy": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: 902ca45e-d077-49bb-a064-f859e999123c)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}"
+      }
+    },
+    {
+      "id": "e2e-04",
+      "contexts": 5,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "completed": false,
+      "errors": {
+        "faithfulness": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: 22a21ec3-8d06-4534-b213-558accc96356)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}",
+        "answer_relevancy": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: 8f5423ca-6edf-48da-996f-bfbc364b221b)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}"
+      }
+    },
+    {
+      "id": "e2e-05",
+      "contexts": 3,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "completed": false,
+      "errors": {
+        "faithfulness": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: 80bf675d-54b9-423f-9af2-d8008680433a)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}",
+        "answer_relevancy": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: 83aeddf0-ad75-440d-b4db-34f4ee1e371b)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}"
+      }
+    },
+    {
+      "id": "e2e-06",
+      "contexts": 10,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "completed": false,
+      "errors": {
+        "faithfulness": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: bd7f6098-93e2-4419-baaf-054f5a25784a)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}",
+        "answer_relevancy": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: 228e333a-b8f7-47e3-b416-63ef8b526f6f)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}"
+      }
+    },
+    {
+      "id": "e2e-07",
+      "contexts": 6,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "completed": false,
+      "errors": {
+        "faithfulness": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: b74e4e08-f981-4ae8-8d4e-0f9567d125b5)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}",
+        "answer_relevancy": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: ae60d66f-7c37-4159-9871-7b6e179bd34f)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}"
+      }
+    },
+    {
+      "id": "e2e-08",
+      "contexts": 2,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "completed": false,
+      "errors": {
+        "faithfulness": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: ad102931-a144-4dcf-9fd3-61a0159de01d)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}",
+        "answer_relevancy": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: e4bd362e-ea66-41e9-adc5-a85c30029344)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}"
+      }
+    },
+    {
+      "id": "e2e-09",
+      "contexts": 9,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "completed": false,
+      "errors": {
+        "faithfulness": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: f4fa7d15-4383-463d-9b11-7b69fd0961f0)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}",
+        "answer_relevancy": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: 1adbee05-e986-450c-8c27-57dff09746b5)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}"
+      }
+    },
+    {
+      "id": "e2e-10",
+      "contexts": 8,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "completed": false,
+      "errors": {
+        "faithfulness": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: 40aca30d-cbab-49ac-a0a3-cae447fb6242)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}",
+        "answer_relevancy": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: 0e625689-8141-48ca-be74-6a90c892a0de)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}"
+      }
+    },
+    {
+      "id": "e2e-11",
+      "contexts": 9,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "completed": false,
+      "errors": {
+        "faithfulness": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: f48e05e4-c434-43e5-beda-a1f65c8d00ac)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}",
+        "answer_relevancy": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: 557932a3-c0bd-4b81-b882-562e1654e9b0)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}"
+      }
+    },
+    {
+      "id": "e2e-12",
+      "contexts": 9,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "completed": false,
+      "errors": {
+        "faithfulness": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: ca0c0c26-c7ca-43a1-9333-2e61a93ebd9a)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}",
+        "answer_relevancy": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: bd3ae68e-bc4b-41fb-9ac3-ce4763d1f7b3)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}"
+      }
+    },
+    {
+      "id": "e2e-13",
+      "contexts": 5,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "completed": false,
+      "errors": {
+        "faithfulness": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: 5cf9ea3e-2c8c-4091-abcd-e1acecba7660)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}",
+        "answer_relevancy": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: 57b07daf-85b1-41f3-8b55-c0b6ad8d6d17)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}"
+      }
+    },
+    {
+      "id": "e2e-14",
+      "contexts": 6,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "completed": false,
+      "errors": {
+        "faithfulness": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: 62f19ea4-a0b6-433b-a13a-2abec4b97106)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}",
+        "answer_relevancy": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: fe1ba582-77c7-4698-8edc-3cb20d83afd7)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}"
+      }
+    },
+    {
+      "id": "e2e-15",
+      "contexts": 9,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "completed": false,
+      "errors": {
+        "faithfulness": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: b5ef1cfa-8699-459e-8544-f2121647ccbc)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}",
+        "answer_relevancy": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: e2a5b058-05b3-4d39-9485-c86ffaa89ad5)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}"
+      }
+    },
+    {
+      "id": "e2e-16",
+      "contexts": 17,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "completed": false,
+      "errors": {
+        "faithfulness": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: 6a9cff4c-4130-4139-8ded-9a6a00531477)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}",
+        "answer_relevancy": "APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance (request_id: de15d67c-1eae-47c8-bc3c-2ed3a34aeb8c)', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}"
+      }
+    }
+  ]
+}

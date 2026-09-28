@@ -2,24 +2,30 @@
 
 ## 简历项目名称
 
-**ResearchFlow —— 基于 nanobot Runtime 的可审计论文研究 Agent**
+**ResearchFlow —— 轻量 Agentic RAG 论文研究 Agent**
 
-技术栈：Python、aiohttp、SQLite、BM25、FastEmbed/ONNX、RRF、Cross-Encoder、SSE、Docker、GitHub Actions
+技术栈：Python、ReAct、SubAgent、FastAPI、Milvus、Unstructured、BGE-M3、BM25、HNSW、RRF、Cross-Encoder、SQLite、SSE、RAGAS
 
 ## 简历项目描述（推荐版）
 
-- 基于 nanobot v0.1.4 的 AgentLoop 与 ToolRegistry 二次开发论文研究 Agent，完成 PDF/Markdown
-  语料摄取、BM25 与多语言向量混合检索、证据缺口反思、稳定引用生成及报告引用校验，支持从
-  引用回溯到原始证据块；支持无答案拒答、Dense 故障降级和可选 Cross-Encoder Rerank。
-- 设计 SQLite 持久化异步任务服务与可重放 SSE 事件流，支持任务取消、最大并发 2、进程重启后
-  遗留任务恢复标记和带引用/版本的 Evidence Ledger；通用对话上下文继续复用 nanobot Memory，
-  提供文档、任务、证据与报告 REST API 及 Web 工作台。
-- 为 10 篇论文、752 个稳定证据块构建检索与端到端评测；在 6 篇 V1 快照的 40 条中英双语检索
-  集上，混合检索 Recall@5 达 0.6500，较
-  BM25 提升 20.9%；在 20 条正负开发集上将 Hybrid 无答案阈值校准为 0.75；端到端任务完成率
-  与引用有效率均为 100%，并使用 DeepSeek V4-Pro 对 Gold Evidence 与答案引用证据进行结构化
-  辅助评测，记录 P95、Token、Claim—Evidence 与 Bad Case；通过 Docker Compose 和 GitHub
-  Actions 实现可复现构建与自动测试。
+- 实现 `ContextBuilder → AgentRunner → ToolRegistry → Tool Execution` 核心运行链路，基于
+  ReAct 实现 LLM 推理、Tool 选择、Observation 回填与多轮迭代的 Agent Loop，并通过迭代上限、
+  超时及异常回传控制执行边界。
+- 将论文检索封装为 Tool 接入 Agent Loop；主 Agent 将 2–3 个独立研究问题委派给只读 SubAgent
+  并行检索，限制其仅可查看来源、检索与读取证据；子任务返回结构化结论、证据缺口和 Citation
+  ID，由主 Agent 统一校验引用、解决冲突、综合报告并写入 Evidence Ledger。
+- 构建论文知识库检索链路，基于 Unstructured 保留标题、正文元素、页码与章节 metadata；使用
+  BGE-M3 生成 Dense 向量，通过 Milvus HNSW 与内置 BM25 Sparse Index 完成双路召回，经加权
+  RRF 融合排序，并引入可选
+  Cross-Encoder Rerank 提升 Top-K 证据相关性。
+- 设计可追溯的 Evidence Grounding 机制，为 Chunk 生成 Citation ID，支持回答从引用回溯至原文；
+  实现引用有效性与 Claim—Evidence 校验，降低论文分析中的无依据生成。
+- 基于 FastAPI、SQLite 与 SSE 实现异步任务、并发控制、异常任务恢复标记与 Agent 执行轨迹推送；
+  建立覆盖 Recall@K、Hit@K、MRR、Faithfulness、Answer Relevancy、引用有效率、延迟与 Token
+  消耗的分层评测体系。40 条 BGE-M3/Milvus 迁移回归集上，Hybrid Recall@5 较 BM25 提升
+  54.1%、MRR 提升 20.6%；16 条端到端测试任务完成率与引用有效率均为 100%，平均/P95
+  延迟为 33.20/105.89 秒，平均输入/输出 Token 为 19.18k/1.10k，并通过结构化 Judge 与
+  RAGAS 对生成质量进行离线复核。
 
 ## 一句话版本
 
@@ -40,7 +46,7 @@ Agent 循环、工具注册和会话能力，我主要解决的是研究场景�
 
 BM25 对英文论文中的精确术语表现较强，但中文问题到英文论文的跨语言召回较弱；多语言向量检索
 可以补足语义匹配，但首位精确度不稳定。因此系统使用加权 RRF 融合两路排名。40 条评测中，
-BM25 Recall@5 为 0.5375，混合检索达到 0.6500。
+BM25 Recall@5 为 0.4625，BGE-M3 Dense 为 0.7000，调参后的混合检索达到 0.7125。
 
 ### 2. 如何保证引用可验证
 
@@ -57,22 +63,28 @@ BM25 Recall@5 为 0.5375，混合检索达到 0.6500。
 
 ### 4. 查询反思是否一定更好
 
-不是。当前规则式反思的 Recall@5 从混合检索的 0.6500 提升到 0.6625，MRR@5 仅从 0.5729
-提升到 0.5746，耗时约翻倍。这说明收益很小，只适合作为低置信度查询的第二阶段。
+不是。当前规则式反思的 Recall@5 为 0.6875，低于调参后 Hybrid 的 0.7125，P95 则从
+994.27 ms 增加到 2149.80 ms。因此它只作为低置信度查询的降级路径，不能宣称全面优于 Hybrid。
 
 ### 5. 为什么 Reranker 没有默认开启
 
-Cross-Encoder 将 Recall@5 提升到 0.7125、MRR 提升到 0.6071，但本机 CPU P95 达 13.52 秒，
+迁移前的 Cross-Encoder 消融将 Recall@5 提升到 0.7125、MRR 提升到 0.6071，但本机 CPU
+P95 达 13.52 秒，
 相比 Hybrid 的约 134 ms 代价过高，因此只作为显式或低置信度二阶段能力。这体现的是效果、
 延迟和部署成本的权衡，而不是简单堆模型。
 
 ## 边界与诚实表述
 
 - 项目是基于 nanobot Runtime 的二次开发，不应描述成从零实现完整 Agent 框架。
-- V1 指标覆盖 6 篇论文；新增 4 篇后的 V2 是开发/诊断集，不能外推到所有开放领域。
+- 原 V1/V2 数字属于 MiniLM/NumPy 迁移前基线；简历中的 Recall/MRR 使用新保存的
+  `retrieval-bge-m3-milvus-v1-tuned.json`，不得把两套结果混用。
+- `768/120` 重建后的引用标签由旧数据机械映射，须完成人工抽检后才能把迁移评测写成最终指标；
+  当前 0.7125/0.4654 明确标注为 BGE-M3/Milvus 迁移回归集结果。
 - 默认端到端评分采用确定性规则；LLM Judge 仅在配置独立 Judge 模型时作为辅助指标。
 - Judge 使用 V4-Pro 非思考模式与 temperature=0；思考模式会忽略温度，不适合宣称确定性评测。
 - 100% 引用有效率不等同于所有表述均事实正确，规则式 Claim 支持率也需要人工复核。
+- RAGAS Answer Relevancy 已完成 16 条（0.8928）；Faithfulness 因模型服务余额不足仍待补跑，
+  简历不得写成“RAGAS 全量评测完成”。
 - 端到端生成受模型版本和随机性影响，简历数字以仓库保存的
-  `e2e-p0-p1-final.json` 为准。
+  `e2e-bge-m3-milvus.json` 为准。
 

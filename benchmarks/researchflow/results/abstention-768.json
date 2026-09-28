@@ -1,0 +1,280 @@
+{
+  "cases": 20,
+  "strategy": "hybrid",
+  "recommended": {
+    "threshold": 0.6,
+    "balanced_accuracy": 0.9,
+    "answerable_accuracy": 0.8,
+    "unanswerable_recall": 1.0,
+    "false_answer_rate": 0.0,
+    "retrieval_recall": 0.8
+  },
+  "scores": [
+    {
+      "threshold": 0.05,
+      "balanced_accuracy": 0.5,
+      "answerable_accuracy": 1.0,
+      "unanswerable_recall": 0.0,
+      "false_answer_rate": 1.0,
+      "retrieval_recall": 0.8
+    },
+    {
+      "threshold": 0.1,
+      "balanced_accuracy": 0.5,
+      "answerable_accuracy": 1.0,
+      "unanswerable_recall": 0.0,
+      "false_answer_rate": 1.0,
+      "retrieval_recall": 0.8
+    },
+    {
+      "threshold": 0.15,
+      "balanced_accuracy": 0.7,
+      "answerable_accuracy": 1.0,
+      "unanswerable_recall": 0.4,
+      "false_answer_rate": 0.6,
+      "retrieval_recall": 0.8
+    },
+    {
+      "threshold": 0.2,
+      "balanced_accuracy": 0.7,
+      "answerable_accuracy": 1.0,
+      "unanswerable_recall": 0.4,
+      "false_answer_rate": 0.6,
+      "retrieval_recall": 0.8
+    },
+    {
+      "threshold": 0.25,
+      "balanced_accuracy": 0.65,
+      "answerable_accuracy": 0.9,
+      "unanswerable_recall": 0.4,
+      "false_answer_rate": 0.6,
+      "retrieval_recall": 0.8
+    },
+    {
+      "threshold": 0.3,
+      "balanced_accuracy": 0.65,
+      "answerable_accuracy": 0.9,
+      "unanswerable_recall": 0.4,
+      "false_answer_rate": 0.6,
+      "retrieval_recall": 0.8
+    },
+    {
+      "threshold": 0.35,
+      "balanced_accuracy": 0.75,
+      "answerable_accuracy": 0.9,
+      "unanswerable_recall": 0.6,
+      "false_answer_rate": 0.4,
+      "retrieval_recall": 0.8
+    },
+    {
+      "threshold": 0.4,
+      "balanced_accuracy": 0.75,
+      "answerable_accuracy": 0.9,
+      "unanswerable_recall": 0.6,
+      "false_answer_rate": 0.4,
+      "retrieval_recall": 0.8
+    },
+    {
+      "threshold": 0.45,
+      "balanced_accuracy": 0.75,
+      "answerable_accuracy": 0.9,
+      "unanswerable_recall": 0.6,
+      "false_answer_rate": 0.4,
+      "retrieval_recall": 0.8
+    },
+    {
+      "threshold": 0.5,
+      "balanced_accuracy": 0.75,
+      "answerable_accuracy": 0.9,
+      "unanswerable_recall": 0.6,
+      "false_answer_rate": 0.4,
+      "retrieval_recall": 0.8
+    },
+    {
+      "threshold": 0.55,
+      "balanced_accuracy": 0.85,
+      "answerable_accuracy": 0.9,
+      "unanswerable_recall": 0.8,
+      "false_answer_rate": 0.2,
+      "retrieval_recall": 0.8
+    },
+    {
+      "threshold": 0.6,
+      "balanced_accuracy": 0.9,
+      "answerable_accuracy": 0.8,
+      "unanswerable_recall": 1.0,
+      "false_answer_rate": 0.0,
+      "retrieval_recall": 0.8
+    },
+    {
+      "threshold": 0.65,
+      "balanced_accuracy": 0.85,
+      "answerable_accuracy": 0.7,
+      "unanswerable_recall": 1.0,
+      "false_answer_rate": 0.0,
+      "retrieval_recall": 0.8
+    },
+    {
+      "threshold": 0.7,
+      "balanced_accuracy": 0.85,
+      "answerable_accuracy": 0.7,
+      "unanswerable_recall": 1.0,
+      "false_answer_rate": 0.0,
+      "retrieval_recall": 0.8
+    },
+    {
+      "threshold": 0.75,
+      "balanced_accuracy": 0.85,
+      "answerable_accuracy": 0.7,
+      "unanswerable_recall": 1.0,
+      "false_answer_rate": 0.0,
+      "retrieval_recall": 0.8
+    },
+    {
+      "threshold": 0.8,
+      "balanced_accuracy": 0.75,
+      "answerable_accuracy": 0.5,
+      "unanswerable_recall": 1.0,
+      "false_answer_rate": 0.0,
+      "retrieval_recall": 0.8
+    },
+    {
+      "threshold": 0.85,
+      "balanced_accuracy": 0.6,
+      "answerable_accuracy": 0.2,
+      "unanswerable_recall": 1.0,
+      "false_answer_rate": 0.0,
+      "retrieval_recall": 0.8
+    },
+    {
+      "threshold": 0.9,
+      "balanced_accuracy": 0.5,
+      "answerable_accuracy": 0.0,
+      "unanswerable_recall": 1.0,
+      "false_answer_rate": 0.0,
+      "retrieval_recall": 0.8
+    }
+  ],
+  "observations": [
+    {
+      "id": "pos-hll-05",
+      "answerable": true,
+      "confidence": 0.8036,
+      "retrieval_hit": true
+    },
+    {
+      "id": "pos-hll-07",
+      "answerable": true,
+      "confidence": 0.2305,
+      "retrieval_hit": false
+    },
+    {
+      "id": "pos-hll-08",
+      "answerable": true,
+      "confidence": 0.7578,
+      "retrieval_hit": false
+    },
+    {
+      "id": "pos-drex-01",
+      "answerable": true,
+      "confidence": 0.6284,
+      "retrieval_hit": true
+    },
+    {
+      "id": "pos-drex-03",
+      "answerable": true,
+      "confidence": 0.7672,
+      "retrieval_hit": true
+    },
+    {
+      "id": "pos-drex-05",
+      "answerable": true,
+      "confidence": 0.826,
+      "retrieval_hit": true
+    },
+    {
+      "id": "pos-drex-06",
+      "answerable": true,
+      "confidence": 0.5925,
+      "retrieval_hit": true
+    },
+    {
+      "id": "pos-drex-07",
+      "answerable": true,
+      "confidence": 0.834,
+      "retrieval_hit": true
+    },
+    {
+      "id": "pos-drex-08",
+      "answerable": true,
+      "confidence": 0.8688,
+      "retrieval_hit": true
+    },
+    {
+      "id": "pos-ull-01",
+      "answerable": true,
+      "confidence": 0.8677,
+      "retrieval_hit": true
+    },
+    {
+      "id": "neg-01",
+      "answerable": false,
+      "confidence": 0.5304,
+      "retrieval_hit": false
+    },
+    {
+      "id": "neg-02",
+      "answerable": false,
+      "confidence": 0.5993,
+      "retrieval_hit": false
+    },
+    {
+      "id": "neg-03",
+      "answerable": false,
+      "confidence": 0.3314,
+      "retrieval_hit": false
+    },
+    {
+      "id": "neg-04",
+      "answerable": false,
+      "confidence": 0.1122,
+      "retrieval_hit": false
+    },
+    {
+      "id": "neg-05",
+      "answerable": false,
+      "confidence": 0.3243,
+      "retrieval_hit": false
+    },
+    {
+      "id": "neg-06",
+      "answerable": false,
+      "confidence": 0.1122,
+      "retrieval_hit": false
+    },
+    {
+      "id": "neg-07",
+      "answerable": false,
+      "confidence": 0.5365,
+      "retrieval_hit": false
+    },
+    {
+      "id": "neg-08",
+      "answerable": false,
+      "confidence": 0.1122,
+      "retrieval_hit": false
+    },
+    {
+      "id": "neg-09",
+      "answerable": false,
+      "confidence": 0.5943,
+      "retrieval_hit": false
+    },
+    {
+      "id": "neg-10",
+      "answerable": false,
+      "confidence": 0.1122,
+      "retrieval_hit": false
+    }
+  ]
+}

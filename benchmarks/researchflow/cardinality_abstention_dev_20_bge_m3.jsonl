@@ -1,0 +1,20 @@
+{"id": "pos-hll-05", "query": "Describe how HyperLogLog chooses a register and updates it using the leftmost one bit.", "relevant_citations": ["RF-22F7CCE2-23"], "answerable": true, "language": "en", "difficulty": "medium"}
+{"id": "pos-hll-07", "query": "哪种经典去重计数算法能够最优并行化，并以 1.04 除以根号 m 的误差工作？", "relevant_citations": ["RF-22F7CCE2-2"], "answerable": true, "language": "zh", "difficulty": "hard"}
+{"id": "pos-hll-08", "query": "Why can querying HLL be slow when it must aggregate every register with a harmonic mean?", "relevant_citations": ["RF-1C4D6D75-21"], "answerable": true, "language": "en", "difficulty": "medium"}
+{"id": "pos-drex-01", "query": "Why do database-oriented distinct counters struggle with dynamic network traffic under tight memory?", "relevant_citations": ["RF-1C4D6D75-9"], "answerable": true, "language": "en", "difficulty": "hard"}
+{"id": "pos-drex-03", "query": "What standard-error expression is derived for DREX when t equals pN divided by m?", "relevant_citations": ["RF-1C4D6D75-62"], "answerable": true, "language": "en", "difficulty": "hard"}
+{"id": "pos-drex-05", "query": "Across wide cardinality ranges, how much can DREX reduce relative error versus HLL and KMV?", "relevant_citations": ["RF-1C4D6D75-71"], "answerable": true, "language": "en", "difficulty": "hard"}
+{"id": "pos-drex-06", "query": "在指定 F1 分数的超级扩散者检测中，DREX 相比 HLL 能节省多少内存？", "relevant_citations": ["RF-1C4D6D75-79"], "answerable": true, "language": "zh", "difficulty": "hard"}
+{"id": "pos-drex-07", "query": "What peak update throughput in Mops is reported for DREX and why is it fast at high cardinality?", "relevant_citations": ["RF-1C4D6D75-81"], "answerable": true, "language": "en", "difficulty": "medium"}
+{"id": "pos-drex-08", "query": "How are two DREX instances aligned and combined to compute their union?", "relevant_citations": ["RF-1C4D6D75-53", "RF-1C4D6D75-54"], "answerable": true, "language": "en", "difficulty": "hard"}
+{"id": "pos-ull-01", "query": "How much less space does UltraLogLog require than HLL for the same distinct-count information?", "relevant_citations": ["RF-71B212EA-2", "RF-71B212EA-25"], "answerable": true, "language": "en", "difficulty": "easy"}
+{"id": "neg-01", "query": "Which of these papers received the 2028 ACM SIGMOD best paper award?", "relevant_citations": [], "answerable": false, "language": "en", "difficulty": "negative"}
+{"id": "neg-02", "query": "这些论文在 NVIDIA H100 上训练了多少个小时？", "relevant_citations": [], "answerable": false, "language": "zh", "difficulty": "negative"}
+{"id": "neg-03", "query": "What was the exact electricity cost of the authors' experiments in US dollars?", "relevant_citations": [], "answerable": false, "language": "en", "difficulty": "negative"}
+{"id": "neg-04", "query": "论文作者是否在 2027 年将该算法部署到了字节跳动生产集群？", "relevant_citations": [], "answerable": false, "language": "zh", "difficulty": "negative"}
+{"id": "neg-05", "query": "What accuracy did HyperLogLog obtain on the ImageNet validation set?", "relevant_citations": [], "answerable": false, "language": "en", "difficulty": "negative"}
+{"id": "neg-06", "query": "这些算法在火星探测器上的峰值吞吐量是多少？", "relevant_citations": [], "answerable": false, "language": "zh", "difficulty": "negative"}
+{"id": "neg-07", "query": "Which author later became the CEO of OpenAI?", "relevant_citations": [], "answerable": false, "language": "en", "difficulty": "negative"}
+{"id": "neg-08", "query": "论文是否证明量子计算机可以把误差降到绝对零？", "relevant_citations": [], "answerable": false, "language": "zh", "difficulty": "negative"}
+{"id": "neg-09", "query": "What was the exact carbon footprint of every benchmark run?", "relevant_citations": [], "answerable": false, "language": "en", "difficulty": "negative"}
+{"id": "neg-10", "query": "作者对 2030 年比特币价格作出了什么预测？", "relevant_citations": [], "answerable": false, "language": "zh", "difficulty": "negative"}

@@ -1,0 +1,8 @@
+# Local single-node storage is appropriate for the resume/demo deployment.
+# The entire Milvus data directory is persisted by docker-compose.research.yml.
+common:
+  storageType: local
+localStorage:
+  path: /var/lib/milvus/data/
+storage:
+  type: local

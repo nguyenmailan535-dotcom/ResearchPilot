@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from nanobot.agent.tools.registry import ToolRegistry
-from nanobot.agent.tools.research import register_research_tools
+from nanobot.agent.tools.research import register_research_read_tools, register_research_tools
 
 
 def _registry(workspace: Path, *, restricted: bool = True) -> ToolRegistry:
@@ -103,3 +103,21 @@ def test_registers_expected_research_tools_without_creating_database(tmp_path: P
         "research_sources",
     }.issubset(registry.tool_names)
     assert not (workspace / "research" / "research.db").exists()
+
+
+def test_read_only_research_tools_exclude_all_mutations(tmp_path: Path) -> None:
+    registry = ToolRegistry()
+    register_research_read_tools(registry, tmp_path)
+
+    assert set(registry.tool_names) == {
+        "research_sources",
+        "research_search",
+        "research_read",
+    }
+    for forbidden in (
+        "research_ingest",
+        "research_report",
+        "research_decision",
+        "research_memory",
+    ):
+        assert not registry.has(forbidden)

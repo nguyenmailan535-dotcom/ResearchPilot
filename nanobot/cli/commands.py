@@ -1651,6 +1651,7 @@ def research_ragas_evaluate(
         "--resume-from",
         help="Saved RAGAS result; rerun only incomplete cases",
     ),
+    limit: int | None = typer.Option(None, "--limit", min=1),
     concurrency: int = typer.Option(2, "--concurrency", min=1, max=4),
 ):
     """Score saved answers with RAGAS Faithfulness and Answer Relevancy."""
@@ -1663,7 +1664,10 @@ def research_ragas_evaluate(
     runtime_config = _load_runtime_config(config, workspace)
     store = ResearchStore(runtime_config.workspace_path)
     saved = json.loads(Path(evaluation).expanduser().read_text(encoding="utf-8"))
-    details = list(saved.get("details", []))
+    selected_details = list(saved.get("details", []))
+    if limit is not None:
+        selected_details = selected_details[:limit]
+    details = list(selected_details)
     previous_details: dict[str, dict] = {}
     if resume_from:
         previous = json.loads(Path(resume_from).expanduser().read_text(encoding="utf-8"))
@@ -1677,7 +1681,7 @@ def research_ragas_evaluate(
         ]
         console.print(
             f"[dim]Resuming {len(details)} incomplete RAGAS cases; "
-            f"reusing {len(saved.get('details', [])) - len(details)} completed cases.[/dim]"
+            f"reusing {len(selected_details) - len(details)} completed cases.[/dim]"
         )
     result = asyncio.run(
         evaluate_ragas_results(
@@ -1687,6 +1691,7 @@ def research_ragas_evaluate(
             api_key=runtime_config.get_api_key(model),
             base_url=runtime_config.get_api_base(model),
             concurrency=concurrency,
+            previous_details=previous_details,
         )
     )
     if resume_from:
@@ -1694,7 +1699,7 @@ def research_ragas_evaluate(
         merged = [
             updated.get(str(detail.get("id", "")))
             or previous_details[str(detail.get("id", ""))]
-            for detail in saved.get("details", [])
+            for detail in selected_details
         ]
         result = aggregate_ragas_details(merged, model=model)
     console.print_json(data={key: value for key, value in result.items() if key != "details"})

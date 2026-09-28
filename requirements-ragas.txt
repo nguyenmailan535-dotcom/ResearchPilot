@@ -2,6 +2,9 @@
 # RAGAS 0.4.3 currently requires the OpenAI 1.x / LangChain 0.3 ecosystem,
 # while nanobot's online runtime uses OpenAI 2.x.
 ragas==0.4.3
+# Required by RAGAS' local HuggingFaceEmbeddings provider. The base research
+# image already supplies the CPU PyTorch runtime used by BGE-M3.
+sentence-transformers==5.2.3
 openai==1.109.1
 instructor==1.3.2
 rich==13.9.4

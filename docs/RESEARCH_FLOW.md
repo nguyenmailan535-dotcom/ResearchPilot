@@ -179,7 +179,8 @@ docker compose -f docker-compose.research.yml --profile eval run --rm researchfl
   --workspace /data/workspace --model deepseek-v4-pro `
   --output /data/workspace/research/evaluations/ragas-bge-m3.json
 
-# If a provider/model failure interrupted only part of the metrics, rerun incomplete cases only.
+# If a provider/model failure interrupted only part of the metrics, reuse successful
+# per-metric scores and rerun only the missing metrics. Use --limit for a smoke test.
 docker compose -f docker-compose.research.yml --profile eval run --rm researchflow-eval `
   /data/workspace/research/evaluations/e2e-bge-m3-milvus-resumed.json `
   --workspace /data/workspace --model deepseek-v4-pro `

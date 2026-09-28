@@ -1,0 +1,122 @@
+{
+  "model": "deepseek-v4-pro",
+  "cases": 16,
+  "completed_cases": 16,
+  "failed_cases": 0,
+  "faithfulness": 0.8773,
+  "answer_relevancy": 0.9134,
+  "details": [
+    {
+      "id": "e2e-01",
+      "contexts": 12,
+      "answer_relevancy": 0.8543,
+      "faithfulness": 0.8333,
+      "completed": true
+    },
+    {
+      "id": "e2e-02",
+      "contexts": 12,
+      "answer_relevancy": 0.9314,
+      "faithfulness": 0.9362,
+      "completed": true
+    },
+    {
+      "id": "e2e-03",
+      "contexts": 9,
+      "faithfulness": 0.8571,
+      "answer_relevancy": 0.9332,
+      "completed": true
+    },
+    {
+      "id": "e2e-04",
+      "contexts": 5,
+      "faithfulness": 0.9474,
+      "answer_relevancy": 0.8811,
+      "completed": true
+    },
+    {
+      "id": "e2e-05",
+      "contexts": 3,
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.8187,
+      "completed": true
+    },
+    {
+      "id": "e2e-06",
+      "contexts": 10,
+      "faithfulness": 0.9744,
+      "answer_relevancy": 0.9351,
+      "completed": true
+    },
+    {
+      "id": "e2e-07",
+      "contexts": 6,
+      "faithfulness": 0.7857,
+      "answer_relevancy": 0.9801,
+      "completed": true
+    },
+    {
+      "id": "e2e-08",
+      "contexts": 2,
+      "faithfulness": 0.875,
+      "answer_relevancy": 0.9576,
+      "completed": true
+    },
+    {
+      "id": "e2e-09",
+      "contexts": 9,
+      "faithfulness": 0.7857,
+      "answer_relevancy": 0.912,
+      "completed": true
+    },
+    {
+      "id": "e2e-10",
+      "contexts": 8,
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.9597,
+      "completed": true
+    },
+    {
+      "id": "e2e-11",
+      "contexts": 9,
+      "faithfulness": 0.7857,
+      "answer_relevancy": 0.9716,
+      "completed": true
+    },
+    {
+      "id": "e2e-12",
+      "contexts": 9,
+      "faithfulness": 0.875,
+      "answer_relevancy": 0.801,
+      "completed": true
+    },
+    {
+      "id": "e2e-13",
+      "contexts": 5,
+      "faithfulness": 0.9412,
+      "answer_relevancy": 0.915,
+      "completed": true
+    },
+    {
+      "id": "e2e-14",
+      "contexts": 6,
+      "faithfulness": 0.8571,
+      "answer_relevancy": 0.9459,
+      "completed": true
+    },
+    {
+      "id": "e2e-15",
+      "contexts": 9,
+      "faithfulness": 0.5833,
+      "answer_relevancy": 0.8709,
+      "completed": true
+    },
+    {
+      "id": "e2e-16",
+      "contexts": 17,
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.9465,
+      "completed": true
+    }
+  ]
+}

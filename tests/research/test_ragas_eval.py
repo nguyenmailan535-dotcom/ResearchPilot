@@ -62,3 +62,24 @@ async def test_ragas_adapter_records_per_metric_failure(tmp_path) -> None:
     assert result["answer_relevancy"] == 0.7
     assert result["details"][0]["completed"] is False
     assert "RuntimeError" in result["details"][0]["errors"]["faithfulness"]
+
+
+@pytest.mark.asyncio
+async def test_ragas_resume_reuses_successful_metric(tmp_path) -> None:
+    store = ResearchStore(tmp_path)
+    faithfulness = _Metric(0.85)
+    relevancy = _Metric(0.99)
+
+    result = await evaluate_ragas_results(
+        store,
+        [{"id": "q1", "query": "question", "answer": "answer"}],
+        faithfulness_metric=faithfulness,
+        relevancy_metric=relevancy,
+        previous_details={"q1": {"answer_relevancy": 0.72}},
+    )
+
+    assert result["faithfulness"] == 0.85
+    assert result["answer_relevancy"] == 0.72
+    assert result["completed_cases"] == 1
+    assert len(faithfulness.calls) == 1
+    assert relevancy.calls == []

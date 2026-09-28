@@ -80,6 +80,8 @@ services:
       RESEARCH_BGE_DEVICE: ${RESEARCH_BGE_DEVICE:-cpu}
       HF_HOME: /root/.cache/huggingface
       RAGAS_MAX_TOKENS: ${RAGAS_MAX_TOKENS:-8192}
+      RAGAS_REQUEST_TIMEOUT_SECONDS: ${RAGAS_REQUEST_TIMEOUT_SECONDS:-180}
+      RAGAS_MAX_RETRIES: ${RAGAS_MAX_RETRIES:-1}
     entrypoint: ["nanobot", "research", "ragas-evaluate"]
     deploy:
       resources:

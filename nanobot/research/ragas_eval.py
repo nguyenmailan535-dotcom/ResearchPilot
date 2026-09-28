@@ -63,17 +63,29 @@ def build_ragas_metrics(*, model: str, api_key: str, base_url: str | None) -> tu
         raise RuntimeError(
             "RAGAS evaluation requires the isolated requirements-ragas.txt environment"
         ) from exc
-    client_kwargs: dict[str, Any] = {"api_key": api_key}
+    client_kwargs: dict[str, Any] = {
+        "api_key": api_key,
+        "timeout": float(os.getenv("RAGAS_REQUEST_TIMEOUT_SECONDS", "180")),
+        "max_retries": int(os.getenv("RAGAS_MAX_RETRIES", "1")),
+    }
     if base_url:
         client_kwargs["base_url"] = base_url
-    llm = llm_factory(
-        model,
-        client=AsyncOpenAI(**client_kwargs),
-        temperature=0,
+    llm_kwargs: dict[str, Any] = {
+        "temperature": 0,
         # Long Chinese research answers can yield many atomic statements.  The
         # RAGAS default is too small and may terminate Instructor JSON with
         # finish_reason=length.
-        max_tokens=int(os.getenv("RAGAS_MAX_TOKENS", "8192")),
+        "max_tokens": int(os.getenv("RAGAS_MAX_TOKENS", "8192")),
+    }
+    if "deepseek" in model.lower() or "deepseek.com" in (base_url or "").lower():
+        # V4 enables high-effort thinking by default. RAGAS uses JSON mode, where
+        # reasoning consumes the output budget and can leave Instructor with an
+        # incomplete JSON payload. Evaluation needs deterministic non-thinking output.
+        llm_kwargs["extra_body"] = {"thinking": {"type": "disabled"}}
+    llm = llm_factory(
+        model,
+        client=AsyncOpenAI(**client_kwargs),
+        **llm_kwargs,
     )
     embeddings = HuggingFaceEmbeddings(
         model=os.getenv("RESEARCH_EMBEDDING_MODEL", "BAAI/bge-m3"),
@@ -92,8 +104,9 @@ async def evaluate_ragas_results(
     api_key: str | None = None,
     base_url: str | None = None,
     concurrency: int = 2,
+    previous_details: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    """Score faithfulness and answer relevancy against the chunks cited by each answer."""
+    """Score metrics against cited chunks, reusing successful per-metric results."""
     resolved_model = model or os.getenv("RAGAS_MODEL", "deepseek-v4-pro")
     if faithfulness_metric is None or relevancy_metric is None:
         resolved_key = api_key or os.getenv("RAGAS_API_KEY") or os.getenv("OPENAI_API_KEY", "")
@@ -107,26 +120,42 @@ async def evaluate_ragas_results(
     semaphore = asyncio.Semaphore(max(1, concurrency))
 
     async def score(detail: dict[str, Any]) -> dict[str, Any]:
+        detail_id = str(detail.get("id", ""))
+        previous = (previous_details or {}).get(detail_id, {})
         query = str(detail.get("query", ""))
         answer = str(detail.get("answer", ""))
         citations = list(dict.fromkeys(value.upper() for value in _CITATION.findall(answer)))
         contexts = [str(item["content"]) for item in store.get_chunks(citations)]
         result: dict[str, Any] = {
-            "id": str(detail.get("id", "")),
+            "id": detail_id,
             "contexts": len(contexts),
         }
-        async with semaphore:
-            scores = await asyncio.gather(
-                faithfulness_metric.ascore(
+        metric_calls = {
+            "faithfulness": lambda: faithfulness_metric.ascore(
                     user_input=query,
                     response=answer,
                     retrieved_contexts=contexts,
                 ),
-                relevancy_metric.ascore(user_input=query, response=answer),
-                return_exceptions=True,
-            )
+            "answer_relevancy": lambda: relevancy_metric.ascore(
+                user_input=query, response=answer
+            ),
+        }
+        pending_names: list[str] = []
+        pending_calls: list[Any] = []
+        for name, call in metric_calls.items():
+            if previous.get(name) is not None:
+                result[name] = round(float(previous[name]), 4)
+            else:
+                pending_names.append(name)
+                pending_calls.append(call())
+        scores: list[Any] = []
+        if pending_calls:
+            async with semaphore:
+                scores = list(
+                    await asyncio.gather(*pending_calls, return_exceptions=True)
+                )
         errors: dict[str, str] = {}
-        for name, value in zip(("faithfulness", "answer_relevancy"), scores, strict=True):
+        for name, value in zip(pending_names, scores, strict=True):
             if isinstance(value, BaseException):
                 errors[name] = _safe_error(value)
                 result[name] = None

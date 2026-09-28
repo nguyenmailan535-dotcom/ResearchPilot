@@ -24,8 +24,8 @@
   建立覆盖 Recall@K、Hit@K、MRR、Faithfulness、Answer Relevancy、引用有效率、延迟与 Token
   消耗的分层评测体系。40 条 BGE-M3/Milvus 迁移回归集上，Hybrid Recall@5 较 BM25 提升
   54.1%、MRR 提升 20.6%；16 条端到端测试任务完成率与引用有效率均为 100%，平均/P95
-  延迟为 33.20/105.89 秒，平均输入/输出 Token 为 19.18k/1.10k，并通过结构化 Judge 与
-  RAGAS 对生成质量进行离线复核。
+  延迟为 33.20/105.89 秒，平均输入/输出 Token 为 19.18k/1.10k；DeepSeek V4-Pro
+  非思考模式下 RAGAS Faithfulness/Answer Relevancy 达到 0.8773/0.9134。
 
 ## 一句话版本
 
@@ -83,8 +83,8 @@ P95 达 13.52 秒，
 - 默认端到端评分采用确定性规则；LLM Judge 仅在配置独立 Judge 模型时作为辅助指标。
 - Judge 使用 V4-Pro 非思考模式与 temperature=0；思考模式会忽略温度，不适合宣称确定性评测。
 - 100% 引用有效率不等同于所有表述均事实正确，规则式 Claim 支持率也需要人工复核。
-- RAGAS Answer Relevancy 已完成 16 条（0.8928）；Faithfulness 因模型服务余额不足仍待补跑，
-  简历不得写成“RAGAS 全量评测完成”。
+- RAGAS 已完成全部 16 条（Faithfulness 0.8773、Answer Relevancy 0.9134）；使用 V4-Pro
+  非思考模式、按指标断点续评，原始结果保存在 `ragas-deepseek-v4-pro-bge-m3.json`。
 - 端到端生成受模型版本和随机性影响，简历数字以仓库保存的
   `e2e-bge-m3-milvus.json` 为准。
 

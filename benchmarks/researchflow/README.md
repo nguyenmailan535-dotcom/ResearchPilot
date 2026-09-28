@@ -179,11 +179,11 @@ Hybrid 相比 BM25 的 Recall@5 相对提升 **54.1%**、MRR@5 相对提升 **20
 16 条端到端复测结果为：任务完成率 1.0000、答案通过率 0.8750、概念覆盖率 0.8958、
 引用有效率 1.0000、相关引用召回率 0.7292、段落引用覆盖率 0.8281、规则 Claim 支持率
 0.7776，平均/P95 延迟 33.20/105.89 秒，平均输入/输出 Token 为 19,183.56/1,095.94。
-DeepSeek V4-Pro 结构化 Judge 平均总分为 1.0000；RAGAS 的 16 条 Answer Relevancy 为
-0.8928，Faithfulness 因模型服务余额不足未完成，不能与已完成指标混写。原始结果分别见
+DeepSeek V4-Pro 结构化 Judge 平均总分为 1.0000；V4-Pro 非思考模式下的 16 条 RAGAS
+Faithfulness 为 0.8773、Answer Relevancy 为 0.9134，16/16 样本完成。原始结果分别见
 [`results/e2e-bge-m3-milvus.json`](./results/e2e-bge-m3-milvus.json)、
 [`results/judge-deepseek-v4-pro-bge-m3.json`](./results/judge-deepseek-v4-pro-bge-m3.json) 和
-[`results/ragas-deepseek-v4-pro-bge-m3.partial.json`](./results/ragas-deepseek-v4-pro-bge-m3.partial.json)。
+[`results/ragas-deepseek-v4-pro-bge-m3.json`](./results/ragas-deepseek-v4-pro-bge-m3.json)。
 
 ## 历史 MiniLM/NumPy 端到端基线
 

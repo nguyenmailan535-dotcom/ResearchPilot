@@ -98,6 +98,7 @@ dev = [
 
 [project.scripts]
 nanobot = "nanobot.cli.commands:app"
+researchpilot = "nanobot.cli.commands:app"
 
 [build-system]
 requires = ["hatchling"]

@@ -1,8 +1,8 @@
 # ResearchPilot Architecture
 
-ResearchPilot is an evidence-grounded technical research agent built on nanobot's existing
-AgentRunner, provider abstraction, ToolRegistry, memory consolidation, and MCP support. It is
-implemented as a cohesive set of native tools instead of introducing LangChain or LangGraph.
+ResearchPilot is an evidence-grounded technical research agent organized around AgentRunner,
+provider abstraction, ToolRegistry, memory consolidation, and MCP support. It is implemented as a
+cohesive set of native tools instead of introducing LangChain or LangGraph.
 
 ## Product scenario
 
@@ -23,7 +23,7 @@ Web UI / CLI / FastAPI
        |
 Persistent task state + resumable SSE events
        |
-nanobot AgentRunner (existing ReAct loop)
+AgentRunner (ReAct loop)
        |
        +-- research_delegate -> 2-3 parallel read-only evidence researchers
        |                         +-- research_sources / search / read only

@@ -27,8 +27,9 @@ def _json(value: Any) -> str:
 class _StoreHandle:
     """Lazily create one shared store so constructing AgentLoop stays side-effect free."""
 
-    def __init__(self, workspace: Path) -> None:
+    def __init__(self, workspace: Path, web_search_tool: Tool | None = None) -> None:
         self.workspace = workspace
+        self.web_search_tool = web_search_tool
         self._store: ResearchStore | None = None
         self._retrieval: RetrievalSuite | None = None
         self._initialization_lock = threading.RLock()
@@ -131,7 +132,13 @@ class ResearchIngestTool(_ResearchTool):
                 },
                 "chunk_size": {"type": "integer", "minimum": 200, "maximum": 4000},
                 "chunk_overlap": {"type": "integer", "minimum": 0, "maximum": 1000},
-                "chunk_strategy": {"type": "string", "enum": ["fixed", "structure"]},
+                "chunk_strategy": {
+                    "type": "string",
+                    "enum": ["fixed", "structure", "semantic"],
+                    "description": (
+                        "semantic keeps Unstructured page/section boundaries and is the default"
+                    ),
+                },
             },
             "required": ["path"],
         }
@@ -142,7 +149,7 @@ class ResearchIngestTool(_ResearchTool):
         max_files: int = 100,
         chunk_size: int = 768,
         chunk_overlap: int = 120,
-        chunk_strategy: str = "fixed",
+        chunk_strategy: str = "semantic",
     ) -> str:
         try:
             result = await asyncio.to_thread(
@@ -198,6 +205,28 @@ class ResearchSearchTool(_ResearchTool):
                     "items": {"type": "string"},
                     "description": "Optional source IDs to restrict retrieval.",
                 },
+                "metadata_filter": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "properties": {
+                        "source_ids": {"type": "array", "items": {"type": "string"}},
+                        "pages": {"type": "array", "items": {"type": "integer", "minimum": 1}},
+                        "page_min": {"type": "integer", "minimum": 1},
+                        "page_max": {"type": "integer", "minimum": 1},
+                        "sections": {"type": "array", "items": {"type": "string"}},
+                        "element_types": {"type": "array", "items": {"type": "string"}},
+                    },
+                    "description": (
+                        "Optional document metadata constraints applied before BM25 and dense recall."
+                    ),
+                },
+                "allow_web_fallback": {
+                    "type": "boolean",
+                    "description": (
+                        "When the user permits external evidence, fall back to the configured "
+                        "web search provider after both local retrieval passes are insufficient."
+                    ),
+                },
             },
             "required": ["query"],
         }
@@ -205,11 +234,13 @@ class ResearchSearchTool(_ResearchTool):
     async def execute(
         self,
         query: str,
-        top_k: int = 6,
+        top_k: int = 5,
         source_ids: list[str] | None = None,
+        metadata_filter: dict[str, Any] | None = None,
         strategy: str = "auto",
         no_answer_threshold: float | None = None,
         rerank: bool = False,
+        allow_web_fallback: bool = False,
     ) -> str:
         try:
             outcome = await asyncio.to_thread(
@@ -218,10 +249,24 @@ class ResearchSearchTool(_ResearchTool):
                 strategy=strategy,
                 top_k=top_k,
                 source_ids=source_ids,
+                metadata_filter=metadata_filter,
                 no_answer_threshold=no_answer_threshold,
                 rerank=rerank,
             )
             if outcome.no_answer:
+                if allow_web_fallback and self._handle.web_search_tool is not None:
+                    fallback_query = outcome.reflected_query or query
+                    external = await self._handle.web_search_tool.execute(
+                        query=fallback_query,
+                        count=min(top_k, 10),
+                    )
+                    if not str(external).startswith("Error:"):
+                        return (
+                            "EXTERNAL_WEB_FALLBACK: local evidence remained insufficient after "
+                            "query reflection. The following untrusted external results are not "
+                            "RF citations; fetch and verify the source page before relying on them.\n\n"
+                            f"{external}"
+                        )
                 return (
                     "INSUFFICIENT_EVIDENCE: the indexed corpus does not contain sufficiently "
                     f"strong evidence (strategy={outcome.used_strategy}, "
@@ -478,10 +523,13 @@ class ResearchSourcesTool(_ResearchTool):
 
 
 def register_research_tools(
-    registry: ToolRegistry, workspace: Path, allowed_dir: Path | None = None
+    registry: ToolRegistry,
+    workspace: Path,
+    allowed_dir: Path | None = None,
+    web_search_tool: Tool | None = None,
 ) -> None:
     """Register one coherent ResearchFlow toolset with a lazily shared store."""
-    handle = _StoreHandle(workspace)
+    handle = _StoreHandle(workspace, web_search_tool=web_search_tool)
     for tool_cls in (
         ResearchIngestTool,
         ResearchSearchTool,

@@ -87,11 +87,11 @@ def split_text(
         return []
     if max_chars < 200:
         raise ValueError("max_chars must be at least 200")
-    if strategy not in {"fixed", "structure"}:
-        raise ValueError("strategy must be 'fixed' or 'structure'")
+    if strategy not in {"fixed", "structure", "semantic"}:
+        raise ValueError("strategy must be 'fixed', 'structure', or 'semantic'")
     overlap = max(0, min(overlap, max_chars // 3))
 
-    if strategy == "structure":
+    if strategy in {"structure", "semantic"}:
         # Keep Markdown/academic headings attached to their section. Long sections still pass
         # through the same sentence/paragraph-aware sliding window below.
         sections = re.split(r"(?m)(?=^(?:#{1,6}\s+|(?:abstract|introduction|method|results?|conclusion|references)\s*$))", cleaned, flags=re.I)
@@ -330,46 +330,85 @@ class ResearchStore:
 
         output: list[tuple[int | None, str, str, str | None]] = []
         for page, units in grouped:
-            pieces: list[str] = []
-            spans: list[tuple[int, int, str, str | None]] = []
-            cursor = 0
-            for content, element_type, section in units:
-                if pieces:
-                    cursor += 2
-                start = cursor
-                pieces.append(content)
-                cursor += len(content)
-                spans.append((start, cursor, element_type, section))
-            combined = "\n\n".join(pieces)
-            search_from = 0
-            previous_end = 0
-            for content in split_text(
-                combined,
-                max_chars=max_chars,
-                overlap=overlap,
-                strategy=strategy,
-            ):
-                start = combined.find(content, max(0, search_from))
-                if start < 0:
-                    start = combined.find(content)
-                if start < 0:  # Defensive fallback for future normalization changes.
-                    start = previous_end
-                end = start + len(content)
-                touched = [
-                    span for span in spans if min(end, span[1]) > max(start, span[0])
-                ]
-                anchor = max(
-                    touched or [(start, end, "Composite", None)],
-                    key=lambda span: min(end, span[1]) - max(start, span[0]),
+            # ``semantic`` is document-structure semantic chunking: Unstructured's titles and
+            # section metadata form hard boundaries, while paragraphs inside one section are
+            # packed into bounded, sentence-aware windows.  This avoids mixing evidence from
+            # unrelated paper sections without paying for a second embedding pass at ingest.
+            unit_groups: list[list[tuple[str, str, str | None]]] = []
+            if strategy == "semantic":
+                for unit in units:
+                    if not unit_groups or unit_groups[-1][-1][2] != unit[2]:
+                        unit_groups.append([unit])
+                    else:
+                        unit_groups[-1].append(unit)
+            else:
+                unit_groups = [units]
+
+            for semantic_units in unit_groups:
+                output.extend(
+                    ResearchStore._pack_element_group(
+                        page,
+                        semantic_units,
+                        max_chars=max_chars,
+                        overlap=overlap,
+                        strategy="structure" if strategy == "semantic" else strategy,
+                    )
                 )
-                element_type = anchor[2] if len(touched) == 1 else "Composite"
-                section = next(
-                    (span[3] for span in reversed(touched) if span[3]),
-                    anchor[3],
-                )
-                output.append((page, content, element_type, section))
-                previous_end = end
-                search_from = max(start + 1, end - overlap - 4)
+        return output
+
+    @staticmethod
+    def _pack_element_group(
+        page: int | None,
+        units: list[tuple[str, str, str | None]],
+        *,
+        max_chars: int,
+        overlap: int,
+        strategy: str,
+    ) -> list[tuple[int | None, str, str, str | None]]:
+        """Pack one page/section group while preserving element provenance."""
+        output: list[tuple[int | None, str, str, str | None]] = []
+        if not units:
+            return output
+        pieces: list[str] = []
+        spans: list[tuple[int, int, str, str | None]] = []
+        cursor = 0
+        for content, element_type, section in units:
+            if pieces:
+                cursor += 2
+            start = cursor
+            pieces.append(content)
+            cursor += len(content)
+            spans.append((start, cursor, element_type, section))
+        combined = "\n\n".join(pieces)
+        search_from = 0
+        previous_end = 0
+        for content in split_text(
+            combined,
+            max_chars=max_chars,
+            overlap=overlap,
+            strategy=strategy,
+        ):
+            start = combined.find(content, max(0, search_from))
+            if start < 0:
+                start = combined.find(content)
+            if start < 0:  # Defensive fallback for future normalization changes.
+                start = previous_end
+            end = start + len(content)
+            touched = [
+                span for span in spans if min(end, span[1]) > max(start, span[0])
+            ]
+            anchor = max(
+                touched or [(start, end, "Composite", None)],
+                key=lambda span: min(end, span[1]) - max(start, span[0]),
+            )
+            element_type = anchor[2] if len(touched) == 1 else "Composite"
+            section = next(
+                (span[3] for span in reversed(touched) if span[3]),
+                anchor[3],
+            )
+            output.append((page, content, element_type, section))
+            previous_end = end
+            search_from = max(start + 1, end - overlap - 4)
         return output
 
     def ingest_file(
@@ -379,7 +418,7 @@ class ResearchStore:
         title: str | None = None,
         max_chars: int = 768,
         overlap: int = 120,
-        chunk_strategy: str = "fixed",
+        chunk_strategy: str = "semantic",
     ) -> dict[str, Any]:
         path = Path(path).expanduser().resolve()
         if not path.is_file():
@@ -501,7 +540,7 @@ class ResearchStore:
         max_files: int = 100,
         max_chars: int = 768,
         overlap: int = 120,
-        chunk_strategy: str = "fixed",
+        chunk_strategy: str = "semantic",
     ) -> dict[str, Any]:
         path = Path(path).expanduser().resolve()
         if path.is_file():
@@ -554,14 +593,48 @@ class ResearchStore:
             ).fetchall()
         return [dict(row) for row in rows]
 
-    def list_chunks(self, source_ids: Iterable[str] | None = None) -> list[dict[str, Any]]:
-        """Return corpus chunks in stable citation order for alternate retrievers."""
-        selected = [value for value in (source_ids or []) if value]
+    @staticmethod
+    def _metadata_where(
+        source_ids: Iterable[str] | None = None,
+        metadata_filter: dict[str, Any] | None = None,
+    ) -> tuple[str, list[Any]]:
+        """Build a parameterized SQLite predicate for supported evidence metadata."""
+        metadata = metadata_filter or {}
+        clauses: list[str] = []
         params: list[Any] = []
-        where = ""
+        selected = [str(value) for value in (source_ids or metadata.get("source_ids") or []) if value]
         if selected:
-            where = "WHERE c.source_id IN ({})".format(",".join("?" for _ in selected))
+            clauses.append("c.source_id IN ({})".format(",".join("?" for _ in selected)))
             params.extend(selected)
+        pages = [int(value) for value in metadata.get("pages", [])]
+        if pages:
+            clauses.append("c.page IN ({})".format(",".join("?" for _ in pages)))
+            params.extend(pages)
+        if metadata.get("page_min") is not None:
+            clauses.append("c.page >= ?")
+            params.append(int(metadata["page_min"]))
+        if metadata.get("page_max") is not None:
+            clauses.append("c.page <= ?")
+            params.append(int(metadata["page_max"]))
+        sections = [str(value) for value in metadata.get("sections", []) if str(value).strip()]
+        if sections:
+            clauses.append("c.section IN ({})".format(",".join("?" for _ in sections)))
+            params.extend(sections)
+        element_types = [
+            str(value) for value in metadata.get("element_types", []) if str(value).strip()
+        ]
+        if element_types:
+            clauses.append("c.element_type IN ({})".format(",".join("?" for _ in element_types)))
+            params.extend(element_types)
+        return ("WHERE " + " AND ".join(clauses) if clauses else "", params)
+
+    def list_chunks(
+        self,
+        source_ids: Iterable[str] | None = None,
+        metadata_filter: dict[str, Any] | None = None,
+    ) -> list[dict[str, Any]]:
+        """Return corpus chunks in stable citation order for alternate retrievers."""
+        where, params = self._metadata_where(source_ids, metadata_filter)
         with self._connect() as conn:
             rows = conn.execute(
                 f"""
@@ -580,19 +653,15 @@ class ResearchStore:
         self,
         query: str,
         *,
-        top_k: int = 6,
+        top_k: int = 5,
         source_ids: Iterable[str] | None = None,
+        metadata_filter: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
         query_tokens = tokenize(query)
         if not query_tokens:
             return []
 
-        params: list[Any] = []
-        where = ""
-        selected = [value for value in (source_ids or []) if value]
-        if selected:
-            where = "WHERE c.source_id IN ({})".format(",".join("?" for _ in selected))
-            params.extend(selected)
+        where, params = self._metadata_where(source_ids, metadata_filter)
         with self._connect() as conn:
             rows = conn.execute(
                 f"""

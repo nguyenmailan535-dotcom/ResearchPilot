@@ -24,10 +24,12 @@ not a one-shot PDF summary.
    `research_read` yourself for disputed or decision-critical citations. Refine the query and
    search again when evidence is insufficient. Never copy a delegated claim whose citation was
    reported invalid.
-6. When two local passes still leave a material evidence gap, use `web_search` only if the user
-   permits external evidence. Prefer the configured Tavily provider, fetch the actual page before
-   relying on it, label it as external, and never present a web result as an `RF-*` citation. If
-   the request is explicitly limited to the indexed corpus, abstain instead of searching the web.
+6. When the user permits external evidence, set `allow_web_fallback=true` on the final
+   `research_search` attempt. The tool first completes local Hybrid Retrieval and confidence-based
+   Query Rewrite, then uses the configured web provider only when both local passes are
+   insufficient. Prefer Tavily, fetch the actual page before relying on it, label it as external,
+   and never present a web result as an `RF-*` citation. If the request is explicitly limited to
+   the indexed corpus, leave web fallback disabled and abstain instead.
 7. Use `research_read` when an exact evidence chunk must be checked before making a claim.
 8. Write the answer or report with citations in the exact form `[RF-xxxxxxxx-N]` immediately
    after the supported claim. Never invent a citation ID.

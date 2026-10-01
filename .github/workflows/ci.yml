@@ -1,4 +1,4 @@
-name: ResearchFlow CI
+name: ResearchPilot CI
 
 on:
   push:
@@ -45,7 +45,7 @@ jobs:
         tests/research
         tests/tools/test_research_tools.py
 
-    - name: Run ResearchFlow tests
+    - name: Run ResearchPilot tests
       run: >-
         uv run pytest
         tests/api
@@ -57,5 +57,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v7
-    - name: Build ResearchFlow image
+    - name: Build ResearchPilot image
       run: docker build -f Dockerfile.research -t researchflow:test .

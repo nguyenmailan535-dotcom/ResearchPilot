@@ -1,4 +1,4 @@
-"""FastAPI HTTP surface for nanobot and the ResearchFlow application."""
+"""FastAPI HTTP surface for nanobot and the ResearchPilot application."""
 
 from __future__ import annotations
 
@@ -347,7 +347,7 @@ def create_app(
             if close_mcp is not None:
                 await close_mcp()
 
-    app = FastAPI(title="ResearchFlow API", version="1.0.0", lifespan=lifespan)
+    app = FastAPI(title="ResearchPilot API", version="1.0.0", lifespan=lifespan)
     app.state.agent_loop = agent_loop
     app.state.model_name = model_name
     app.state.request_timeout = request_timeout

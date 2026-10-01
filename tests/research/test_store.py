@@ -91,6 +91,72 @@ def test_pdf_elements_are_packed_into_real_windows(tmp_path: Path, monkeypatch) 
     assert result["chunk_config"]["parser"]["revision"] == "pdf-elements-packed-v2"
 
 
+def test_semantic_pdf_chunking_preserves_section_boundaries(tmp_path: Path, monkeypatch) -> None:
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    source = workspace / "paper.pdf"
+    source.write_bytes(b"synthetic pdf")
+    store = ResearchStore(workspace)
+    elements = [
+        (1, "method evidence " * 12, "NarrativeText", "Method"),
+        (1, "method details " * 12, "NarrativeText", "Method"),
+        (1, "result evidence " * 12, "NarrativeText", "Results"),
+        (1, "result details " * 12, "NarrativeText", "Results"),
+    ]
+    monkeypatch.setattr(ResearchStore, "_read_pdf", staticmethod(lambda _path: elements))
+
+    result = store.ingest_file(source, max_chars=300, overlap=40)
+    chunks = store.list_chunks()
+
+    assert result["chunk_config"]["strategy"] == "semantic"
+    assert {chunk["section"] for chunk in chunks} == {"Method", "Results"}
+    assert all(
+        not ("method" in chunk["content"] and "result" in chunk["content"])
+        for chunk in chunks
+    )
+
+
+def test_search_applies_page_section_and_element_metadata_filters(
+    tmp_path: Path, monkeypatch
+) -> None:
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    source = workspace / "paper.pdf"
+    source.write_bytes(b"synthetic pdf")
+    store = ResearchStore(workspace)
+    elements = [
+        (1, "shared evidence from the method section", "NarrativeText", "Method"),
+        (2, "shared evidence from the results section", "Table", "Results"),
+    ]
+    monkeypatch.setattr(ResearchStore, "_read_pdf", staticmethod(lambda _path: elements))
+    store.ingest_file(source, max_chars=300, overlap=0)
+
+    filtered = store.search(
+        "shared evidence",
+        metadata_filter={
+            "pages": [2],
+            "sections": ["Results"],
+            "element_types": ["Table"],
+        },
+    )
+
+    assert len(filtered) == 1
+    assert filtered[0]["page"] == 2
+    assert filtered[0]["section"] == "Results"
+
+
+def test_search_defaults_to_top_five(tmp_path: Path) -> None:
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    store = ResearchStore(workspace)
+    for index in range(6):
+        source = workspace / f"paper-{index}.txt"
+        source.write_text(f"shared retrieval evidence document {index}", encoding="utf-8")
+        store.ingest_file(source)
+
+    assert len(store.search("shared retrieval evidence")) == 5
+
+
 def test_report_verification_and_save(tmp_path: Path) -> None:
     workspace = tmp_path / "workspace"
     workspace.mkdir()

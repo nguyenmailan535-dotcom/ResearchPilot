@@ -1,14 +1,14 @@
 <div align="center">
-  <h1>ResearchFlow Agent</h1>
-  <p>基于 nanobot Runtime 的可审计本地论文研究 Agent</p>
+  <h1>ResearchPilot</h1>
+  <p>专业文献 Agentic RAG 助手</p>
   <p>
-    <a href="https://github.com/nguyenmailan535-dotcom/researchflow-agent/actions/workflows/ci.yml"><img src="https://github.com/nguyenmailan535-dotcom/researchflow-agent/actions/workflows/ci.yml/badge.svg" alt="ResearchFlow CI"></a>
+    <a href="https://github.com/nguyenmailan535-dotcom/researchflow-agent/actions/workflows/ci.yml"><img src="https://github.com/nguyenmailan535-dotcom/researchflow-agent/actions/workflows/ci.yml/badge.svg" alt="ResearchPilot CI"></a>
     <img src="https://img.shields.io/badge/python-≥3.11-blue" alt="Python">
     <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
   </p>
 </div>
 
-> Built on the open-source nanobot v0.1.4 Runtime. ResearchFlow reuses its AgentRunner,
+> ResearchPilot is built on the open-source nanobot v0.1.4 Runtime. It reuses AgentRunner,
 > ToolRegistry and session runtime, while the research retrieval, evidence verification,
 > asynchronous task service, SSE workspace and evaluation system are project extensions.
 
@@ -149,16 +149,22 @@
   </tr>
 </table>
 
-## 🔬 ResearchFlow: Evidence-Grounded Research Agent
+## 🔬 ResearchPilot: Professional Literature Agentic RAG Assistant
 
-This branch extends nanobot v0.1.4 with **ResearchFlow**, a technical and academic research
+This branch extends nanobot v0.1.4 with **ResearchPilot**, a technical and academic research
 workflow built directly on the existing AgentRunner and ToolRegistry. It parses local PDFs with
-Unstructured, stores workflow state in SQLite, and projects evidence into Milvus for BGE-M3 dense
+Unstructured and performs page/section-aware semantic chunking, stores workflow state in SQLite,
+and projects evidence into Milvus for BGE-M3 dense
 HNSW and BM25 sparse retrieval. It supports selectable BM25, dense,
 weighted-RRF hybrid and reflected-hybrid retrieval; optionally reranks candidates; abstains when
-evidence is weak; validates Claim—Evidence alignment; and keeps cited project decisions in a
+evidence is weak; applies source/page/section/type metadata filters; routes an explicitly permitted
+low-confidence miss to the configured web provider; validates Claim—Evidence alignment; and keeps cited project decisions in a
 versioned Evidence Ledger. A FastAPI asynchronous task API, resumable SSE event stream, and
 zero-build web client turn the workflow into a complete local application.
+
+PDF ingest defaults to `768/120` page/section-aware semantic chunks. Online retrieval returns
+Top-5 evidence by default, and source ID, page range, section, and element-type filters are applied
+to both sparse and dense recall before RRF fusion.
 
 For substantial questions with independent dimensions, the coordinator can run 2-3 read-only
 research SubAgents concurrently. Workers receive only source-listing, evidence-search and
@@ -188,17 +194,17 @@ of 54.1% and 20.6% over BM25. The 16-question end-to-end run records 100% task c
 citation validity, 87.5% answer pass rate, and 33.20/105.89-second average/P95 latency. Evaluation
 also records P50/P95 latency, token/cost totals, abstention
 quality, deterministic Claim—Evidence support, Bad Cases, and an optional structured LLM judge.
-See [ResearchFlow architecture](./docs/RESEARCH_FLOW.md), the
+See [ResearchPilot architecture](./docs/RESEARCH_FLOW.md), the
 [HTTP/SSE API](./docs/RESEARCH_API.md), and the
 [reproducible benchmark report](./benchmarks/researchflow/README.md).
 
-![ResearchFlow architecture](./docs/assets/researchflow-architecture.svg)
+![ResearchPilot architecture](./docs/assets/researchflow-architecture.svg)
 
 ### Demo
 
-![ResearchFlow workspace demo](./docs/assets/researchflow-demo.gif)
+![ResearchPilot workspace](./docs/assets/researchflow-workspace.png)
 
-The animation is generated from a real local run. See the [full workspace screenshot](./docs/assets/researchflow-workspace.png) and the [resume-ready project description](./docs/RESUME_PROJECT.md).
+The screenshot is captured from a real local run. See the [resume-ready project description](./docs/RESUME_PROJECT.md).
 
 ### Docker quick start
 

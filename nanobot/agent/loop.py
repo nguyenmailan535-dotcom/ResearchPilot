@@ -250,12 +250,18 @@ class AgentLoop:
                 restrict_to_workspace=self.restrict_to_workspace,
                 path_append=self.exec_config.path_append,
             ))
-        self.tools.register(WebSearchTool(config=self.web_search_config, proxy=self.web_proxy))
+        web_search_tool = WebSearchTool(config=self.web_search_config, proxy=self.web_proxy)
+        self.tools.register(web_search_tool)
         self.tools.register(WebFetchTool(proxy=self.web_proxy))
         self.tools.register(MessageTool(send_callback=self.bus.publish_outbound))
         self.tools.register(SpawnTool(manager=self.subagents))
         self.tools.register(ResearchDelegateTool(manager=self.subagents))
-        register_research_tools(self.tools, self.workspace, allowed_dir=allowed_dir)
+        register_research_tools(
+            self.tools,
+            self.workspace,
+            allowed_dir=allowed_dir,
+            web_search_tool=web_search_tool,
+        )
         if self.cron_service:
             self.tools.register(
                 CronTool(self.cron_service, default_timezone=self.context.timezone or "UTC")

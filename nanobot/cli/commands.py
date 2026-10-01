@@ -1032,7 +1032,7 @@ def research_ingest(
     max_files: int = typer.Option(100, "--max-files", min=1, max=500),
     chunk_size: int = typer.Option(768, "--chunk-size", min=200, max=4000),
     chunk_overlap: int = typer.Option(120, "--chunk-overlap", min=0, max=1000),
-    chunk_strategy: str = typer.Option("fixed", "--chunk-strategy"),
+    chunk_strategy: str = typer.Option("semantic", "--chunk-strategy"),
 ):
     """Index local evidence for grounded research."""
     store = _research_store(workspace)
@@ -1066,7 +1066,7 @@ def research_ingest(
 def research_search(
     query: str = typer.Argument(..., help="Evidence query"),
     workspace: str | None = typer.Option(None, "--workspace", "-w"),
-    top_k: int = typer.Option(6, "--top-k", min=1, max=20),
+    top_k: int = typer.Option(5, "--top-k", min=1, max=20),
     strategy: str = typer.Option("auto", "--strategy"),
     no_answer_threshold: float | None = typer.Option(
         None, "--no-answer-threshold", min=0, max=1

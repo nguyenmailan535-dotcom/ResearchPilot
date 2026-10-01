@@ -42,5 +42,19 @@ def test_milvus_hit_mapping_and_source_filter(tmp_path) -> None:
     assert result[0]["citation"] == "RF-12345678-1"
     assert result[0]["score"] == 0.75
     assert backend._source_filter(["abc123"]) == 'source_id in ["abc123"]'
+    assert backend._metadata_filter(
+        ["abc123"],
+        {
+            "pages": [2, 3],
+            "page_min": 2,
+            "page_max": 5,
+            "sections": ["Method"],
+            "element_types": ["NarrativeText"],
+        },
+    ) == (
+        'source_id in ["abc123"] and page in [2,3] and page >= 2 and page <= 5 '
+        'and section in ["Method"] and element_type in ["NarrativeText"]'
+    )
+    assert backend._source_filter(['quoted"id']) == 'source_id in ["quoted\\\"id"]'
     with pytest.raises(ValueError):
-        backend._source_filter(['bad"id'])
+        backend._source_filter(["bad\x00id"])

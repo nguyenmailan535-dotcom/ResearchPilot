@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import AsyncMock
 
 import pytest
 
@@ -87,6 +89,41 @@ async def test_research_ingest_respects_workspace_restriction(tmp_path: Path) ->
 
     assert result.startswith("Error indexing research sources")
     assert "outside the allowed workspace" in result
+
+
+@pytest.mark.asyncio
+async def test_research_search_can_route_insufficient_local_evidence_to_web(
+    tmp_path: Path,
+) -> None:
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    source = workspace / "paper.txt"
+    source.write_text("local evidence about cardinality estimation", encoding="utf-8")
+    web_search = SimpleNamespace(
+        execute=AsyncMock(return_value="Results for: missing topic\n\n1. External paper")
+    )
+    registry = ToolRegistry()
+    register_research_tools(
+        registry,
+        workspace,
+        allowed_dir=workspace,
+        web_search_tool=web_search,
+    )
+    await registry.execute("research_ingest", {"path": str(source)})
+
+    result = await registry.execute(
+        "research_search",
+        {
+            "query": "missing topic",
+            "strategy": "bm25",
+            "no_answer_threshold": 0.9,
+            "allow_web_fallback": True,
+        },
+    )
+
+    assert result.startswith("EXTERNAL_WEB_FALLBACK")
+    assert "not RF citations" in result
+    web_search.execute.assert_awaited_once()
 
 
 def test_registers_expected_research_tools_without_creating_database(tmp_path: Path) -> None:

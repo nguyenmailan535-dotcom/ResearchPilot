@@ -1,6 +1,6 @@
-# ResearchFlow
+# ResearchPilot Architecture
 
-ResearchFlow is an evidence-grounded technical research agent built on nanobot's existing
+ResearchPilot is an evidence-grounded technical research agent built on nanobot's existing
 AgentRunner, provider abstraction, ToolRegistry, memory consolidation, and MCP support. It is
 implemented as a cohesive set of native tools instead of introducing LangChain or LangGraph.
 
@@ -29,8 +29,8 @@ nanobot AgentRunner (existing ReAct loop)
        |                         +-- research_sources / search / read only
        |                         +-- structured findings + citation validation
        |                         +-- main-Agent synthesis and writes
-       +-- research_ingest  -> Unstructured element parsing + configurable chunking
-       +-- research_search  -> Milvus BM25 / BGE-M3 HNSW / RRF / reflection / reranking
+       +-- research_ingest  -> Unstructured parsing + page/section semantic chunking
+       +-- research_search  -> BM25 / BGE-M3 / RRF / metadata filter / rewrite / web fallback
        +-- research_read    -> exact evidence lookup
        +-- research_decision-> cited, versioned Evidence Ledger
        +-- research_report  -> citation + Claim/Evidence verification
@@ -45,6 +45,12 @@ SQLite remains the source of truth for sources, evidence chunks, the Evidence Le
 task state and replayable events. Milvus is a rebuildable retrieval projection: Unstructured
 element metadata and chunks are synchronized incrementally, BGE-M3 emits normalized 1024-dimensional
 dense vectors, a Milvus BM25 Function generates sparse vectors, and HNSW serves dense ANN search.
+The default semantic chunker treats Unstructured page and section boundaries as hard evidence
+boundaries, then packs adjacent elements into bounded, sentence-aware windows. `research_search`
+returns Top-5 evidence by default and can filter source IDs, page ranges, sections and element
+types before either sparse or dense recall. When the caller explicitly permits external evidence,
+an insufficient local result after confidence-based Query Rewrite is routed to the configured web
+provider and clearly marked as non-RF evidence.
 The local SQLite/NumPy backend remains available for unit tests and degraded development runs.
 For a non-trivial corpus, run `nanobot research sync-index --workspace <workspace>` after ingest so
 embedding and index construction happen before the first interactive query. The Docker profile uses
@@ -62,7 +68,7 @@ resolves conflicts, performs final synthesis and remains the only writer.
 
 ## Design references
 
-ResearchFlow was implemented for this repository and does not copy the following projects. The
+ResearchPilot was implemented for this repository and does not copy the following projects. The
 star counts below are a 2026-09-25 snapshot; its workflow is informed by their publicly documented
 ideas:
 
@@ -76,7 +82,7 @@ ideas:
 - [Khoj](https://github.com/khoj-ai/khoj) (~37.5k stars): self-hosted personal knowledge and
   long-lived assistant context.
 
-See each upstream project's license before reusing any of its code. ResearchFlow currently uses
+See each upstream project's license before reusing any of its code. ResearchPilot currently uses
 only the nanobot repository's existing MIT-licensed runtime and original implementation code in
 this branch.
 

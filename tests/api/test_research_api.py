@@ -198,7 +198,7 @@ async def test_web_client_is_served(api_client) -> None:
     client = await api_client(create_app(agent))
     response = await client.get("/")
     assert response.status == 200
-    assert "ResearchFlow" in await response.text()
+    assert "ResearchPilot" in await response.text()
     response = await client.get("/assets/app.js")
     assert response.status == 200
     assert "EventSource" in await response.text()

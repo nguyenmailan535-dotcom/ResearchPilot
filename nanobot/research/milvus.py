@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import threading
 from collections.abc import Iterable
@@ -222,13 +223,42 @@ class MilvusResearchBackend:
 
     @staticmethod
     def _source_filter(source_ids: Iterable[str] | None) -> str:
-        selected = [value for value in (source_ids or []) if value]
-        if not selected:
-            return ""
-        if any(not value.replace("-", "").isalnum() for value in selected):
-            raise ValueError("Invalid source_id filter")
-        quoted = ",".join(f'"{value}"' for value in selected)
-        return f"source_id in [{quoted}]"
+        return MilvusResearchBackend._metadata_filter(source_ids, None)
+
+    @staticmethod
+    def _metadata_filter(
+        source_ids: Iterable[str] | None,
+        metadata_filter: dict[str, Any] | None,
+    ) -> str:
+        """Translate supported evidence metadata into a safe Milvus expression."""
+        metadata = metadata_filter or {}
+        clauses: list[str] = []
+
+        def quoted(values: Iterable[Any], label: str) -> str:
+            normalized = [str(value) for value in values if str(value).strip()]
+            if any("\x00" in value for value in normalized):
+                raise ValueError(f"Invalid {label} filter")
+            return ",".join(json.dumps(value, ensure_ascii=False) for value in normalized)
+
+        selected = list(source_ids or metadata.get("source_ids") or [])
+        if selected:
+            clauses.append(f"source_id in [{quoted(selected, 'source_id')}]")
+        pages = [int(value) for value in metadata.get("pages", [])]
+        if pages:
+            clauses.append("page in [{}]".format(",".join(str(value) for value in pages)))
+        if metadata.get("page_min") is not None:
+            clauses.append(f"page >= {int(metadata['page_min'])}")
+        if metadata.get("page_max") is not None:
+            clauses.append(f"page <= {int(metadata['page_max'])}")
+        sections = metadata.get("sections", [])
+        if sections:
+            clauses.append(f"section in [{quoted(sections, 'section')}]")
+        element_types = metadata.get("element_types", [])
+        if element_types:
+            clauses.append(
+                f"element_type in [{quoted(element_types, 'element_type')}]"
+            )
+        return " and ".join(clauses)
 
     @staticmethod
     def _format_hits(raw: Any) -> list[dict[str, Any]]:
@@ -261,7 +291,12 @@ class MilvusResearchBackend:
         ]
 
     def bm25(
-        self, query: str, *, top_k: int, source_ids: Iterable[str] | None = None
+        self,
+        query: str,
+        *,
+        top_k: int,
+        source_ids: Iterable[str] | None = None,
+        metadata_filter: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
         self.sync()
         raw = self.client.search(
@@ -269,14 +304,19 @@ class MilvusResearchBackend:
             data=[query],
             anns_field="sparse_vector",
             limit=max(1, top_k),
-            filter=self._source_filter(source_ids),
+            filter=self._metadata_filter(source_ids, metadata_filter),
             search_params={"metric_type": "BM25"},
             output_fields=self._output_fields,
         )
         return self._format_hits(raw)
 
     def vector(
-        self, query: str, *, top_k: int, source_ids: Iterable[str] | None = None
+        self,
+        query: str,
+        *,
+        top_k: int,
+        source_ids: Iterable[str] | None = None,
+        metadata_filter: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
         self.sync()
         vector = np.asarray(list(self.embedder.query_embed(query)), dtype=np.float32)[0]
@@ -286,7 +326,7 @@ class MilvusResearchBackend:
             data=[vector.tolist()],
             anns_field="dense_vector",
             limit=max(1, top_k),
-            filter=self._source_filter(source_ids),
+            filter=self._metadata_filter(source_ids, metadata_filter),
             search_params={
                 "metric_type": "IP",
                 "params": {"ef": int(os.getenv("RESEARCH_HNSW_EF", "64"))},

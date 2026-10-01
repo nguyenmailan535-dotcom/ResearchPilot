@@ -1,31 +1,18 @@
-# ResearchFlow 简历与面试材料
+# ResearchPilot 简历与面试材料
 
 ## 简历项目名称
 
-**ResearchFlow —— 轻量 Agentic RAG 论文研究 Agent**
+**ResearchPilot｜专业文献 Agentic RAG 助手**
 
-技术栈：Python、ReAct、SubAgent、FastAPI、Milvus、Unstructured、BGE-M3、BM25、HNSW、RRF、Cross-Encoder、SQLite、SSE、RAGAS
+技术栈：Python、Agent Harness、FastAPI、Milvus、Unstructured、BGE-M3、BM25、RRF、RAGAS、Tavily
 
 ## 简历项目描述（推荐版）
 
-- 实现 `ContextBuilder → AgentRunner → ToolRegistry → Tool Execution` 核心运行链路，基于
-  ReAct 实现 LLM 推理、Tool 选择、Observation 回填与多轮迭代的 Agent Loop，并通过迭代上限、
-  超时及异常回传控制执行边界。
-- 将论文检索封装为 Tool 接入 Agent Loop；主 Agent 将 2–3 个独立研究问题委派给只读 SubAgent
-  并行检索，限制其仅可查看来源、检索与读取证据；子任务返回结构化结论、证据缺口和 Citation
-  ID，由主 Agent 统一校验引用、解决冲突、综合报告并写入 Evidence Ledger。
-- 构建论文知识库检索链路，基于 Unstructured 保留标题、正文元素、页码与章节 metadata；使用
-  BGE-M3 生成 Dense 向量，通过 Milvus HNSW 与内置 BM25 Sparse Index 完成双路召回，经加权
-  RRF 融合排序，并引入可选
-  Cross-Encoder Rerank 提升 Top-K 证据相关性。
-- 设计可追溯的 Evidence Grounding 机制，为 Chunk 生成 Citation ID，支持回答从引用回溯至原文；
-  实现引用有效性与 Claim—Evidence 校验，降低论文分析中的无依据生成。
-- 基于 FastAPI、SQLite 与 SSE 实现异步任务、并发控制、异常任务恢复标记与 Agent 执行轨迹推送；
-  建立覆盖 Recall@K、Hit@K、MRR、Faithfulness、Answer Relevancy、引用有效率、延迟与 Token
-  消耗的分层评测体系。40 条 BGE-M3/Milvus 迁移回归集上，Hybrid Recall@5 较 BM25 提升
-  54.1%、MRR 提升 20.6%；16 条端到端测试任务完成率与引用有效率均为 100%，平均/P95
-  延迟为 33.20/105.89 秒，平均输入/输出 Token 为 19.18k/1.10k；DeepSeek V4-Pro
-  非思考模式下 RAGAS Faithfulness/Answer Relevancy 达到 0.8773/0.9134。
+- **上下文管理：**实现 System Prompt、会话历史、Skills、Memory、Tool Schema 与用户请求的上下文组装，并通过 Tool Result 截断与 Skills 渐进披露机制降低 Context Window 占用。
+- **记忆系统：**实现 HISTORY.md + MEMORY.md 分层记忆，通过 Memory Consolidation 对历史会话进行摘要压缩，并支持 Agent 主动沉淀长期记忆，实现跨会话信息复用。
+- **文档解析与向量索引：**使用 Unstructured 解析 PDF 并进行语义切分；基于 BGE-M3 生成 Dense Embedding，将 Chunk、页码及 Metadata 持久化至 Milvus，并采用 HNSW 构建向量索引。
+- **混合检索：**构建 BM25 + Dense Retrieval 双路召回，通过 RRF 融合并结合 Metadata Filter 返回 Top-5 Evidence；低相关结果触发 Query Rewrite 与二次检索，仍未命中时降级至 Web Search。
+- **效果评测：**构建40条检索回归集与16条端到端问答集；相比BM25基线，Hybrid Retrieval的Recall@5由0.4625提升至0.7125，MRR@5由0.3858提升至0.4654；RAGAS Faithfulness和Answer Relevancy分别达到0.8773和0.9134。
 
 ## 一句话版本
 
@@ -34,7 +21,7 @@
 
 ## 面试开场（约 40 秒）
 
-ResearchFlow 是我在读完 nanobot v0.1.4 源码后完成的二次开发项目。原版 Runtime 已经提供了
+ResearchPilot 是我在读完 nanobot v0.1.4 源码后完成的二次开发项目。原版 Runtime 已经提供了
 Agent 循环、工具注册和会话能力，我主要解决的是研究场景中的三个工程问题：第一，回答必须能
 回溯到本地论文原文；第二，长任务需要异步执行并向前端实时展示；第三，检索优化不能只凭主观
 体验，需要有可复现评测。因此我实现了混合检索和稳定引用体系、SQLite 异步任务与 SSE 事件流，

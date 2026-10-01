@@ -247,8 +247,9 @@ class DenseRetriever:
         self,
         query: str,
         *,
-        top_k: int = 6,
+        top_k: int = 5,
         source_ids: Iterable[str] | None = None,
+        metadata_filter: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
         if self._embeddings is None:
             # Delegated researchers share one retriever and may reach the first dense query at
@@ -263,12 +264,36 @@ class DenseRetriever:
         segment_scores = self._embeddings @ query_vector
         scores = np.full(len(self._chunks), -np.inf, dtype=np.float32)
         np.maximum.at(scores, self._segment_chunk_indices, segment_scores)
-        selected = {value for value in (source_ids or []) if value}
+        metadata = metadata_filter or {}
+        selected = {
+            str(value)
+            for value in (source_ids or metadata.get("source_ids") or [])
+            if value
+        }
+        pages = {int(value) for value in metadata.get("pages", [])}
+        sections = {str(value) for value in metadata.get("sections", []) if value}
+        element_types = {
+            str(value) for value in metadata.get("element_types", []) if value
+        }
+        page_min = metadata.get("page_min")
+        page_max = metadata.get("page_max")
+
+        def matches(chunk: dict[str, Any]) -> bool:
+            page = chunk.get("page")
+            return (
+                (not selected or chunk["source_id"] in selected)
+                and (not pages or page in pages)
+                and (page_min is None or (page is not None and page >= int(page_min)))
+                and (page_max is None or (page is not None and page <= int(page_max)))
+                and (not sections or chunk.get("section") in sections)
+                and (not element_types or chunk.get("element_type") in element_types)
+            )
+
         candidates = np.asarray(
             [
                 index
                 for index, chunk in enumerate(self._chunks)
-                if not selected or chunk["source_id"] in selected
+                if matches(chunk)
             ],
             dtype=np.int32,
         )
@@ -329,13 +354,34 @@ class RetrievalOutcome:
 
 
 def reflect_query(query: str, seed_results: list[dict[str, Any]]) -> str:
-    """Expand a query after inspecting first-pass evidence, without an LLM or labels."""
-    del seed_results  # Reserved for future confidence/gap signals; avoid pseudo-feedback drift.
+    """Deterministically rewrite a weak query using glossary and first-pass metadata."""
     lowered = query.lower()
     additions: list[str] = []
     for triggers, expansion in _REFLECTION_GLOSSARY:
         if any(trigger.lower() in lowered for trigger in triggers):
             additions.append(expansion)
+    # For queries outside the curated glossary, use only compact title/section metadata from
+    # the strongest first-pass evidence. This produces an observable second query without
+    # copying passage claims or requiring an online LLM in the retrieval path.
+    if not additions and seed_results:
+        query_terms = set(tokenize(query))
+        feedback_terms: list[str] = []
+        for item in seed_results[:3]:
+            metadata = f"{item.get('title', '')} {item.get('section', '')}"
+            for term in tokenize(metadata):
+                if (
+                    len(term) > 2
+                    and term not in query_terms
+                    and term not in _QUERY_STOPWORDS
+                    and term not in feedback_terms
+                ):
+                    feedback_terms.append(term)
+                if len(feedback_terms) >= 6:
+                    break
+            if len(feedback_terms) >= 6:
+                break
+        if feedback_terms:
+            additions.append(" ".join(feedback_terms))
     return " ".join([query, *dict.fromkeys(additions)]).strip()
 
 
@@ -374,25 +420,64 @@ class RetrievalSuite:
         )
 
     def bm25(
-        self, query: str, *, top_k: int, source_ids: Iterable[str] | None = None
+        self,
+        query: str,
+        *,
+        top_k: int,
+        source_ids: Iterable[str] | None = None,
+        metadata_filter: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
         if self.backend is not None:
-            return self.backend.bm25(query, top_k=top_k, source_ids=source_ids)
-        return self.store.search(query, top_k=top_k, source_ids=source_ids)
+            return self.backend.bm25(
+                query,
+                top_k=top_k,
+                source_ids=source_ids,
+                metadata_filter=metadata_filter,
+            )
+        return self.store.search(
+            query,
+            top_k=top_k,
+            source_ids=source_ids,
+            metadata_filter=metadata_filter,
+        )
 
     def vector(
-        self, query: str, *, top_k: int, source_ids: Iterable[str] | None = None
+        self,
+        query: str,
+        *,
+        top_k: int,
+        source_ids: Iterable[str] | None = None,
+        metadata_filter: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
         if self.backend is not None:
-            return self.backend.vector(query, top_k=top_k, source_ids=source_ids)
-        return self.dense.search(query, top_k=top_k, source_ids=source_ids)
+            return self.backend.vector(
+                query,
+                top_k=top_k,
+                source_ids=source_ids,
+                metadata_filter=metadata_filter,
+            )
+        return self.dense.search(
+            query,
+            top_k=top_k,
+            source_ids=source_ids,
+            metadata_filter=metadata_filter,
+        )
 
     def hybrid(
-        self, query: str, *, top_k: int, source_ids: Iterable[str] | None = None
+        self,
+        query: str,
+        *,
+        top_k: int,
+        source_ids: Iterable[str] | None = None,
+        metadata_filter: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
         pool = max(20, top_k * 4)
-        bm25 = self.bm25(query, top_k=pool, source_ids=source_ids)
-        vector = self.vector(query, top_k=pool, source_ids=source_ids)
+        bm25 = self.bm25(
+            query, top_k=pool, source_ids=source_ids, metadata_filter=metadata_filter
+        )
+        vector = self.vector(
+            query, top_k=pool, source_ids=source_ids, metadata_filter=metadata_filter
+        )
         fused = reciprocal_rank_fusion(
             [bm25, vector],
             top_k=top_k,
@@ -410,12 +495,24 @@ class RetrievalSuite:
         return fused
 
     def reflected_hybrid(
-        self, query: str, *, top_k: int, source_ids: Iterable[str] | None = None
+        self,
+        query: str,
+        *,
+        top_k: int,
+        source_ids: Iterable[str] | None = None,
+        metadata_filter: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
         pool = max(20, top_k * 4)
-        seed = self.hybrid(query, top_k=pool, source_ids=source_ids)
+        seed = self.hybrid(
+            query, top_k=pool, source_ids=source_ids, metadata_filter=metadata_filter
+        )
         reflected = reflect_query(query, seed)
-        second_pass = self.hybrid(reflected, top_k=pool, source_ids=source_ids)
+        second_pass = self.hybrid(
+            reflected,
+            top_k=pool,
+            source_ids=source_ids,
+            metadata_filter=metadata_filter,
+        )
         return reciprocal_rank_fusion([seed, second_pass], top_k=top_k)
 
     @staticmethod
@@ -498,8 +595,9 @@ class RetrievalSuite:
         query: str,
         *,
         strategy: str = "auto",
-        top_k: int = 6,
+        top_k: int = 5,
         source_ids: Iterable[str] | None = None,
+        metadata_filter: dict[str, Any] | None = None,
         no_answer_threshold: float | None = None,
         allow_fallback: bool = True,
         rerank: bool = False,
@@ -524,7 +622,12 @@ class RetrievalSuite:
         pool = max(20, top_k * 4) if rerank else top_k
 
         try:
-            results = getattr(self, used)(query, top_k=pool, source_ids=source_ids)
+            results = getattr(self, used)(
+                query,
+                top_k=pool,
+                source_ids=source_ids,
+                metadata_filter=metadata_filter,
+            )
         except (RuntimeError, OSError, ValueError) as exc:
             if not allow_fallback:
                 raise
@@ -534,14 +637,29 @@ class RetrievalSuite:
                 # If the external retrieval plane itself is unavailable, SQLite FTS remains a
                 # useful local sparse fallback.  This keeps the Agent operational while exposing
                 # the degradation in RetrievalOutcome rather than silently changing semantics.
-                results = self.store.search(query, top_k=pool, source_ids=source_ids)
+                results = self.store.search(
+                    query,
+                    top_k=pool,
+                    source_ids=source_ids,
+                    metadata_filter=metadata_filter,
+                )
                 fallback_reason = f"sparse backend unavailable: {exc}"
             else:
                 try:
-                    results = self.bm25(query, top_k=pool, source_ids=source_ids)
+                    results = self.bm25(
+                        query,
+                        top_k=pool,
+                        source_ids=source_ids,
+                        metadata_filter=metadata_filter,
+                    )
                     fallback_reason = f"dense retrieval unavailable: {exc}"
                 except (RuntimeError, OSError, ValueError) as backend_exc:
-                    results = self.store.search(query, top_k=pool, source_ids=source_ids)
+                    results = self.store.search(
+                        query,
+                        top_k=pool,
+                        source_ids=source_ids,
+                        metadata_filter=metadata_filter,
+                    )
                     fallback_reason = (
                         f"dense retrieval unavailable: {exc}; "
                         f"sparse backend unavailable: {backend_exc}"
@@ -555,7 +673,10 @@ class RetrievalSuite:
                 reflected_query = reflect_query(query, results)
                 if reflected_query != query:
                     reflected = self.reflected_hybrid(
-                        query, top_k=pool, source_ids=source_ids
+                        query,
+                        top_k=pool,
+                        source_ids=source_ids,
+                        metadata_filter=metadata_filter,
                     )
                     reflected_confidence, reflected_signals = self._confidence(
                         "reflected_hybrid", reflected, query

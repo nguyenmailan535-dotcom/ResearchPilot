@@ -1,4 +1,4 @@
-# ResearchFlow HTTP API
+# ResearchPilot HTTP API
 
 Start the service with the same nanobot configuration used by the CLI:
 

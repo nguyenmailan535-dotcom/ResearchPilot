@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1440" height="820" viewBox="0 0 1440 820" role="img" aria-labelledby="title desc">
-  <title id="title">ResearchFlow system architecture</title>
+  <title id="title">ResearchPilot system architecture</title>
   <desc id="desc">Clients connect to an asynchronous API and SSE layer, which schedules bounded research tasks on the nanobot runtime. Research tools retrieve and verify evidence stored in SQLite, local documents, vector indexes, memory, and reports.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
@@ -25,7 +25,7 @@
     </style>
   </defs>
   <rect width="1440" height="820" rx="28" fill="url(#bg)"/>
-  <text x="64" y="67" class="title">ResearchFlow · Evidence-grounded Agent</text>
+  <text x="64" y="67" class="title">ResearchPilot · Evidence-grounded Agent</text>
   <text x="64" y="94" class="subtitle">nanobot Runtime + hybrid retrieval + verifiable citations + persistent asynchronous execution</text>
 
   <text x="64" y="145" class="section">ENTRY</text>

@@ -76,6 +76,17 @@ def test_reflection_expands_cross_language_retrieval_terms() -> None:
     assert "ULL" not in expanded
 
 
+def test_reflection_uses_first_pass_metadata_outside_curated_glossary() -> None:
+    expanded = reflect_query(
+        "checkpoint recovery",
+        [{"title": "Durable Agent Runtime", "section": "Failure Recovery"}],
+    )
+
+    assert expanded.startswith("checkpoint recovery")
+    assert "durable" in expanded.lower()
+    assert "runtime" in expanded.lower()
+
+
 def test_bge_model_initialization_is_singleton_under_concurrent_queries(monkeypatch) -> None:
     instances: list[object] = []
 

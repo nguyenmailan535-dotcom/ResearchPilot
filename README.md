@@ -110,7 +110,7 @@ cd ResearchPilot
 uv sync --all-extras
 ```
 
-安装后可以使用 `researchpilot` 命令；为兼容现有脚本，同时保留 `nanobot` 命令别名。
+安装后使用 `researchpilot` 命令管理语料、运行 Agent、启动 API 与执行评测。
 
 ### 2. 配置模型与检索服务
 

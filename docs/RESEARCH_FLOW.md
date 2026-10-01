@@ -52,11 +52,11 @@ types before either sparse or dense recall. When the caller explicitly permits e
 an insufficient local result after confidence-based Query Rewrite is routed to the configured web
 provider and clearly marked as non-RF evidence.
 The local SQLite/NumPy backend remains available for unit tests and degraded development runs.
-For a non-trivial corpus, run `nanobot research sync-index --workspace <workspace>` after ingest so
+For a non-trivial corpus, run `researchpilot research sync-index --workspace <workspace>` after ingest so
 embedding and index construction happen before the first interactive query. The Docker profile uses
 Milvus standalone with embedded etcd and local persistent storage, avoiding an external object-store
 dependency for the single-node resume/demo deployment.
-Generic conversation memory remains owned by the nanobot runtime. Citation IDs are stable
+Generic conversation memory remains owned by the ResearchPilot runtime. Citation IDs are stable
 (`RF-<source>-<chunk>`) across unchanged re-indexing.
 
 For substantial questions with independent dimensions, the main Agent can delegate two or three
@@ -82,25 +82,25 @@ ideas:
 - [Khoj](https://github.com/khoj-ai/khoj) (~37.5k stars): self-hosted personal knowledge and
   long-lived assistant context.
 
-See each upstream project's license before reusing any of its code. ResearchPilot currently uses
-only the nanobot repository's existing MIT-licensed runtime and original implementation code in
-this branch.
+See each referenced project's license before reusing any of its code. Their repositories are design
+references only and are not vendored into ResearchPilot. Third-party dependencies and inherited
+MIT-licensed code retain their original notices in `LICENSE` and dependency metadata.
 
 ## Quick start
 
 ```powershell
 # Index a folder of local PDFs and Markdown notes.
-nanobot research ingest .\papers --workspace .\demo-workspace
+researchpilot research ingest .\papers --workspace .\demo-workspace
 
 # Inspect deterministic retrieval without spending model tokens.
-nanobot research search "消息重复消费 幂等" --workspace .\demo-workspace `
+researchpilot research search "消息重复消费 幂等" --workspace .\demo-workspace `
   --strategy hybrid --no-answer-threshold 0.75
 
-# Run the normal nanobot Agent over the same workspace.
-nanobot agent --workspace .\demo-workspace
+# Run the ResearchPilot Agent over the same workspace.
+researchpilot agent --workspace .\demo-workspace
 
 # Start the API and browser UI at http://127.0.0.1:18791
-nanobot serve --host 127.0.0.1 --port 18791 --workspace .\demo-workspace
+researchpilot serve --host 127.0.0.1 --port 18791 --workspace .\demo-workspace
 ```
 
 Then ask:
@@ -113,7 +113,7 @@ identify disagreements, and save a cited recommendation for project agent-runtim
 Validate a generated report independently:
 
 ```powershell
-nanobot research verify .\demo-workspace\research\reports\message-queues.md `
+researchpilot research verify .\demo-workspace\research\reports\message-queues.md `
   --workspace .\demo-workspace
 ```
 
@@ -124,7 +124,7 @@ Run a reproducible retrieval evaluation:
 ```
 
 ```powershell
-nanobot research evaluate .\eval.jsonl --workspace .\demo-workspace --top-k 5 `
+researchpilot research evaluate .\eval.jsonl --workspace .\demo-workspace --top-k 5 `
   --output .\results\bm25.json
 ```
 
@@ -134,7 +134,7 @@ reflection on the checked-in 40-question benchmark:
 ```powershell
 pip install -e ".[research,api,eval]"
 
-nanobot research benchmark `
+researchpilot research benchmark `
   .\benchmarks\researchflow\cardinality_sketch_40.jsonl `
   --workspace .\research-demo `
   --output .\benchmarks\researchflow\results\final.json
@@ -146,11 +146,11 @@ Select a chunk configuration on the development set and calibrate abstention wit
 negative questions:
 
 ```powershell
-nanobot research chunk-ablation `
+researchpilot research chunk-ablation `
   .\benchmarks\researchflow\cardinality_sketch_40.jsonl `
   --workspace .\research-demo
 
-nanobot research calibrate-threshold `
+researchpilot research calibrate-threshold `
   .\benchmarks\researchflow\cardinality_abstention_dev_20.jsonl `
   --workspace .\research-demo --strategy hybrid
 ```
@@ -158,20 +158,20 @@ nanobot research calibrate-threshold `
 Run the independent grounded-answer evaluation:
 
 ```powershell
-nanobot research e2e-evaluate `
+researchpilot research e2e-evaluate `
   .\benchmarks\researchflow\cardinality_e2e_holdout_16.jsonl `
   --workspace .\research-demo `
   --output .\benchmarks\researchflow\results\e2e-final.json
 
 # Offline Judge over saved answers (does not regenerate the answers).
-nanobot research judge-evaluate `
+researchpilot research judge-evaluate `
   .\benchmarks\researchflow\cardinality_e2e_holdout_16.jsonl `
   .\benchmarks\researchflow\results\e2e-p0-p1-final.json `
   --workspace .\research-demo --judge-model deepseek-v4-pro `
   --output .\benchmarks\researchflow\results\judge-deepseek-v4-pro.json
 
 # Optional, more expensive Claim—Evidence semantic verification.
-nanobot research judge-evaluate `
+researchpilot research judge-evaluate `
   .\benchmarks\researchflow\cardinality_e2e_holdout_16.jsonl `
   .\benchmarks\researchflow\results\e2e-p0-p1-final.json `
   --workspace .\research-demo --judge-model deepseek-v4-pro `
@@ -196,7 +196,7 @@ docker compose -f docker-compose.research.yml --profile eval run --rm researchfl
 
 ## What is deliberately out of scope
 
-- A Feishu-specific channel. Existing nanobot channels remain compatible, but they are delivery
+- A Feishu-specific channel. Existing delivery channels remain compatible, but they are delivery
   adapters rather than the project's core contribution.
 - An online LLM judge in the serving hot path. The optional judge is evaluation-only; deterministic
   retrieval, citation, Claim/Evidence, latency and token metrics remain the primary signals.

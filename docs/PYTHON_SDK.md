@@ -1,15 +1,15 @@
-# Python SDK
+# ResearchPilot Python SDK
 
-Use nanobot programmatically — load config, run the agent, get results.
+Use ResearchPilot programmatically — load config, run the agent, get results.
 
 ## Quick Start
 
 ```python
 import asyncio
-from nanobot import Nanobot
+from nanobot import ResearchPilot
 
 async def main():
-    bot = Nanobot.from_config()
+    bot = ResearchPilot.from_config()
     result = await bot.run("What time is it in Tokyo?")
     print(result.content)
 
@@ -18,9 +18,9 @@ asyncio.run(main())
 
 ## API
 
-### `Nanobot.from_config(config_path?, *, workspace?)`
+### `ResearchPilot.from_config(config_path?, *, workspace?)`
 
-Create a `Nanobot` from a config file.
+Create a `ResearchPilot` runtime from a config file.
 
 | Param | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -111,7 +111,7 @@ class Censor(AgentHook):
 
 ```python
 import asyncio
-from nanobot import Nanobot
+from nanobot import ResearchPilot
 from nanobot.agent import AgentHook, AgentHookContext
 
 class TimingHook(AgentHook):
@@ -125,7 +125,7 @@ class TimingHook(AgentHook):
         print(f"[timing] iteration took {elapsed:.2f}s")
 
 async def main():
-    bot = Nanobot.from_config(workspace="/my/project")
+    bot = ResearchPilot.from_config(workspace="/my/project")
     result = await bot.run(
         "Explain the main function",
         hooks=[TimingHook()],

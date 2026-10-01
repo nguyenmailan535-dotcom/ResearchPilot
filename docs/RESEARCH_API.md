@@ -1,9 +1,9 @@
 # ResearchPilot HTTP API
 
-Start the service with the same nanobot configuration used by the CLI:
+Start the service with the same ResearchPilot configuration used by the CLI:
 
 ```powershell
-nanobot serve --host 127.0.0.1 --port 18791 --workspace .\research-demo
+researchpilot serve --host 127.0.0.1 --port 18791 --workspace .\research-demo
 ```
 
 The API persists task state and replayable events in the workspace SQLite database. At most two
@@ -44,7 +44,7 @@ or the `?after=<id>` query parameter. Persisted event types are `task.created`, 
 
 ## Docker
 
-Copy `.env.example` to `.env`, keep the provider credentials in the mounted nanobot
+Copy `.env.example` to `.env`, keep the provider credentials in the mounted ResearchPilot
 `config.json`, and run:
 
 ```bash

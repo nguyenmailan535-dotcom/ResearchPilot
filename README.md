@@ -15,7 +15,7 @@ ResearchPilot 面向论文与技术文档研究场景，将 Agent 多轮工具�
 交互，也可以使用 FastAPI 与 Web 工作台执行长任务并实时观察 Agent 轨迹。
 
 [系统设计](./docs/RESEARCH_FLOW.md) · [HTTP/SSE API](./docs/RESEARCH_API.md) ·
-[评测数据](./benchmarks/researchflow/README.md) · [简历与面试材料](./docs/RESUME_PROJECT.md)
+[评测数据](./benchmarks/researchflow/README.md)
 
 ![ResearchPilot 工作台](./docs/assets/researchflow-workspace.png)
 
@@ -93,10 +93,6 @@ ResearchPilot 面向论文与技术文档研究场景，将 Agent 多轮工具�
 | 引用有效率 | 100% |
 | RAGAS Faithfulness | 0.8773 |
 | RAGAS Answer Relevancy | 0.9134 |
-
-原始评测文件位于 [`benchmarks/researchflow/results`](./benchmarks/researchflow/results)。不同模型、
-索引版本和硬件产生的结果不会混用；完整口径见
-[`benchmarks/researchflow/README.md`](./benchmarks/researchflow/README.md)。
 
 ## 快速开始
 
@@ -215,7 +211,7 @@ nanobot/
 └── web/                   # 零构建 Web 工作台
 
 benchmarks/researchflow/   # 评测集、原始结果与审计记录
-docs/                      # 架构、API、简历与面试材料
+docs/                      # 架构与 API 文档
 ```
 
 ## License

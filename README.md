@@ -10,9 +10,12 @@
   </p>
 </div>
 
-ResearchPilot 面向论文与技术文档研究场景，将 Agent 多轮工具调用、长期记忆、混合检索、
-证据引用、异步任务与效果评测组织成一条完整的 Agentic RAG 工作流。系统既可以通过 CLI
-交互，也可以使用 FastAPI 与 Web 工作台执行长任务并实时观察 Agent 轨迹。
+ResearchPilot 面向专业文献研究场景，构建支持上下文管理、长期记忆、混合检索与效果评测的
+Agentic RAG 助手，用于提升多篇论文中的证据检索、信息整合与可追溯问答效率。系统既可以
+通过 CLI 交互，也可以使用 FastAPI 与 Web 工作台执行长任务并实时观察 Agent 轨迹。
+
+**技术栈：** Python、Agent Harness、Unstructured、SQLite、BGE-M3、Milvus、BM25、
+BGE-Reranker、RAGAS
 
 [系统设计](./docs/RESEARCH_FLOW.md) · [HTTP/SSE API](./docs/RESEARCH_API.md) ·
 [评测数据](./benchmarks/researchflow/README.md)
@@ -21,9 +24,9 @@ ResearchPilot 面向论文与技术文档研究场景，将 Agent 多轮工具�
 
 ## 核心能力
 
-### Agent Harness
+### Agent Runtime / Harness
 
-- 通过 `ContextBuilder → AgentRunner → ToolRegistry → Tool Execution` 组织上下文构建、模型推理、工具选择、Observation 回填与多轮迭代。
+- 通过 `ContextBuilder → AgentRunner → ToolRegistry → Tool Execution` 组织上下文构建，基于 Function Calling 完成模型推理、工具注册与分发、参数校验、Observation 回填和多轮 Agent Loop，并以迭代上限、超时与异常回传控制执行边界。
 - 统一装配 System Prompt、会话历史、Skills、Memory、Tool Schema 和用户请求，并通过 Tool Result 截断与 Skills 渐进披露控制上下文长度。
 - 使用 `HISTORY.md + MEMORY.md` 保存分层记忆；Memory Consolidation 对历史会话进行摘要压缩，并允许 Agent 主动沉淀长期信息。
 - 复杂问题可以拆分为 2-3 个只读研究子任务并发执行，由主 Agent 负责冲突处理、证据校验和最终综合。
@@ -40,7 +43,7 @@ ResearchPilot 面向论文与技术文档研究场景，将 Agent 多轮工具�
 - 支持 `bm25`、`vector`、`hybrid` 和 `reflected_hybrid` 四种检索策略。
 - BM25 与 Dense 双路召回后通过加权 RRF 融合，支持来源、页码区间、章节和元素类型过滤，默认返回 Top-5 Evidence。
 - 低置信度结果触发 Query Rewrite 与二次检索；本地证据仍不足且用户明确允许时，降级至 Tavily Web Search。
-- 可选 Cross-Encoder Reranker 用于精度优先场景；默认关闭，避免 CPU 部署下显著增加 P95 延迟。
+- 可选 BGE Cross-Encoder Reranker 用于精度优先场景；默认关闭，避免 CPU 部署下显著增加 P95 延迟。
 
 ### Evidence Grounding
 
@@ -80,19 +83,20 @@ ResearchPilot 面向论文与技术文档研究场景，将 Agent 多轮工具�
 
 ## 评测结果
 
-仓库保存了 40 条检索回归集、16 条端到端问答集以及对应原始结果，避免只展示主观 Demo。
+仓库保存了 40 条检索回归集、16 条端到端问答集以及对应原始结果。检索方案使用相同语料、
+Query、Ground Truth 与 Top-K 口径进行对照。
 
 | 指标 | BM25 | Hybrid Retrieval | 变化 |
 | --- | ---: | ---: | ---: |
-| Recall@5 | 0.4625 | 0.7125 | +54.1% |
-| MRR@5 | 0.3858 | 0.4654 | +20.6% |
+| Recall@5 | 46.25% | 71.25% | +25.00 个百分点 |
+| MRR@5 | 0.39 | 0.47 | +0.08 |
 
 | 端到端指标 | 结果 |
 | --- | ---: |
 | 任务完成率 | 100% |
 | 引用有效率 | 100% |
-| RAGAS Faithfulness | 0.8773 |
-| RAGAS Answer Relevancy | 0.9134 |
+| RAGAS Faithfulness | 0.88 |
+| RAGAS Answer Relevancy | 0.91 |
 
 ## 快速开始
 
@@ -217,3 +221,4 @@ docs/                      # 架构与 API 文档
 ## License
 
 本项目按照 [MIT License](./LICENSE) 发布。
+

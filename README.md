@@ -17,8 +17,7 @@ Agentic RAG 助手，用于提升多篇论文中的证据检索、信息整合�
 **技术栈：** Python、Agent Harness、Unstructured、SQLite、BGE-M3、Milvus、BM25、
 BGE-Reranker、RAGAS
 
-[系统设计](./docs/RESEARCH_FLOW.md) · [HTTP/SSE API](./docs/RESEARCH_API.md) ·
-[评测数据](./benchmarks/researchflow/README.md)
+[系统设计](./docs/RESEARCH_FLOW.md) · [HTTP/SSE API](./docs/RESEARCH_API.md)
 
 ![ResearchPilot 工作台](./docs/assets/researchflow-workspace.png)
 
@@ -83,8 +82,8 @@ BGE-Reranker、RAGAS
 
 ## 评测结果
 
-仓库保存了 40 条检索回归集、16 条端到端问答集以及对应原始结果。检索方案使用相同语料、
-Query、Ground Truth 与 Top-K 口径进行对照。
+评测采用包含 40 个问题的开发集和 80 个问题的独立评测集；开发集用于参数选择，评测集用于
+最终效果报告。仓库仅展示汇总指标，不公开具体问题和逐题原始结果。
 
 | 指标 | BM25 | Hybrid Retrieval | 变化 |
 | --- | ---: | ---: | ---: |
